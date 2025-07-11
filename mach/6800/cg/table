@@ -1,0 +1,2490 @@
+"$Id$"
+#define em_bsize	2	/* must be equal to EM_BSIZE */
+#define	ND	!defined($1)
+#define	D	defined($1)
+#define	BASE	240
+#define MIN	(0-BASE)
+#define MAX	(254-em_bsize-BASE)
+#define IN(x)	(x>=MIN && x<=(MAX-2))
+
+
+/*
+ * 6800 code generator
+ *
+ * word: 16bit
+ * pointer: 16bit
+ * EM_BSIZE: Number of bytes in the hole between AB and LB.
+ *           AB: Argment base, LB:Local Base
+ */
+
+EM_WSIZE = 2
+EM_PSIZE = 2
+EM_BSIZE = 2
+
+REGISTERS:
+AA = ("a",1), REG.
+BB = ("b",1), REG.
+XX = ("x",2), X16.
+AB = ("<dummy>",2,AA,BB), R16.
+
+/* AB is a registerpair, A contains the highbyte of a word and
+ * B contains the lowbyte
+ */
+
+
+TOKENS:
+IMMEDIATE 	= {INT off;} 1  "#%[off]" /* a fake token the
+					   * cgg needs one
+					   */
+
+TOKENEXPRESSIONS:
+AAA = IMMEDIATE		/* a fake tokenexpression
+			 * the cgg needs one
+			 */
+
+
+/*
+ * EM pattern '|' stack pattern '|' code '|'
+ *   stack replacement '|' EM replacement '|'
+ */
+
+CODE:
+
+/* GROUP 1 - LOAD */
+
+/* loc: load 16bit constant */
+
+loc $1==0	| |
+		allocate(R16)
+		"\tclrb"
+		"\tclra"
+					| %[a] | |
+loc ($1%256)==($1/256)	| |
+		allocate(R16)
+		"\tldab #[$1].l"
+		"\ttba"
+					| %[a] | |
+loc	 | |
+		allocate(R16)
+		"\tldab #[$1].l"
+		"\tldaa #[$1].h"
+					| %[a] | |
+
+/* ldc: load 32bit constant */
+
+ldc highw(1)==loww(1) && (loww(1)%256)==(loww(1)/256) | |
+		allocate(R16)
+		"\tldab #[%(loww(1)%)].l"
+		"\ttba"
+		"\tpshb"
+		"\tpsha"
+					| %[a] | |
+ldc	 | |
+		allocate(R16)
+		"\tldab #[%(loww(1)%)].h"
+		"\tldaa #[%(loww(1)%)].l"
+		"\tpshb"
+		"\tpsha"
+		"\tldab #[%(highw(1)%)].l"
+		"\tldaa #[%(highw(1)%)].h"
+					| %[a] | |
+
+/* lol: load local var or arg, $1==offset*/
+
+lol IN($1)	||
+		allocate(R16)
+		"\tldx LBl"
+		"\tldab $1+BASE+1,x"
+		"\tldaa $1+BASE,x"
+					| %[a] | |
+lol 	| |
+		allocate(R16)
+		"\tldab #[$1].l"
+		"\tldaa #[$1].h"
+		"\taddb LB+1"
+		"\tadca LB"
+		"\tstab TMP+1"
+		"\tstaa TMP"
+		"\tldx TMP"
+		"\tldab 1,x"
+		"\tldaa 0,x"
+					| %[a] | |
+
+/* loe: load from external address */
+loe	| |
+		allocate(R16)
+		"\tldab $1+1"
+		"\tldaa $1"
+					| %[a] | |
+
+/* lil: load indirect from local var */
+
+lil IN($1)	| |
+		allocate(R16)
+		"\tldx LBl"
+		"\tldx [BASE+$1],x"
+		"\tldab 1,x"
+		"\tldaa 0,x"
+					| %[a] | |
+lil 	| |
+		allocate(R16)
+		"ldab #[$1].l"
+		"ldaa #[$1].h"
+		"addb LB+1"
+		"adca LB"
+		"stab TMP+1"
+		"staa TMP"
+		"ldx TMP"
+		"ldx 0,x"
+		"ldab 1,x"
+		"ldaa 0,x"
+					| %[a] | |
+
+/* lof: load from address : AB=(AB) */
+
+lof $1==0	| R16 |
+		"\tstab TMP+1"
+		"\tstaa TMP"
+		"\tldx TMP"
+		"\tldab 1,x"
+		"\tldaa 0,x"
+					| %[1] | |
+lof    | |
+		allocate(R16)
+		"\taddb #[$1].l"
+		"\tadca #[$1].h"
+		"\tstab TMP+1"
+		"\tstaa TMP"
+		"\tldx TMP"
+		"\tldab 1,x"
+		"\tldaa 0,x"
+					| %[a] | |
+
+/* lal: load address local */
+lal	| |
+		allocate(R16)
+		"\tldab #[$1].l"
+		"\tldaa #[$1].h"
+		"\taddb LB+1"
+		"\tadca LB"
+					| %[a] | |
+
+/* lae: load address external */
+lae 	| |
+		allocate(R16)
+		"\tldab #[$1].l"
+		"\tldaa #[$1].h"
+					| %[a] | |
+
+/* lxl: load local base  n (255 => n > 0) static levels back.*/
+
+lxl $1==0	| |
+		allocate(R16)
+		"\tldab LB+1"
+		"\tldaa LB"
+					| %[a] | |
+lxl $1<=255	| |		/* n restricted to a max of 255 */
+		allocate(R16)
+		"\tldab #[$1].l"
+		"\tjsr Lxl"
+					| %[a] | |
+
+/* lxl: load argument base  n (255 => n > 0) static levels back.*/
+
+lxa $1==0	| |
+		allocate(R16)
+		"\tldab LB+1"
+		"\tldaa LB"
+		"\taddb #EM_BSIZE"
+		"\tadca #0"
+					| %[a] | |
+lxa $1<=255	| |		/* n restricted to a max of 255 */
+		allocate(R16)
+		"\tldab #[$1].l"
+		"\tjsr Lxa2"
+					| %[a] | |
+
+/* load indirect, $1==size */
+
+loi $1==1	| R16 |
+		"\tstab TMP+1"
+		"\tstaa TMP"
+		"\tldx TMP"
+		"\tldab 0,x"
+		"\tclra"
+					| %[1] | |
+loi $1==2	| R16 |
+		"\tstab TMP+1"
+		"\tstaa TMP"
+		"\tldx TMP"
+		"\tldab 1,x"
+		"\tldaa 0,x"
+					| %[1] | |
+loi $1==4	| R16 |
+		"\tstab TMP+1"
+		"\tstaa TMP"
+		"\tldx TMP"
+		"\tldab 3,x"
+		"\tldaa 2,x"
+		"\tpshb"
+		"\tpsha"
+		"\tldab 1,x"
+		"\tldaa 0,x"
+		"\tpshb"
+		"\tpsha"
+					| | |
+loi D		| R16 |
+		"\tstab TMP+1"
+		"\tstaa TMP"
+		"\taddb #[$1].l"
+		"\tadca #[$1].h"
+		"\tstab TMP2+1"
+		"\tstaa TMP2"
+		"\tldx TMP2"
+		"1:"
+		"\tdex"
+		"\tldab 0,x"
+		"\tpshb"
+		"\tcpx TMP"
+		"\tbne 1b"
+					| | |
+
+/* load from stack top, size==AccAB */
+
+los $1==2	| R16 |
+		"\tldx 0,x"
+		"\tins"
+		"\tins"
+		"\tstx TMP"
+		"\taddb TMP+1"
+		"\tadca TMP"
+		"\tstab TMP2+1"
+		"\tstaa TMP2"
+		"\tldx TMP2"
+		"1:"
+		"\tdex"
+		"\tldab 0,x"
+		"\tpshb"
+		"\tcpx TMP"
+		"\tbne 1b"
+					| | |
+
+ldl IND($1)	| |
+		allocate(R16)
+		"\tldx LBl"
+		"\tldab BASE+$1+3,x"
+		"\tldaa BASE+$1+2,x"
+		"\tpshb"
+		"\tpsha"
+		"\tldab BASE+$1+1,x"
+		"\tldaa BASE+$1,x"
+					| %[a] | |
+ldl	| |
+		allocate(R16)
+		"\tldab LBl+1"
+		"\tldaa LBl"
+		"\taddb #[$1].l"
+		"\tadca #[$1].h"
+		"\tstab TMP+1"
+		"\tstaa TMP"
+		"\tldx TMP"
+		"\tldab 3,x"
+		"\tldaa 2,x"
+		"\tpshb"
+		"\tpsha"
+		"\tldab 1,x"
+		"\tldaa 0,x"
+					| | |
+lde	| |
+		allocate(R16)
+		"\tldab $1+3"
+		"\tldaa $1+2"
+		"\tpshb"
+		"\tpsha"
+		"\tldab $1+1"
+		"\tldaa $1"
+					| %[a] | |
+ldf $1==0	| R16 |
+		"jsr Ldi"
+					| | |
+ldf	| |
+		allocate(R16)
+		"\tpula"
+		"\tpulb"
+		"\taddb #[$1].l"
+		"\tadca #[$1].h"
+		"\tstab TMP+1"
+		"\tstaa TMP"
+		"\tldx TMP"
+		"\tldab 3,x"
+		"\tldaa 2,x"
+		"\tpshb"
+		"\tpsha"
+		"\tldab 1,x"
+		"\tldaa 0,x"
+					| | |
+
+/* lpi: load pointer immdiate */
+
+lpi 	| |
+		allocate(R16)
+		"\tldab #[$1].l"
+		"\tldaa #[$1].h"
+					| %[a] | |
+
+
+/* GROUP 2 - STORE */
+stl IN($1)	| R16 |
+                "\tldx LBl"
+                "\tstab $1+BASE+1,x"
+                "\tstaa $1+BASE,x"
+					| | |
+stl	| |
+		allocate(R16)
+		"\tldab #[$1].l"
+		"\tldaa #[$1].h"
+		"\taddb LB+1"
+		"\tadca LB"
+		"\tstab TMP+1"
+		"\tstaa TMP"
+		"\tldx TMP"
+		"\tpula"
+		"\tpulb"
+		"\tstab 1,x"
+		"\tstaa 1,x"
+					| | |
+ste	| R16 |
+		"\tstab $1+1"
+		"\tstaa $1"
+					| | |
+sil IN($1)	| |
+		allocate(R16)
+		"\tldx LBl"
+		"\tldx BASE+$1,x"
+		"\tpula"
+		"\tpulb"
+		"\tstab 1,x"
+		"\tstaa 0,x"
+					| | |
+sil	| |
+		allocate(R16)
+		"\tldab LBl+1"
+		"\tldaa LBl"
+		"\taddb #BASE+$1"
+		"\tadca #0"
+		"\tstab TMP+1"
+		"\tstaa TMP"
+		"\tldx TMP"
+		"\tpula"
+		"\tpulb"
+		"\tstab 1,x"
+		"\tstaa 0,x"
+					| | |
+stf $1==0	| R16 |
+		"\tstab TMP+1"
+		"\tstaa TMP"
+		"\tldx TMP"
+		"\tpula"
+		"\tpulb"
+		"\tstab 1,x"
+		"\tstaa 0,x"
+					| | |
+stf	| |
+		allocate(R16)
+		"\tpula"
+		"\tpulb"
+		"\taddb #[$1].h"
+		"\tadca #[$1].l"
+		"\tstab TMP+1"
+		"\tstaa TMP"
+		"\tldx TMP"
+		"\tpula"
+		"\tpulb"
+		"\tstab 1,x"
+		"\tstaa 0,x"
+					| | |
+sti $1==1	| R16 |
+		"\tstab TMP+1"
+		"\tstaa TMP"
+		"\tldx TMP"
+		"\tpula"
+		"\tpulb"
+		"\tstab 0,x"
+					| | |
+sti $1==2	| R16 |
+		"\tstab TMP+1"
+		"\tstaa TMP"
+		"\tldx TMP"
+		"\tpula"
+		"\tpulb"
+		"\tstab 1,x"
+		"\tstaa 0,x"
+					| | |
+sti $1==4	| R16 |
+		"\tstab TMP+1"
+		"\tstaa TMP"
+		"\tldx TMP"
+		"\tpula"
+		"\tpulb"
+		"\tstab 3,x"
+		"\tstaa 2,x"
+		"\tpula"
+		"\tpulb"
+		"\tstab 1,x"
+		"\tstaa 0,x"
+					| | |
+/* TODO: pulb -> pula/pulb */
+sti D	| R16 |
+		"\tstab TMP+1"
+		"\tstaa TMP"
+		"\taddb #[$1].l"
+		"\tadca #[$1].h"
+		"\tstab TMP2+1"
+		"\tstaa TMP2"
+		"\tldx TMP"
+		"1:"
+		"\tpulb"
+		"\tstab 0,x"
+		"\tinx"
+		"\tcpx TMP2"
+		"\tbne 1b"
+					| | |
+
+/* TODO: */
+sts $1==2	| R16 |
+		"\tjsr Sts"
+					| | |
+sdl IND($1)	| R16 |
+		"\tldx Lbl"
+		"\tstab BASE+$1+1,x"
+		"\tstaa BASE+$1+0,x"
+		"\tpula"
+		"\tpulb"
+		"\tstab BASE+$1+3,x"
+		"\tstaa BASE+$1+2,x"
+					| | |
+sdl	| |
+		allocate(R16)
+		"\tldab #[$1].l"
+		"\tldaa #[$1].h"
+		"\taddb LB+1"
+		"\tadca LB"
+		"\tstab TMP+1"
+		"\tstaa TMP"
+		"\tldx TMP"
+		"\tpula"
+		"\tpulb"
+		"\tstab BASE+$1+1,x"
+		"\tstaa BASE+$1+0,x"
+		"\tpula"
+		"\tpulb"
+		"\tstab BASE+$1+3,x"
+		"\tstaa BASE+$1+2,x"
+					| | |
+sde	| R16 |
+		"\tstab $1+1"
+		"\tstaa $1"
+		"\tpula"
+		"\tpulb"
+		"\tstab $1+3"
+		"\tstaa $1+2"
+					| | |
+sdf $1==0	| R16 |
+		"\tstab TMP+1"
+		"\tstaa TMP"
+		"\tldx TMP"
+		"\tpula"
+		"\tpulb"
+		"\tstab 1,x"
+		"\tstaa 0,x"
+		"\tpula"
+		"\tpulb"
+		"\tstab 3,x"
+		"\tstaa 2,x"
+					| | |
+sdf	| |
+		allocate(R16)
+		"\ttsx"
+		"\taddb 1,x"
+		"\tadca 0,x"
+		"\tins"
+		"\tins"
+		"\tstab TMP+1"
+		"\tstaa TMP"
+		"\tldx TMP"
+		"\tpula"
+		"\tpulb"
+		"\tstab 1,x"
+		"\tstaa 0,x"
+		"\tpula"
+		"\tpulb"
+		"\tstab 3,x"
+		"\tstaa 2,x"
+					| | |
+
+
+/* GROUP 3 - INTEGER ARITHMETIC */
+
+loc lol adi (IN($2) && $3==2)	| |
+		allocate(R16)
+		"\tldx LBl"
+		"\tldab #[$1].l"
+		"\tldaa #[$1].h"
+		"\taddb BASE+$2+1,x"
+		"\tadca BASE+$2+0,x"
+					| %[a] | |
+lol loc adi	| | | | loc $2 lol $1 adi $3 |
+
+lol lol adi (IN($1) && IN($2) && $3==2) | |
+		allocate(R16)
+		"\tldx LBl"
+		"\tldab BASE+$1+1,x"
+		"\tldaa BASE+$1+0,x"
+		"\taddb BASE+$2+1,x"
+		"\tadca BASE+$2+0,x"
+					| %[a] | |
+lol loe adi (IN($1) && $3==2) | |
+		allocate(R16)
+		"\tldx LBl"
+		"\tldab BASE+$1+1,x"
+		"\tldaa BASE+$1+0,x"
+		"\taddb $2+1"
+		"\tadca $2"
+					| %[a] | |
+loe lol adi	| | | | lol $2 loe $1 adi $3 |
+loe loe adi $3==2	| |
+		allocate(R16)
+		"\tldab $1+1"
+		"\tldaa $1"
+		"\taddb $2+1"
+		"\tadca $2"
+					| %[a] | |
+loc loe adi $3==2	| |
+		allocate(R16)
+		"\tldab #[$1].l"
+		"\tldaa #[$1].h"
+		"\taddb $2+1"
+		"\tadca $2"
+					| %[a] | |
+loe loc adi 	| | | | loc $2 loe $1 adi $3 |
+ldl adi IND($1) && $2==2	| |
+		allocate(R16)
+		"\tldx LBl"
+		"\tldab BASE+$1+1,x"
+		"\tldaa BASE+$1+0,x"
+		"\taddb BASE+$1+3,x"
+		"\tadca BASE+$1+2,x"
+					| %[a] | |
+lde adi $2==2	| |
+		allocate(R16)
+		"\tldab $1+1"
+		"\tldaa $1+0"
+		"\taddb $1+3"
+		"\tadca $1+2"
+					| %[a] | |
+loc adi $2==2 | R16 |
+		"\taddb #[$1].l"
+		"\tadca #[$1].h"
+					| %[1] | |
+lol adi IN($1) && $2==2 | R16 |
+		"\tldx LBl"
+		"\tldab BASE+$1+1,x"
+		"\tldaa BASE+$1+0,x"
+					| %[1] | |
+loe adi $2==2	| R16 |
+		"\taddb $1+1"
+		"\tadca $1"
+					| %[1] | |
+lol lol adi IN($1) && !IN($2) && $3==2
+		| | | | lol $2 lol $1 adi $3 |
+adi $1==2	| R16 |
+		"\ttsx"
+		"\taddb 1,x"
+		"\tadca 0,x"
+		"\tins"
+		"\tins"
+					| %[1] | |
+adi $1==4	| |
+		allocate(R16)
+		"\ttsx"
+		"\tldab 7,x"
+		"\tldaa 6,x"
+		"\taddb 3,x"
+		"\tadca 2,x"
+		"\tstab 7,x"
+		"\tstaa 6,x"
+		"\tldab 5,x"
+		"\tldaa 4,x"
+		"\tadcb 1,x"
+		"\tadca 0,x"
+		"\tstab 5,x"
+		"\tsraa 4,x"
+		"\tins"
+		"\tins"
+		"\tins"
+		"\tins"
+					| | |
+adi ND	| R16 |
+		"\ttsta"
+		"\tbeq 1f"
+		"\tcmpb #2"
+		"\tbeq 1f"
+		"\tjsr Trap"
+		"1:"
+		"\tpula"
+		"\tpulb"
+		"\ttsx"
+		"\taddb 1,x"
+		"\tadca 0,x"
+		"\tins"
+		"\tins"
+					| %[1] | |
+loc lol sbi (IN($2) && $3==2)	| |
+		allocate(R16)
+		"\tldx LBl"
+		"\tldab #[$1].l"
+		"\tldaa #[$1].h"
+		"\tsubb BASE+$2+1,x"
+		"\tsbca BASE+$2+0,x"
+ 					| %[a] | |
+lol loc sbi	| | | | lol $1 loc 0-$2 adi $3 |
+lol lol sbi (IN($1) && IN($2) && $3==2) | |
+		allocate(R16)
+		"\tldx LBl"
+		"\tldab BASE+$1+1,x"
+		"\tldaa BASE+$1+0,x"
+		"\tsubb BASE+$2+1,x"
+		"\tsbca BASE+$2+0,x"
+					| %[a] | |
+lol loe sbi (IN($1) && $3==2) | |
+		allocate(R16)
+		"\tldx LBl"
+		"\tldab BASE+$1+1,x"
+		"\tldaa BASE+$1+0,x"
+		"\tsubb $2+1"
+		"\tsbca $2"
+					| %[a] | |
+loe lol sbi (IN($2) && $3==2) | |
+		allocate(R16)
+		"\tldx LBl"
+		"\tldab $2+1"
+		"\tldaa $2"
+		"\tsubb BASE+$1+1,x"
+		"\tsbca BASE+$1+0,x"
+					| %[a] | |
+loe loe sbi $3==2	| |
+		allocate(R16)
+		"\tldab $1+1"
+		"\tldaa $1"
+		"\tsubb $2+1"
+		"\tsbca $2"
+					| %[a] | |
+loc loe sbi $3==2	| |
+		allocate(R16)
+		"\tldab #[$1].l"
+		"\tldaa #[$1].h"
+		"\tsubb $2+1"
+		"\tsbca $2"
+					| %[a] | |
+loe loc sbi 	| | | | loe $1 loc 0-$2 adi $3 |
+ldl sbi IND($1) && $2==2	| |
+		allocate(R16)
+		"\tldx LBl"
+		"\tldab BASE+$1+3,x"
+		"\tldaa BASE+$1+2,x"
+		"\tsubb BASE+$1+1,x"
+		"\tsbca BASE+$1+0,x"
+					| %[a] | |
+lde sbi $2==2	| |
+		allocate(R16)
+		"\tldab $1+3"
+		"\tldaa $1+2"
+		"\tsubb $1+1"
+		"\tsbca $1+0"
+					| %[a] | |
+loc sbi $2==2	| R16 |
+		"\tsubb #[$1].l"
+		"\tsbca #[$1].h"
+					| %[1] | |
+lol sbi IN($1) && $2==2 | R16 |
+		"\tldx LBl"
+		"\tsubb BASE+$1+1,x"
+		"\tsbca BASE+$1+0,x"
+					| %[1] | |
+loe sbi $2==2 | R16 |
+		"\tsubb $1+1"
+		"\tsbca $1"
+					| %[1] | |
+sbi $1==2	| R16 |
+		"\tstab TMP+1"
+		"\tstaa TMP"
+		"\tpula"
+		"\tpulb"
+		"\tsubb TMP+1"
+		"\tsbca TMP"
+					| %[1] | |
+sbi $1==4	| |
+		allocate(R16)
+		"\ttsx"
+		"\tldab 3,x"
+		"\tldaa 2,x"
+		"\tsubb 7,x"
+		"\tsbca 6,x"
+		"\tstab 7,x"
+		"\tstaa 6,x"
+		"\tldab 1,x"
+		"\tldaa 0,x"
+		"\tsbcb 5,x"
+		"\tsbca 4,x"
+		"\tstab 5,x"
+		"\tstaa 4,x"
+					| | |
+sbi ND	| R16 |
+		"\ttsta"
+		"\tbeq 1f"
+		"\tcmpb #2"
+		"\tbeq 1f"
+		"\tjsr Trap"
+		"1:"
+		"\ttsx"
+		"\tldab 3,x"
+		"\tldaa 2,x"
+		"\tsubb 1,x"
+		"\tsbca 0,x"
+		"\tins"
+		"\tins"
+		"\tins"
+		"\tins"
+					| %[1] | |
+loc lol mli (IN($2) && $3==2)	| |
+		allocate(R16)
+		"\tldab #[$1].l"
+		"\tldaa #[$1].h"
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tldx Lbl"
+		"\tldab BASE+$2+1,x"
+		"\tldaa BASE+$2+0,x"
+		"jsr Mlinp"
+ 					| %[a] | |
+lol loc mli	| | | | loc $2 lol $1 mli $3 |
+lol lol mli (IN($1) && IN($2) && $3==2) | |
+		allocate(R16)
+		"\tldx Lbl"
+		"\tldab BASE+$1+1,x"
+		"\tldaa BASE+$1+0,x"
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tldab BASE+$2+1,x"
+		"\tldaa BASE+$2+0,x"
+		"jsr Mlinp"
+					| %[a] | |
+lol loe mli (IN($1) && $3==2) | |
+		allocate(R16)
+		"\tldx LBl"
+		"\tldab BASE+$1+1,x"
+		"\tldaa BASE+$1+0,x"
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tldab $2+1"
+		"\tldaa $2"
+		"jsr Mlinp"
+					| %[a] | |
+loe lol mli (IN($2) && $3==2) | | | | lol $2 loe $1 mli $3 |
+loe loe mli $3==2	| |
+		allocate(R16)
+		"ldab $1+1"
+		"ldaa $1"
+		"stab ARTH+1"
+		"staa ARTH"
+		"ldab $2+1"
+		"ldaa $2"
+		"jsr Mlinp"
+					| %[a] | |
+loc loe mli $3==2	| |
+		allocate(R16)
+		"ldab #[$1].l"
+		"ldaa #[$1].h"
+		"stab ARTH+1"
+		"staa ARTH"
+		"ldab $2+1"
+		"ldaa $2"
+		"jsr Mlinp"
+					| %[a] | |
+loe loc mli 	| | | | loc $2 loe $1 mli $3 |
+ldl mli IND($1) && $2==2	| |
+		allocate(R16)
+		"\tldx LBl"
+		"\tldab BASE+$1+1,x"
+		"\tldaa BASE+$1+0,x"
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tldab BASE+$1+3,x"
+		"\tldaa BASE+$1+2,x"
+		"jsr Mlinp"
+					| %[a] | |
+lde mli $2==2	| |
+		allocate(R16)
+		"\tldab $1+1"
+		"\tldaa $1"
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tldab $1+3"
+		"\tldaa $1+2"
+		"\tjsr Mlinp"
+					| %[a] | |
+loc mli $2==2 | R16 |
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tldab #[$1].l"
+		"\tldaa #[$1].h"
+		"\tjsr Mlinp"
+					| %[1] | |
+lol mli IN($1) && $2==2 | R16 |
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tldx Lbl"
+		"\tldab BASE+$1+1,x"
+		"\tldaa BASE+$1+0,x"
+		"\tjsr Mlinp"
+					| %[1] | |
+loe mli $2==2	| R16 |
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tldab $1+1"
+		"\tldaa $1"
+		"\tjsr Mlinp"
+					| %[1] | |
+lol lol mli IN($1) && !IN($2) && $3==2
+		| | | | lol $2 lol $1 mli $3 |
+mli $1==2	| R16 |
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tpula"
+		"\tpulb"
+		"jsr Mli2"
+					| %[1] | |
+mli $1==4	| |
+		allocate(R16)
+		"jsr Mli4"
+					| | |
+mli ND	| R16 |
+		"\ttsta"
+		"\tbeq 1f"
+		"\tcmpb #2"
+		"\tbeq 1f"
+		"\tjsr Trap"
+		"1:"
+		"\ttsx"
+		"\tldab 3,x"
+		"\tldaa 2,x"
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tpula"
+		"\tpulb"
+		"jsr Mli2"
+					| %[1] | |
+loc lol dvi (IN($2) && $3==2)	| |
+		allocate(R16)
+		"\tldx LBl"
+		"\tldab BASE+$2+1"
+		"\tldaa BASE+$2"
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tldab #[$1].l"
+		"\tldaa #[$1].h"
+		"\tjsr Dvi"
+ 					| %[a] | |
+lol loc dvi (IN($1) && $3==2)	| |
+		allocate(R16)
+		"\tldab #[$2].l"
+		"\tldaa #[$2].h"
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tldx LBl"
+		"\tldab BASE+$1+1,x"
+		"\tldaa BASE+$1+0,x"
+		"\tjsr Dvi"
+ 					| %[a] | |
+lol lol dvi (IN($1) && IN($2) && $3==2) | |
+		allocate(R16)
+		"\tldx LBl"
+		"\tldab BASE+$2+1,x"
+		"\tldaa BASE+$2+0,x"
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tldab BASE+$1+1,x"
+		"\tldaa BASE+$1+0,x"
+		"\tjsr Dvi"
+					| %[a] | |
+lol loe dvi (IN($1) && $3==2) | |
+		allocate(R16)
+		"\tldx LBl"
+		"\tldab BASE+$1+1,x"
+		"\tldaa BASE+$1+0,x"
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tldab $2+1"
+		"\tldaa $2"
+		"\tjsr Dvi"
+					| %[a] | |
+loe lol dvi (IN($2) && $3==2) | |
+		allocate(R16)
+		"\tldx LBl"
+		"\tldab BASE+$2+1,x"
+		"\tldaa BASE+$2+0,x"
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tldab $1+1"
+		"\tldaa $1"
+		"\tjsr Dvi"
+					| %[a] | |
+loe loe dvi $3==2	| |
+		allocate(R16)
+		"\tldab $2+1"
+		"\tldaa $2"
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tldab $1+1"
+		"\tldaa $1"
+		"\tjsr Dvi"
+					| %[a] | |
+loc loe dvi $3==2	| |
+		allocate(R16)
+		"ldab #[$1].l"
+		"ldaa #[$1].h"
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tldab $2+1"
+		"\tldaa $2"
+		"\tjsr Dvi"
+					| %[a] | |
+loe loc dvi $3==2	| |
+		allocate(R16)
+		"ldab #[$2].l"
+		"ldaa #[$2].h"
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tldab $1+1"
+		"\tldaa $1"
+		"\tjsr Dvi"
+					| %[a] | |
+ldl dvi IND($1) && $2==2	| |
+		allocate(R16)
+		"\tldx LBl"
+		"\tldab #BASE+$1+1,x"
+		"\tldaa #BASE+$1+0,x"
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tldab #BASE+$1+3,x"
+		"\tldaa #BASE+$1+2,x"
+		"\tjsr Dvi"
+					| %[a] | |
+lde dvi $2==2	| |
+		allocate(R16)
+		"\tldab $1+1"
+		"\tldaa $1"
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tldab $1+3"
+		"\tldaa $1+2"
+		"\tjsr Dvi"
+					| %[a] | |
+loc dvi $2==2 | R16 |
+		"\tpshb"
+		"\tpsha"
+		"ldab #[$1].l"
+		"ldaa #[$1].h"
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tpula"
+		"\tpulb"
+		"\tjsr Div"
+					| %[1] | |
+lol dvi IN($1) && $2==2 | R16 |
+		"\tldx LBl"
+		"\tpshb"
+		"\tpsha"
+		"\tldab BASE+$1+1,x"
+		"\tldaa BASE+$1+0,x"
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tpula"
+		"\tpulb"
+		"\tjsr Dvi"
+					| %[1] | |
+loe dvi $2==2	| R16 |
+		"\tpshb"
+		"\tpsha"
+		"\tldab $1+1,x"
+		"\tldaa $1+0,x"
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tpula"
+		"\tpulb"
+		"\tjsr Dvi"
+					| %[1] | |
+dvi $1==2	| R16 |
+		"jsr Dvi2"
+					| %[1] | |
+dvi $1==4	| |
+		allocate(R16)
+		"jsr Dvi4"
+					| | |
+dvi ND	| R16 |
+		"\ttsta"
+		"\tbeq 1f"
+		"\tcmpb #2"
+		"\tbeq 1f"
+		"\tjsr Trap"
+		"1:"
+		"\ttsx"
+		"\tldab 3,x"
+		"\tldaa 2,x"
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tpula"
+		"\tpulb"
+		"\tjsr Dvi2"
+					| %[1] | |
+rmi $1==2	| R16 |
+		"\tjsr Rmi2"
+					| %[1] | |
+rmi $1==4	| |
+		allocate(R16)
+		"\tjsr Rmi4"
+					| | |
+rmi ND	| R16 |
+		"\ttsta"
+		"\tbeq 1f"
+		"\tcmpb #2"
+		"\tbeq 1f"
+		"\tjsr Trap"
+		"1:"
+		"\tjsr Rmi2"
+					| %[1] | |
+ngi $1==2	| R16 |
+		"\tnega"
+		"\tnegb"
+		"\tsbca #0"
+					| %[1] | |
+ngi $1==4	| |
+		allocate(R16)
+		"\ttsx"
+		"\tjsr Ngi4"
+					| | |
+ngi ND	| R16 |
+		"\ttsta"
+		"\tbeq 1f"
+		"\tcmpb #2"
+		"\tbeq 1f"
+		"\tjsr Trap"
+		"1:"
+		"\tjsr Ngi2"
+					| %[1] | |
+sli $1==2	| R16 |
+		"\tjsr Sli2"
+					| %[1] | |
+sli $1==4	| R16 |
+		"\tjsr Sli4"
+					| | |
+sli ND	| R16 |
+		"\ttsta"
+		"\tbeq 1f"
+		"\tcmpb #2"
+		"\tbeq 1f"
+		"\tjsr Trap"
+		"1:"
+		"\tjsr Sli2"
+					| %[1] | |
+sri $1==2	| R16 |
+		"\tjsr Sri2"
+					| %[1] | |
+sri $1==4	| R16 |
+		"\tjsr Sri4"
+					| | |
+sri ND	| R16 |
+		"\ttsta"
+		"\tbeq 1f"
+		"\tcmpb #2"
+		"\tbeq 1f"
+		"\tjsr Trap"
+		"1:"
+		"\tjsr Sri2"
+					| %[1] | |
+
+
+/* GROUP 4 - UNSIGNED ARITHMETIC */
+
+loc lol adu	| | | | loc $1 lol $2 adi $3 |
+lol loc adu	| | | | lol $1 loc $2 adi $3 |
+lol lol adu	| | | | lol $1 lol $2 adi $3 |
+lol loe adu	| | | | lol $1 loe $2 adi $3 |
+loe lol adu	| | | | loe $1 lol $2 adi $3 |
+loe loe adu	| | | | loe $1 loe $2 adi $3 |
+loc loe adu	| | | | loc $1 loe $2 adi $3 |
+loe loc adu	| | | | loe $1 loc $2 adi $3 |
+ldl adu		| | | | ldl $1 adi $2 |
+lde adu		| | | | lde $1 adi $2 |
+loc adu		| | | | loc $1 adi $2 |
+lol adu		| | | | lol $1 adi $2 |
+loe adu		| | | | loe $1 adi $2 |
+adu		| | | | adi $1 |
+
+loc lol sbu	| | | | loc $1 lol $2 sbi $3 |
+lol loc sbu	| | | | lol $1 loc $2 sbi $3 |
+lol lol sbu	| | | | lol $1 lol $2 sbi $3 |
+lol loe sbu	| | | | lol $1 loe $2 sbi $3 |
+loe lol sbu	| | | | loe $1 lol $2 sbi $3 |
+loe loe sbu	| | | | loe $1 loe $2 sbi $3 |
+loc loe sbu	| | | | loc $1 loe $2 sbi $3 |
+loe loc sbu	| | | | loe $1 loc $2 sbi $3 |
+ldl sbu		| | | | ldl $1 sbi $2 |
+lde sbu		| | | | lde $1 sbi $2 |
+loc sbu		| | | | loc $1 sbi $2 |
+lol sbu		| | | | lol $1 sbi $2 |
+loe sbu		| | | | loe $1 sbi $2 |
+sbu		| | | | sbi $1 |
+
+loc lol mlu (IN($2) && $3==2)	| |
+		allocate(R16)
+		"\tldx LBl"
+		"\tldab #[$1].l"
+		"\tldaa #[$1].h"
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tldab BASE+$2+1,x"
+		"\tldaa BASE+$2+0,x"
+		"\tjsr Mlu"
+ 					| %[a] | |
+lol loc mlu	| | | | loc $2 lol $1 mlu $3 |
+lol lol mlu (IN($1) && IN($2) && $3==2) | |
+		allocate(R16)
+		"\ldx LBl"
+		"\tldab BASE+$1+1,x"
+		"\tldaa BASE+$1+0,x"
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tldab BASE+$2+1,x"
+		"\tldaa BASE+$2+0,x"
+		"\tjsr Mlu"
+					| %[a] | |
+lol loe mlu (IN($1) && $3==2) | |
+		allocate(R16)
+		"\tldx LBl"
+		"\tldab BASE+$1+1,x"
+		"\tldaa BASE+$1+0,x"
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tldab $2+1"
+		"\tldaa $2"
+		"\tjsr Mlu"
+					| %[a] | |
+loe lol mlu (IN($2) && $3==2) | | | | lol $2 loe $1 mlu $3 |
+loe loe mlu $3==2	| |
+		allocate(R16)
+		"\tldab $1+1"
+		"\tldaa $1"
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tldab $2+1"
+		"\tldaa $2"
+		"\tjsr Mlu"
+					| %[a] | |
+loc loe mlu $3==2	| |
+		allocate(R16)
+		"\tldab #[$1].l"
+		"\tldaa #[$1].h"
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tldab $1+1"
+		"\tldaa $1"
+		"\tjsr Mlu"
+					| %[a] | |
+loe loc mlu 	| | | | loc $2 loe $1 mlu $3 |
+ldl mlu IND($1) && $2==2	| |
+		allocate(R16)
+		"\tldx LBl"
+		"\tldab BASE+$1+1,x"
+		"\tldab BASE+$1+0,x"
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tldab BASE+$1+3,x"
+		"\tldab BASE+$1+2,x"
+		"\tjsr Mlu"
+					| %[a] | |
+lde mlu $2==2	| |
+		allocate(R16)
+		"\tldab $1+1"
+		"\tldaa $1+0"
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tldab $1+3"
+		"\tldaa $1+2"
+		"\tjsr Mlu"
+					| %[a] | |
+loc mlu $2==2 | R16 |
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tldab #[$1].l"
+		"\tldaa #[$1].h"
+		"\tjsr Mlu"
+					| %[1] | |
+lol mlu IN($1) && $2==2 | R16 |
+		"\tldx LBl"
+		"\tldab BASE+$1+1,x"
+		"\tldaa BASE+$1+1,x"
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tldab BASE+$1+3,x"
+		"\tldaa BASE+$1+2,x"
+		"\tjsr Mlu"
+					| %[1] | |
+loe mlu $2==2	| R16 |
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tldab $1+1"
+		"\tldaa $1"
+		"\tjsr Mul"
+					| %[1] | |
+lol lol mlu IN($1) && !IN($2) && $3==2
+		| | | | lol $2 lol $1 mlu $3 |
+mlu $1==2	| R16 |
+		"jsr Mlu2"
+					| %[1] | |
+mlu $1==4	| |
+		allocate(R16)
+		"jsr Mlu4"
+					| | |
+mlu ND	| R16 |
+		"\ttsta"
+		"\tbeq 1f"
+		"\tcmpb #2"
+		"\tbeq 1f"
+		"\tjsr Trap"
+		"1:"
+		"\tjsr Mlu2"
+					| %[1] | |
+
+loc lol dvu (IN($2) && $3==2)	| |
+		allocate(R16)
+		"\tldx LBl"
+		"\tldab BASE+$2+1,x"
+		"\tldaa BASE+$2+0,x"
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tldab #[$1].h"
+		"\tldaa #[$1].l"
+		"\tjsr Dvu"
+ 					| %[a] | |
+lol loc dvu (IN($1) && $3==2)	| |
+		allocate(R16)
+		"\tldab #[$2].l"
+		"\tldaa #[$2].h"
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tldx LBl"
+		"\tldab #BASE+$1+1,x"
+		"\tldaa #BASE+$1+0,x"
+		"\tjsr Dvu"
+ 					| %[a] | |
+lol lol dvu (IN($1) && IN($2) && $3==2) | |
+		allocate(R16)
+		"\tldx LBl"
+		"\tldab #BASE+$2+1,x"
+		"\tldaa #BASE+$2+0,x"
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tldab #BASE+$1+1,x"
+		"\tldaa #BASE+$1+0,x"
+		"\tjsr Dvu"
+					| %[a] | |
+lol loe dvu (IN($1) && $3==2) | |
+		allocate(R16)
+		"\tldx LBl"
+		"\tldab #BASE+$1+1,x"
+		"\tldaa #BASE+$1+0,x"
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tldab $2+1"
+		"\tldaa $2"
+		"\tjsr Dvu"
+					| %[a] | |
+loe lol dvu (IN($2) && $3==2) | |
+		allocate(R16)
+		"\tldx LBl"
+		"\tldab #BASE+$2+1,x"
+		"\tldaa #BASE+$2+0,x"
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tldab $1+1"
+		"\tldaa $1"
+		"\tjsr Dvu"
+					| %[a] | |
+loe loe dvu $3==2	| |
+		allocate(R16)
+		"\tldab $2+1"
+		"\tldaa $2"
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tldab $1+1"
+		"\tldaa $1"
+		"\tjsr Dvu"
+					| %[a] | |
+loc loe dvu $3==2	| |
+		allocate(R16)
+		"\tlda $2"
+		"\tlda $2+1"
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tldab #[$1].l"
+		"\tldaa #[$1].h"
+		"\tjsr Dvu"
+					| %[a] | |
+loe loc dvu $3==2	| |
+		allocate(R16)
+		"\tldab #[$2].l"
+		"\tldaa #[$2].h"
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tldab $1+1"
+		"\tldaa $1"
+		"\tjsr Dvu"
+					| %[a] | |
+ldl dvu IND($1) && $2==2	| |
+		allocate(R16)
+		"\tldx LBl"
+		"\tldab BASE+$1+1,x"
+		"\tldaa BASE+$1+0,x"
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tldab BASE+$2+1,x"
+		"\tldaa BASE+$2+0,x"
+		"\tjsr Dvu"
+					| %[a] | |
+lde dvu $2==2	| |
+		allocate(R16)
+		"\tldab $1+1"
+		"\tldaa $1"
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tldab $1+3"
+		"\tldaa $1+2"
+		"\tjsr Dvu"
+					| %[a] | |
+loc dvu $2==2 | R16 |
+		"\tpshb"
+		"\tpsha"
+		"\tldab #[$1].l"
+		"\tldaa #[$1].h"
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tpula"
+		"\tpulb"
+		"\tjsr Dvu"
+					| %[1] | |
+lol dvu IN($1) && $2==2 | R16 |
+		"\tpshb"
+		"\tpsha"
+		"\tldx LBl"
+		"\tldab BASE+$1+1,x"
+		"\tldaa BASE+$1+0,x"
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tpula"
+		"\tpulb"
+		"\tjsr Dvu"
+					| %[1] | |
+loe dvu $2==2	| R16 |
+		"\tpshb"
+		"\tpsha"
+		"\tldab $1+1"
+		"\tldaa $1"
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tpula"
+		"\tpulb"
+		"\tjsr Dvu"
+					| %[1] | |
+dvu $1==2	| R16 |
+		"\tjsr Dvu2"
+					| %[1] | |
+dvu $1==4	| |
+		allocate(R16)
+		"\tjsr Dvu4"
+					| | |
+dvu ND	| R16 |
+		"\ttsta"
+		"\tbeq 1f"
+		"\tcmpb #2"
+		"\tbeq 1f"
+		"\tjsr Trap"
+		"1:"
+		"\tjsr Dvu2"
+					| %[1] | |
+
+rmu $1==2	| R16 |
+		"\tjsr Rmu2"
+					| %[1] | |
+rmu $1==4	| |
+		allocate(R16)
+		"\tjsr Rmu4"
+					| | |
+slu	| | | | sli $1 |
+sru $1==2	| R16 |
+		"\tjsr Sru2"
+					| %[1] | |
+sru $1==4	| R16 |
+		"\tjsr Sru4"
+					| | |
+sru ND	| R16 |
+		"\ttsta"
+		"\tbeq 1f"
+		"\tcmpb #2"
+		"\tbeq 1f"
+		"\tjsr Trap"
+		"1:"
+		"\tjsr Sru2"
+					| %[1] | |
+
+
+/* GROUP 6 - POINTER ARITHMETIC */
+
+adp $1==0	| | | | |
+adp	| | | | loc $1 adi 2 |
+ads $1==2	| R16 |
+		"\ttsx"
+		"\taddb 1,x"
+		"\tadca 0,x"
+		"\tins"
+		"\tins"
+					| %[1] | |
+ads ND 	| R16 |
+		"\ttsta"
+		"\tbeq 1f"
+		"\tcmpb #2"
+		"\tbeq 1f"
+		"\tjsr Trap"
+		"1:"
+		"\ttsx"
+		"\taddb 1,x"
+		"\tadca 0,x"
+		"\tins"
+		"\tins"
+					| %[1] | |
+sbs $1==2	| R16 |
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tpula"
+		"\tpulb"
+		"\taddb ARTH+1"
+		"\tadca ARTH"
+					| %[1] | |
+sbs ND	| R16 |
+		"\ttsta"
+		"\tbeq 1f"
+		"\tcmpb #2"
+		"\tbeq 1f"
+		"\tjsr Trap"
+		"1:"
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tpula"
+		"\tpulb"
+		"\taddb ARTH+1"
+		"\tadca ARTH"
+					| %[1] | |
+
+
+/* GROUP 7 INCREMENT/DECREMENT/ZERO */
+
+inc	| R16 |
+		"\taddb #1"
+		"\tadca #0"
+					| %[1] | |
+inl IN($1)	| |
+		"\tldx LBl"
+		"\tinc BASE+$1+1,x"
+		"\tbne 1f"
+		"\tinc BASE+$1,x"
+		"1:"
+					| | |
+inl D	| |
+		allocate(R16)
+		"\tldab #[$1].l"
+		"\tldaa #[$1].h"
+		"\taddb LB+1"
+		"\tadca LB"
+		"\tstab TMP+1"
+		"\tstaa TMP"
+		"\tldx TMP"
+		"\tinc 1,x"
+		"\tbne 1f"
+		"\tinc 0,x"
+		"1:"
+					| | |
+ine	| |
+		"\tldx $1"
+		"\tinx"
+		"\tstx $1"
+					| | |
+dec	| R16 |
+		"\tsubb #1"
+		"\tsbca #0"
+					| %[1] | |
+del IN($1)	| |
+		allocate(R16)
+		"\tldx LBl"
+		"\tldab BASE+$1+1,x"
+		"\tldaa BASE+$1+0,x"
+		"\tsubb #1"
+		"\tsbca #0"
+		"\tstab BASE+$1+1,x"
+		"\tstaa BASE+$1+0,x"
+					| | |
+del	| |
+		allocate(R16)
+		"\tldab #[$1].l"
+		"\tldaa #[$1].h"
+		"\taddb LB+1"
+		"\tadca LB"
+		"\tstab TMP+1"
+		"\tstaa TMP"
+		"\tldx TMP"
+		"\tldab 1,x"
+		"\tldaa 0,x"
+		"\tsubb #1"
+		"\tsbca #0"
+		"\tstab 1,x"
+		"\tstaa 0,x"
+					| | |
+dee 	| |
+		"\tldx $1"
+		"\tdex"
+		"\tstx $1"
+					| | |
+zrl IN($1)	| |
+		"\tldx LBl"
+		"\tclr BASE+$1+1,x"
+		"\tclr BASE+$1+0,x"
+					| | |
+zrl	| |
+		allocate(R16)
+		"\tldab #[$1].l"
+		"\tldaa #[$1].h"
+		"\taddb LB+1"
+		"\tadca LB"
+		"\tstab TMP+1"
+		"\tstaa TMP"
+		"\tldx TMP"
+		"\tclr 1,x"
+		"\tclr 0,x"
+					| | |
+zre	| |
+		"\tclr $1+1"
+		"\tclr $1"
+					| | |
+zer $1==2	| |
+		allocate(R16)
+		"\tclrb"
+		"\tclra"
+					| %[a] | |
+zer $1==4	| |
+		allocate(R16)
+		"\tclrb"
+		"\tclra"
+		"\tpshb"
+		"\tpsha"
+					| %[a] | |
+zer $1>0 && $1<=256	| |
+		allocate(R16)
+		"\tclra"
+		"\tldab $1"
+		"\tlsrb"
+		"\tincb"
+		"1:"
+		"\tpsha"
+		"\tpsha"
+		"\tdecb"
+		"\tbne 1b"
+					| | |
+
+
+/* GROUP 8 - CONVERT (stack: source, source size, dest. size (top)) */
+
+loc loc cii $1==1 && $2==2	| R16 |
+		"\tclra"
+		"\tasrb"
+		"\taslb"
+		"\tsbca #0"
+					| %[1] | |
+cii 	| R16 |
+		"jsr Cii"
+					| | |
+cui 	| | | | cii |
+ciu	| | | | cii |
+cuu 	| | | | cii |
+loc loc cui $1==$2	| | | | |
+loc loc ciu $1==$2	| | | | |
+loc loc cuu $1==2 && $2==4 | | | | loc 0 |
+
+
+/* GROUP 9 - LOGICAL */
+
+and $1==2	| R16 |
+		"\ttsx"
+		"\tandb 1,x"
+		"\tanda 0,x"
+		"\tins"
+		"\tins"
+					| %[1] | |
+and ND	| R16 |
+		"\tins"
+		"\tins"
+		"\ttsx"
+		"\tstx ADDR"
+		"\taslb"
+		"\trola"
+		"\taddb ADDR+1"
+		"\tadca ADDR"
+		"\tstab ADDR+3"
+		"\tstaa ADDR+2"
+		"\tldx ADDR+2"
+		"1:"
+		"\tpulb"
+		"\tandb 0,x"
+		"\tstab 0,x"
+		"\tinx"
+		"\tcpx ADDR+2"
+		"\tbne 1b"
+					| | |
+ior $1==2	| R16 |
+		"\ttsx"
+		"\torab 1,x"
+		"\toraa 0,x"
+		"\tins"
+		"\tins"
+					| %[1] | |
+ior ND	| R16 |
+		"\tins"
+		"\tins"
+		"\ttsx"
+		"\tstx ADDR"
+		"\taslb"
+		"\trola"
+		"\taddb ADDR+1"
+		"\tadca ADDR"
+		"\tstab ADDR+3"
+		"\tstaa ADDR+2"
+		"\tldx ADDR+2"
+		"1:"
+		"\tpulb"
+		"\torab 0,x"
+		"\tstab 0,x"
+		"\tinx"
+		"\tcpx ADDR+2"
+		"\tbne 1b"
+					| | |
+xor $1==2	| R16 |
+		"\ttsx"
+		"\teorb 1,x"
+		"\teora 0,x"
+		"\tins"
+		"\tins"
+					| %[1] | |
+xor ND	| R16 |
+		"\tins"
+		"\tins"
+		"\ttsx"
+		"\tstx ADDR"
+		"\taslb"
+		"\trola"
+		"\taddb ADDR+1"
+		"\tadca ADDR"
+		"\tstab ADDR+3"
+		"\tstaa ADDR+2"
+		"\tldx ADDR+2"
+		"1:"
+		"\tpulb"
+		"\teorb 0,x"
+		"\tstab 0,x"
+		"\tinx"
+		"\tcpx ADDR+2"
+		"\tbne 1b"
+					| | |
+com $1==2	| R16 |
+		"\tcomb"
+		"\tcoma"
+					| %[1] | |
+com ND	| R16 |
+		"\ttsx"
+		"\tstx ADDR"
+		"\taddb ADDR+1"
+		"\tadca ADDR"
+		"\tstab ADDR+3"
+		"\tstaa ADDR+2"
+		"1:"
+		"\tcom 0,x"
+		"\tinx"
+		"\tcpx ADDR+2"
+		"\tbne 1b"
+					| | |
+rol $1==2	| R16 |
+		"\taslb"
+		"\trola"
+					| %[1] | |
+rol $1==4	| R16 |
+		"\ttsx"
+		"\tasl 1,1"
+		"\trol 0,1"
+		"\trolb"
+		"\trola"
+					| | |
+rol ND	| R16 |
+		"\ttsx"
+		"\tstx ADDR"
+		"\taddb ADDR+1"
+		"\tadca ADDR"
+		"\tstab ADDR+3"
+		"\tstaa ADDR+2"
+		"\tldx ADDR+2"
+		"\tclc"
+		"1:"
+		"\tdex"
+		"\trol 0,x"
+		"\tcpx ADDR"
+		"\tbne 1b"
+					| %[1] | |
+ror $1==2	| R16 |
+		"\tasra"
+		"\trorb"
+					| %[1] | |
+ror $1==4	| R16 |
+		"\ttsx"
+		"\tasra"
+		"\trorb"
+		"\tror 0,x"
+		"\tror 1,x"
+					| | |
+ror ND	| R16 |
+		"\ttsx"
+		"\tstx ADDR"
+		"\taddb ADDR+1"
+		"\tadca ADDR"
+		"\tstab ADDR+3"
+		"\tstaa ADDR+2"
+		"\tclc"
+		"1:"
+		"\tror 0,x"
+		"\tinx"
+		"\tcpx ADDR+2"
+		"\tbne 1b"
+					| %[1] | |
+
+
+/* GROUP 10 - SETS */
+
+/* if bit $1 is on, AB=1 else AB=0 */
+
+loc inn $1<0 && $2==2	| R16 |
+		"\tclrb"
+		"\tclra"
+					| %[1] | |
+loc inn	$2==2 && $1==0	| R16 |
+		"\andb #1"
+		"\tclra"
+					| %[1] | |
+loc inn	$2==2 && $1>0 && $1<16	| R16 |
+		"\tldx #$1"
+		"1:"
+		"\tlsra"
+		"\trorb"
+		"\tdex"
+		"\tbne 1b"
+		"\tandb #1"
+		"\tclra"
+					| %[1] | |
+loc inn zeq $1>0 && $1<16 && $2==2	| R16 |
+		"\tldx #$1"
+		"1:"
+		"\tlsra"
+		"\trorb"
+		"\tdex"
+		"\tbne 1b"
+		"\tandb #1"
+		"\tbeq $3 ! ???"
+					| | |
+loc inn zne $1>0 && $1<16 && $2==2	| R16 |
+		"\tldx #$1"
+		"1:"
+		"\tlsra"
+		"\trorb"
+		"\tdex"
+		"\tbne 1b"
+		"\tandb #1"
+		"\tbne $3 ! ???"
+					| | |
+inn $1==2	| R16 |
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tldx ARTH"
+		"\tpula"
+		"\tpulb"
+		"1:"
+		"\tlsra"
+		"\trorb"
+		"\tdex"
+		"\tbne 1b"
+		"\tandb #1"
+		"\tclra"
+				| %[1] | |
+inn zeq $1==2	| R16 |
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tldx ARTH"
+		"\tpula"
+		"\tpulb"
+		"1:"
+		"\tlsra"
+		"\trorb"
+		"\tdex"
+		"\tbne 1b"
+		"\tandb #1"
+		"\tbeq $2"
+				| %[1] | |
+inn zne $1==2	| R16 |
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tldx ARTH"
+		"\tpula"
+		"\tpulb"
+		"1:"
+		"\tlsra"
+		"\trorb"
+		"\tdex"
+		"\tbne 1b"
+		"\tandb #1"
+		"\tbne $2"
+				| %[1] | |
+inn $1<=256	| R16 |
+		"\tldx #$1-1"
+		"\tjsr Inn"
+					| %[1] | |
+inn ND	| R16 |
+		"jsr TestFFh"
+		"\tpula"
+		"\tpulb"
+		"\tjsr Inn"
+					| %[1] | |
+loc set $2==2 && $1>=0 && $1<16	| |
+		allocate(R16)
+		"\tldx #$1"
+		"\tclrb"
+		"\tclra"
+		"\tsec"
+		"1:"
+		"\trolb"
+		"\trola"
+		"\tdex"
+		"bne 1b"
+					| %[a] | |
+set $1==2	| R16 |
+		"\tstab ARTH+1"
+		"\tstaa ARTH"
+		"\tldx ARTH"
+		"\tclrb"
+		"\tclra"
+		"\tsec"
+		"1:"
+		"\trolb"
+		"\trola"
+		"\tdex"
+		"\tbne 1b"
+					| %[1] | |
+set $1<=256	| R16 |
+		"\tldx #$1-1"
+		"\tjsr Set"
+					| | |
+set ND	| R16 |
+		"\tjsr TestFFh"
+		"\tjsr Pop"
+		"\tjsr Set"
+					| | |
+
+
+/* GROUP 11 - ARRAY */
+
+lae lar defined(rom(1,3)) | | | | lae $1 aar $2 loi rom(1,3) |
+lar $1==2	| R16 |
+		"\tjsr Lar"
+					| | |
+lar ND	| R16 |
+		"\ttsta"
+		"\tbeq 1f"
+		"\tcmpb #2"
+		"\tbeq 1f"
+		"\tjsr Trap"
+		"1:"
+		"\tjsr Lar"
+					| | |
+lae sar defined(rom(1,3)) | | | | lae $1 aar $2 sti rom(1,3) |
+sar $1==2	| R16 |
+		"\tjsr Sar"
+					| | |
+sar ND	| R16 |
+		"\ttsta"
+		"\tbeq 1f"
+		"\tcmpb #2"
+		"\tbeq 1f"
+		"\tjsr Trap"
+		"1:"
+		"\tjsr Sar"
+					| | |
+lae aar $2==2 && rom(1,3)==1 && rom(1,1)==0 | | | | adi 2 |
+lae aar $2==2 && rom(1,3)==1 && rom(1,1)!=0 | |
+				    | | adi 2 adp 0-rom(1,1) |
+lae aar $2==2 && rom(1,3)==2 && rom(1,1)==0 | R16 |
+		"\taslb"
+		"\trola"
+					| %[1] | adi 2 |
+lae aar $2==2 && rom(1,3)==2 && rom(1,1)!=0 | R16 |
+		"\taslb"
+		"\trola"
+				    | %[1] | adi 2 adp (0-rom(1,1))*2 |
+lae aar $2==2 && rom(1,3)>2 && rom(1,1)==0 | |
+					| | loc rom(1,3) mli 2 adi 2 |
+lae aar $2==2 && rom(1,3)>2 && rom(1,1)!=0 | |
+		| | loc rom(1,3) mli 2 adi 2 adp (0-rom(1,1))*rom(1,3) |
+aar $1==2	| R16 |
+		"\tjsr Aar"
+					| %[1] | |
+aar ND	| R16 |
+		"\ttsta"
+		"\tbeq 1f"
+		"\tcmpb #2"
+		"\tbeq 1f"
+		"\tjsr Trap"
+		"1:"
+		"\tjsr Aar"
+					| %[1] | |
+
+
+/* GROUP 12 - COMPARE */
+
+cmi $1==2	| R16 |
+		"\tjsr Cmi"
+					| %[1] | |
+cmi $1==4	| |
+		allocate(R16)
+		"\tjsr Cmi4"
+					| %[a] | |
+cmi ND	| R16 |
+		"\ttsta"
+		"\tbeq 1f"
+		"\tcmpb #2"
+		"\tbeq 1f"
+		"\tjsr Trap"
+		"1:"
+		"\tjsr Cmi"
+					| %[1] | |
+cmu $1==2	| R16 |
+		"\tjsr Cmu2"
+					| %[1] | |
+cmu $1==4	| |
+		allocate(R16)
+		"\tjsr Cmu4"
+					| %[a] | |
+cmu ND	| R16 |
+		"\ttsta"
+		"\tbeq 1f"
+		"\tcmpb #2"
+		"\tbeq 1f"
+		"\tjsr Trap"
+		"1:"
+		"\tjsr Cmu"
+					| | |
+cmp	| |
+					| | cmu 2 |
+cms $1==2	| |
+		allocate(R16)
+		"\tldx #2"
+		"\tjsr Cms"
+					| %[a] | |
+cms $1==4	| |
+		allocate(R16)
+		"\tldx #4"
+		"\tjsr Cms"
+					| %[a] | |
+cms ND	| R16 |
+		"\tjsr TestFFh"
+		"\tinx"
+		"\tjsr Cms"
+					| %[1] | |
+tlt	| R16 |
+		"\tjsr Tlt"
+					| %[1] | |
+tle	| R16 |
+		"\tjsr Tle"
+					| %[1] | |
+teq	| R16 |
+		"\tjsr Teq"
+					| %[1] | |
+tne	| R16 |
+		"\tjsr Tne"
+					| %[1] | |
+tge	| R16 |
+		"\tjsr Tge"
+					| %[1] | |
+tgt	| R16 |
+		"\tjsr Tgt"
+					| %[1] | |
+
+
+/* GROUP 13 - BRANCH */
+
+bra	| |
+		remove(ALL)
+		"\tjmp $1"
+					| | |
+
+blt	| R16 |
+		"\tjsr Sbi2"
+		"\tbmi $1"
+					| | |
+ble	| R16 |
+		"\tjsr Sbi2"
+		"\tbmi $1"
+		"\tbne 1f"
+		"\ttxa"
+		"\tbeq $1\n1:"
+					| | |
+beq	| R16 |
+		"\tstab BRANCH+1"
+		"\tstaa BRANCH"
+		"\tpula"
+		"\tpulb"
+		"\tcmpb BRANCH+1"
+		"\tbne 1f"
+		"\tcmpa BRANCH"
+		"\tbeq $1\n1:"
+					| | |
+bne	| R16 |
+		"\tstab BRANCH+1"
+		"\tstxb BRANCH"
+		"\tpula"
+		"\tpulb"
+		"\tcmpb BRANCH+1"
+		"\tbne $1"
+		"\tcmpa BRANCH"
+		"\tbne $1"
+					| | |
+bge	| R16 |
+		"\tjsr Sbi2"
+		"\tbpl $1"
+					| | |
+bgt	| R16 |
+		"\tjsr Sbi2"
+		"\tbmi 1f"
+		"\tbne $1"
+		"\ttstb"
+		"\tbne $1\n1:"
+					| | |
+
+cmi zlt $1==2 | | | | blt $2 |
+cmp zlt	| | | | blt $2 |
+zlt	| R16 |
+		"\ttsta"
+		"\tbmi $1"
+					| | |
+cmi zle $1==2 | | | | ble $2 |
+cmp zle | | | | ble $2 |
+zle	| R16 |
+		"\ttsta"
+		"\tbmi $1"
+		"\tbne 1f"
+		"\ttstb"
+		"\tbeq $1\n1:"
+					| | |
+cmi zeq $1==2 | | | | beq $2 |
+cmp zeq | | | | beq $2 |
+cms zeq $1==2 | | | | beq $2 |
+zeq	| R16 |
+		"\ttstb"
+		"\tbne 1f"
+		"\ttsta"
+		"\tbeq $1\n1:"
+					| | |
+cmi zne $1==2 | | | | bne $2 |
+cmp zne | | | | bne $2 |
+cms zne $1==2 | | | | bne $2 |
+zne	| R16 |
+		"\ttsta"
+		"\tbne $1"
+		"\ttstb"
+		"\tbne $1"
+					| | |
+cmi zge $1==2 | | | | bge $2 |
+cmp zge | | | | bge $2 |
+zge	| R16 |
+		"\ttsta"
+		"\tbpl $1"
+					| | |
+cmi zgt $1==2 | | | | bgt $2 |
+cmp zgt | | | | bgt $2 |
+zgt	| R16 |
+		"\ttsta"
+		"\tbmi 1f"
+		"\tbne $1"
+		"\ttstb"
+		"\tbne $1\n1:"
+					| | |
+
+
+/* GROUP 14 - PROCEDURE CALL */
+
+cai	| R16 |
+		"\tstab ADDR+1"
+		"\tstaa ADDR"
+		"\tldx ADDR"
+		"\tjsr 0,x"
+					| | |
+cal	| |
+		remove(ALL)
+		"\tjsr $1"
+					| | |
+lfr $1==2 | |
+		allocate(R16)
+		"\tldab RETURN+1"
+		"\tldaa RETURN"
+					| %[a] | |
+lfr $1==4 | |
+		allocate(R16)
+		"\tldab RETURN+3"
+		"\tldaa RETURN+2"
+		"\tpshb"
+		"\tpsha"
+		"\tldab RETURN+1"
+		"\tldaa RETURN"
+		"\tpshb"
+		"\tpsha"
+					| | |
+lfr ret $1==$2	| | | | ret 0 |
+asp lfr ret $2==$3 | | | | ret 0 |
+ret $1==0 | |
+		allocate(R16)
+		"\trts"
+					| | |
+ret $1==2 | |
+		allocate(R16)
+		"\tpula"
+		"\tpulb"
+		"\tstab RETURN+1"	
+		"\tstaa RETURN"	
+		"\trts"
+					| | |
+ret $1==4 	| |
+		allocate(R16)
+		"\tpula"
+		"\tpulb"
+		"\tstab RETURN+1"	
+		"\tstaa RETURN"	
+		"\tpula"
+		"\tpulb"
+		"\tstab RETURN+3"	
+		"\tstaa RETURN+2"	
+					| | |
+
+
+/* GROUP 15 - MISCELLANOUS */
+
+asp	| |
+		allocate(R16)
+		"\tldab #[$1].l"
+		"\tldaa #[$1].h"
+		"\tsts TMP"
+		"\taddb TMP+1"
+		"\tadca TMP"
+		"\tstab TMP+1"
+		"\tstaa TMP"
+		"\tlds TMP"
+					| | |
+ass $1==2	| R16 |
+		"\tjsr Asp"
+					| | |
+ass ND	| R16 |
+		"\ttsta"
+		"\tbeq 1f"
+		"\tcmpb #2"
+		"\tbeq 1f"
+		"\tjsr Trap"
+		"1:"
+		"\tpula"
+		"\tpulb"
+		"\tjsr Asp"
+					| | |
+blm $1==0	| | | | asp 4 |
+blm D	| R16 |
+		"\tstab ADDR+3"
+		"\tstaa ADDR+2"
+		"\tpula"
+		"\tpulb"
+		"\tstab ADDR+1"
+		"\tstaa ADDR"
+		"\tldab #[$1].l"
+		"\tstab NBYTES+1"
+		"\tldaa #[$1].h"
+		"\tstaa NBYTES"
+		"\tjsr Blm"
+					| | |
+bls $1==2	| R16 |
+		"\tstab NBYTES+1"
+		"\tstaa NBYTES"
+		"\tpula"
+		"\tpulb"
+		"\tstab ADDR+3"
+		"\tstaa ADDR+2"
+		"\tpula"
+		"\tpulb"
+		"\tstab ADDR+1"
+		"\tstaa ADDR"
+		"\tjsr Blm"
+					| | |
+bls ND	| R16 |
+		"\ttsta"
+		"\tbeq 1f"
+		"\tcmpb #2"
+		"\tbeq 1f"
+		"\tjsr Trap"
+		"1:"
+		"\tstab NBYTES+1"
+		"\tstaa NBYTES"
+		"\tpula"
+		"\tpulb"
+		"\tstab ADDR+3"
+		"\tstaa ADDR+2"
+		"\tpula"
+		"\tpulb"
+		"\tstab ADDR+1"
+		"\tstaa ADDR"
+		"\tjsr Blm"
+					| | |
+csa	| R16 |
+		"\tjmp Csa"
+					| | |
+csb	| R16 |
+		"\tjmp Csb"
+					| | |
+dch	| | | | loi 2 |
+dup $1==2	| R16 |
+		"\tpshb"
+		"\tpsha"
+					| %[1] | |
+dup $1<=256	| |
+		allocate(R16)
+		"\tldx #[$1]"
+		"\tjsr Dup"
+					| | |
+dus $1==2	| R16 |
+		"\tjsr TestFFh"
+		"\tjsr Dup"
+					| | |
+exg $1==2	| R16 |
+		"\tjsr Exg2"
+					| %[1] | |
+exg $1<=255	| |
+		allocate(R16)
+		"\tldx #$1"
+		"\tjsr Exg"
+					| | |
+fil	| |
+		"\tldx #[$1]"
+		"\tstx hol0+4"
+					| | |
+gto	| |
+		allocate(R16)
+		"\tldx #[$1]"
+		"\tjmp Gto"
+					| | |
+lim	| |
+		allocate(R16)
+		"\tldab IGNMASK+1"
+		"\tldaa IGNMASK"
+					| %[a] | |
+lin	| |
+		"\tldx #[$1]"
+		"\tstx hol0"
+					| | |
+lni	| |
+		"\tldx hol0"
+		"\tinx"
+		"\tstx hol0"
+					| | |
+lor $1==0	| |
+		allocate(R16)
+		"\tldab LB+1"
+		"\tldaa LB"
+					| %[a] | |
+lor $1==1	| |
+		allocate(R16)
+		"\ttsx"
+		"\tstx TMP"
+		"\tldab TMP+1"
+		"\tldaa TMP"
+					| %[a] | |
+lor $1==2	| |
+		allocate(R16)
+		"\tldab HP+1"
+		"\tldaa HP"
+					| %[a] | |
+lpb	| | | | adp 2 |
+mon	| R16 |
+		"\tjsr Mon"
+					| %[1] | |
+nop	| STACK |
+#ifdef DEBUG
+		allocate(R16)
+		"\tjsr Printstack"
+#endif
+					| | |
+rck	| R16 | | | |
+rtt	| |
+		remove(ALL)
+		"\tjmp Rtt"
+					| | |
+sig 	| R16 |
+		"\tdes"
+		"\tdes"
+		"\ttsx"
+		"\tpshb"
+		"\tpsha"
+		"\tldab ERRPROC+1"
+		"\tldaa ERRPROC"
+		"\tstab 3,x"
+		"\tstaa 2,x"
+		"\tpula"
+		"\tpulb"
+		"\tstab ERRPROC+1"
+		"\tstaa ERRPROC"
+					| | |
+sim	| R16 |
+		"\tstab IGNMASK+1"
+		"\tstaa IGNMASK"
+					| | |
+str $1==0	| R16 |
+		"\tstab LB+1"
+		"\tstaa LB"
+		"\tsubb #BASE"
+		"\tsbca #0"
+		"\tstab LBl+1"
+		"\tstaa LBl"
+					| | |
+str $1==1	| R16 |
+		"\tstab TMP+1"
+		"\tstaa TMP"
+		"\tldx TMP"
+		"\ttxs"
+					| | |
+str $1==2	| R16 |
+		"\tstab HP+1"
+		"\tstaa HP"
+					| | |
+trp	| R16 |
+		"\tjsr Trap"
+					| | |
+lol lal sti $1==$2 && $3==1 | | | | | /* throw away funny C-proc-prolog */
+
+	| STACK |
+		allocate(R16)
+		"\tpula"
+		"\tpulb"
+					| %[a] | |
+
+/* FLOATING POINT
+ * Every EM floating point instruction is translated
+ * into a library call. At present, these library
+ * routines generate an 'Illegal EM instruction' trap.
+ */
+
+
+adf $1==4	| STACK |
+		"\tjsr Adf4"
+					| | |
+adf $1==8	| STACK |
+		"\tjsr Adf8"		| | |
+
+sbf $1==4	| STACK |
+		"\tjsr Sbf4"
+					| | |
+sbf $1==8	| STACK |
+		"\tjsr Sbf8"		| | |
+
+mlf $1==4	| STACK |
+		"\tjsr Mlf4"
+					| | |
+mlf $1==8	| STACK |
+		"\tjsr Mlf8"		| | |
+
+dvf $1==4	| STACK |
+		"\tjsr Dvf4"
+					| | |
+dvf $1==8	| STACK |
+		"\tjsr Dvf8"		| | |
+
+ngf $1==4	| STACK |
+		"\tjsr Ngf4"
+					| | |
+ngf $1==8	| STACK |
+		"\tjsr Ngf8"		| | |
+
+zrf $1==4	| STACK |
+		"\tjsr Zrf4"
+					| | |
+zrf $1==8	| STACK |
+		"\tjsr Zrf8"		| | |
+
+cmf $1==4	| STACK |
+		"\tjsr Cmf4"
+					| | |
+cmf $1==8	| STACK |
+		"\tjsr Cmf8"		| | |
+
+fef $1==4	| STACK |
+		"\tjsr Fef4"
+					| | |
+fef $1==8	| STACK |
+		"\tjsr Fef8"		| | |
+
+fif $1==4	| STACK |
+		"\tjsr Fif4"
+					| | |
+fif $1==8	| STACK |
+		"\tjsr Fif8"		| | |
+
+cfi 		| STACK |
+		"\tjsr Cfi"		| | |
+
+cif 		| STACK |
+		"\tjsr Cif"		| | |
+
+cuf 		| STACK |
+		"\tjsr Cuf"		| | |
+
+cff 		| STACK |
+		"\tjsr Cff"		| | |
+
+cfu 		| STACK |
+		"\tjsr Cfu"		| | |
+
+lfr $1==8	| STACK |
+		"\tjsr Lfr8"		| | |
+
+ret $1==8	| STACK |
+		"\tjmp Ret8"		| | |
+
+/*************\
+*  M O V E S  *
+\*************/
+
+MOVES:  (AAA,AAA,"nop")
+
+STACKS:  (R16, , "\tjsr Push")
