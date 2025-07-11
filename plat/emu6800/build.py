@@ -6,7 +6,7 @@ import importlib
 
 build_as = importlib.import_module("mach.proto.as.build").build_as
 
-cflags = ["-DUSE_I80_RSTS"]
+cflags = ["-DMC6800"]
 
 build_as(name="as", arch="6800")
 build_cg(name="cg", arch="6800")
