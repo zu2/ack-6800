@@ -8,8 +8,8 @@ build_as = importlib.import_module("mach.proto.as.build").build_as
 
 cflags = ["-DMC6800"]
 
-build_as(name="as", arch="6800")
-build_cg(name="cg", arch="6800")
+build_as(name="as", arch="mc6800")
+build_cg(name="cg", arch="mc6800")
 #build_plat_libs(name="plat_libs", arch="6800", plat="emu6800")
 
 ackcfile(name="boot", srcs=["./boot.s"], plat="emu6800", cflags=cflags)
