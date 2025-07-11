@@ -1,3 +1,24 @@
+# ack-6800
+
+Porting of the Amsterdam Compiler Kit to the Motorola MC6800 is underway.
+The intended environment is emu6800 from the Fuzix Compiler Kit.
+
+## Current status
+
+The system is not operational at this stage.
+
+## TODO
+
+- Addition of essential source files under mach/6800/
+- Addition of essential source files under plat/emu6800/
+- Adjustment of the build process to allow compilation with ack -memu6800 (execution is not yet possible).
+- Enabling compilation of a main function that performs no operations.
+- Further development of remaining components.
+
+The following is the original README.
+( https://github.com/davidgiven/ack/blob/default/README )
+----
+----
                       THE AMSTERDAM COMPILER KIT V6.2+
                       ================================
 
