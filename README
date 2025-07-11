@@ -15,6 +15,27 @@ The system is not operational at this stage.
 - Enabling compilation of a main function that performs no operations.
 - Further development of remaining components.
 
+## Install & compile
+
+To join the development, please follow the steps below to test code generation. The environment is assumed to be Ubuntu Linux.
+
+Output is currently limited to assembler source; execution is not functional at this stage.
+
+Handling many files may lead to a shortage of i-nodes. It is recommended to use a larger disk. I am using 64GB in my setup.
+
+$ sudo apt install git make gcc pkg-config lua5.4 flex bison
+$ git clone https://github.com/zu2/ack-6800.git
+$ cd ack-6800
+$ make
+(debug:  make V=1 -j1)
+$ sudo make install
+$ export PATH=/opt/pkg/ack/bin:$PATH
+$ cd examples
+$ ack -memu6800 -c.s mandelbrot.c
+
+
+
+
 The following is the original README.
 ( https://github.com/davidgiven/ack/blob/default/README )
 ----
