@@ -9,7 +9,8 @@ The system is not operational at this stage.
 
 ## TODO
 
-- Addition of essential source files under mach/6800/
+- Addition of essential source files under mach/mc6800/
+  - change directory name mach/6800 to mach/mc6800
 - Addition of essential source files under plat/emu6800/
 - Adjustment of the build process to allow compilation with ack -memu6800 (execution is not yet possible).
 - Enabling compilation of a main function that performs no operations.
@@ -28,7 +29,7 @@ $ git clone https://github.com/zu2/ack-6800.git
 $ cd ack-6800
 $ make
 (debug:  make V=1 -j1)
-$ sudo make install
+$ make install
 $ export PATH=/opt/pkg/ack/bin:$PATH
 $ cd examples
 $ ack -memu6800 -c.s mandelbrot.c

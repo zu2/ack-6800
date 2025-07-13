@@ -64,8 +64,9 @@ loc ($1%256)==($1/256)	| |
 		"\tldab #[$1].l"
 		"\ttba"
 					| %[a] | |
-loc	 | |
+loc 	 | |
 		allocate(R16)
+		"! loc"
 		"\tldab #[$1].l"
 		"\tldaa #[$1].h"
 					| %[a] | |
@@ -172,9 +173,10 @@ lal	| |
 /* lae: load address external */
 lae 	| |
 		allocate(R16)
-		"\tldab #[$1].l"
-		"\tldaa #[$1].h"
-					| %[a] | |
+		"! lae"
+		"\tldx #$1"
+		"\tjsr Pushx"
+					| | |
 
 /* lxl: load local base  n (255 => n > 0) static levels back.*/
 
@@ -233,11 +235,13 @@ loi $1==4	| R16 |
 		"\tpshb"
 		"\tpsha"
 					| | |
-loi D		| R16 |
+loi 		| R16 |
 		"\tstab TMP+1"
 		"\tstaa TMP"
-		"\taddb #[$1].l"
-		"\tadca #[$1].h"
+		"\tldx #$1"
+		"\tstx TMP2"
+		"\taddb TMP2+1"
+		"\tadca TMP2"
 		"\tstab TMP2+1"
 		"\tstaa TMP2"
 		"\tldx TMP2"
@@ -248,7 +252,6 @@ loi D		| R16 |
 		"\tcpx TMP"
 		"\tbne 1b"
 					| | |
-
 /* load from stack top, size==AccAB */
 
 los $1==2	| R16 |
@@ -434,11 +437,14 @@ sti $1==4	| R16 |
 		"\tstaa 0,x"
 					| | |
 /* TODO: pulb -> pula/pulb */
-sti D	| R16 |
+
+sti 	| R16 |
 		"\tstab TMP+1"
 		"\tstaa TMP"
-		"\taddb #[$1].l"
-		"\tadca #[$1].h"
+		"\tldx #$1"
+		"\tstx TMP2"
+		"\taddb TMP2+1"
+		"\tadca TMP2"
 		"\tstab TMP2+1"
 		"\tstaa TMP2"
 		"\tldx TMP"
@@ -449,7 +455,6 @@ sti D	| R16 |
 		"\tcpx TMP2"
 		"\tbne 1b"
 					| | |
-
 /* TODO: */
 sts $1==2	| R16 |
 		"\tjsr Sts"
@@ -1031,7 +1036,8 @@ dvi $1==4	| |
 		allocate(R16)
 		"jsr Dvi4"
 					| | |
-dvi ND	| R16 |
+
+dvi | R16 |
 		"\ttsta"
 		"\tbeq 1f"
 		"\tcmpb #2"
@@ -1047,6 +1053,7 @@ dvi ND	| R16 |
 		"\tpulb"
 		"\tjsr Dvi2"
 					| %[1] | |
+
 rmi $1==2	| R16 |
 		"\tjsr Rmi2"
 					| %[1] | |
@@ -1509,10 +1516,12 @@ inl IN($1)	| |
 		"\tinc BASE+$1,x"
 		"1:"
 					| | |
-inl D	| |
+inl 	| |
 		allocate(R16)
-		"\tldab #[$1].l"
-		"\tldaa #[$1].h"
+		"\tldx #$1"
+		"\tstx TMP"
+		"\tldab TMP+1"
+		"\tldaa TMP"
 		"\taddb LB+1"
 		"\tadca LB"
 		"\tstab TMP+1"
@@ -2223,6 +2232,7 @@ ass ND	| R16 |
 		"\tjsr Asp"
 					| | |
 blm $1==0	| | | | asp 4 |
+/*
 blm D	| R16 |
 		"\tstab ADDR+3"
 		"\tstaa ADDR+2"
@@ -2236,6 +2246,7 @@ blm D	| R16 |
 		"\tstaa NBYTES"
 		"\tjsr Blm"
 					| | |
+*/
 bls $1==2	| R16 |
 		"\tstab NBYTES+1"
 		"\tstaa NBYTES"

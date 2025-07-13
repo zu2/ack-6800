@@ -51,7 +51,7 @@ void prolog(full nlocals)
 		return;
 	else
 		fprintf(codefile,
-	"\tldx #[%d].h\n\tlda #[%d].l\n\tjsr Lcs\n",
+	"\tldab #[%d].l\n\tldaa #[%d].h\n\tjsr Lcs\n",
 					nlocals, nlocals);
 }
 
