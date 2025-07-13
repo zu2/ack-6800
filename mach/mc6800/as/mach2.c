@@ -9,9 +9,12 @@
  */
 
 %token <y_word> X
+%token <y_word> EXTENSION
 %token <y_word> NOARG
 %token <y_word> BRANCH
 %token <y_word> AOP
 %token <y_word> XOP
 
 %type <y_word> memref
+
+%nonassoc EXTENSION

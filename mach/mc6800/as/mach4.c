@@ -10,6 +10,19 @@
  * Motorola 6800 parsing rules
  */
 
+expr    
+        :       expr    EXTENSION       
+                        { $$.val = ($1.val >> $2) & 0xFF;
+#ifdef RELOCATION       
+                          $$.typ = combine($1.typ, S_ABS, '&');
+                                            /* This will generate an 'invalid operator'      */         
+                                            /* error if $1.typ is not absolute after pass 1. */         
+#else   
+                          $$.typ = $1.typ;  /* Even if $1.typ is relocatable, it should be   */         
+                                            /* absolute by the final pass.                   */
+#endif /* RELOCATION */
+                        }
+        ;
 operation
 	:
 		NOARG

@@ -7,6 +7,8 @@
 /*
  * Motorola 6800 keywords
  */
+{0,     EXTENSION,      0,              ".l"},
+{0,     EXTENSION,      8,              ".h"},
 {0,	X,		0,		"x"},
 {0,	BRANCH,		0x20,		"bra"},
 {0,	BRANCH,		0x22,		"bhi"},
