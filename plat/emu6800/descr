@@ -62,7 +62,8 @@ name led
 	args {ALIGN} {SEPID?} \
 		({RTS}:.b=-u _i_main) \
 	    (.e:{HEAD}={PLATFORMDIR}/boot.o) \
-		-o > < 
+		-o > < \
+		(.e:{TAIL}={PLATFORMDIR}/libem.a)
 	linker
 end
 #		({RTS}:.ocm.bas.b={PLATFORMDIR}/c-ansi.o) \

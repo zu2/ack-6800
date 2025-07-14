@@ -2498,4 +2498,4 @@ ret $1==8	| STACK |
 
 MOVES:  (AAA,AAA,"nop")
 
-STACKS:  (R16, , "\tjsr Push")
+STACKS:  (R16, , "\tpshb\n\tpsha")
