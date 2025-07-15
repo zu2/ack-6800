@@ -88,8 +88,8 @@ end
 #
 name cv
 	from .out
-	to .img
-	program /bin/true
+	to .bin
+	program /usr/bin/cp
 	args < >
 	outfile emu6800.bin
 end
