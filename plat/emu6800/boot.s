@@ -2,7 +2,7 @@
 .define hol0, ADDR
 .define LB, LBl
 .define	ARTH, RETURN
-.define start
+.define START
 
 .sect .zero
 .sect .text
@@ -25,7 +25,7 @@ RETURN: .space 4        ! the return area
 .sect .text
 ! .base 256            ! where to start in the emu6800
 ! GENERAL PURPOSE ROUTINES
-START:  jmp     START
+START:  jmp     _main
 
 .sect .data
 PROGNAME:               ! for initialising the programname pointer
