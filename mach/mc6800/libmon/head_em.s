@@ -1,7 +1,7 @@
 .define BASE
 .define hol0, ADDR
 .define LB, LBl
-.define	ARTH, RETURN
+.define	ARTH, RETURN, RETSIZE
 .define TMP,TMP2
 .define NBYTES
 .define start
@@ -22,6 +22,7 @@ LB: .space 2            ! the localbase
 LBl: .space 2           ! the second localbase (localbase-BASE)
 ARTH: .space 16         ! used for arithmetic
 RETURN: .space 4        ! the return area
+RETSIZE: .space 1
 TMP: .space 2
 TMP2: .space 2
 NBYTES: .space 1
