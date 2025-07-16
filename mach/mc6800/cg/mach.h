@@ -10,8 +10,8 @@
 #define ex_ap(y)        fprintf(codefile,".extern %s\n",y)
 #define in_ap(y)        /* nothing */
 
-#define newilb(x)       fprintf(codefile,"%s:\n",x)
-#define newdlb(x)       fprintf(codefile,"%s:\n",x)
+#define newilb(x)       fprintf(codefile,".sect .text\n%s: !newilb\n",x)
+#define newdlb(x)       fprintf(codefile,"%s: !newdlb\n",x)
 #define dlbdlb(x,y)     fprintf(codefile,"%s = %s\n",x,y)
 #define newlbss(l,x)    fprintf(codefile,".comm %s,%u\n",l,x);
 
@@ -27,7 +27,7 @@
 #define con_ilb(x)      fprintf(codefile,".data2\t%s\n",x)
 #define con_dlb(x)      fprintf(codefile,".data2\t%s\n",x)
 
-#define modhead         ".sect .text\n.sect .rom\n.sect .data\n.sect .bss\n.sect .zero\n"
+#define modhead         ".sect .zero\n.sect .text\n.sect .rom\n.sect .data\n.sect .bss\n"
 
 #define fmt_id(ft, fs)	sprintf(fs,"_%s",ft)
 
