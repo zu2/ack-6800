@@ -94,7 +94,7 @@ ldc	 | |
 
 lol IN($1)	| |
 		allocate(R16)
-		"\tldx LBl"
+		"\tldx <LBl"
 		"\tldab $1+BASE+1,x"
 		"\tldaa $1+BASE,x"
 					| %[a] | |
@@ -102,11 +102,11 @@ lol 	| |
 		allocate(R16)
 		"\tldab #[$1].l"
 		"\tldaa #[$1].h"
-		"\taddb LB+1"
-		"\tadca LB"
-		"\tstab TMP+1"
-		"\tstaa TMP"
-		"\tldx TMP"
+		"\taddb <LB+1"
+		"\tadca <LB"
+		"\tstab <TMP+1"
+		"\tstaa <TMP"
+		"\tldx <TMP"
 		"\tldab 1,x"
 		"\tldaa 0,x"
 					| %[a] | |
@@ -122,7 +122,7 @@ loe	| |
 
 lil IN($1)	| |
 		allocate(R16)
-		"\tldx LBl"
+		"\tldx <LBl"
 		"\tldx [BASE+$1],x"
 		"\tldab 1,x"
 		"\tldaa 0,x"
@@ -131,11 +131,11 @@ lil 	| |
 		allocate(R16)
 		"ldab #[$1].l"
 		"ldaa #[$1].h"
-		"addb LB+1"
-		"adca LB"
-		"stab TMP+1"
-		"staa TMP"
-		"ldx TMP"
+		"addb <LB+1"
+		"adca <LB"
+		"stab <TMP+1"
+		"staa <TMP"
+		"ldx <TMP"
 		"ldx 0,x"
 		"ldab 1,x"
 		"ldaa 0,x"
@@ -144,9 +144,9 @@ lil 	| |
 /* lof: load from address : AB=(AB) */
 
 lof $1==0	| R16 |
-		"\tstab TMP+1"
-		"\tstaa TMP"
-		"\tldx TMP"
+		"\tstab <TMP+1"
+		"\tstaa <TMP"
+		"\tldx <TMP"
 		"\tldab 1,x"
 		"\tldaa 0,x"
 					| %[1] | |
@@ -154,9 +154,9 @@ lof    | |
 		allocate(R16)
 		"\taddb #[$1].l"
 		"\tadca #[$1].h"
-		"\tstab TMP+1"
-		"\tstaa TMP"
-		"\tldx TMP"
+		"\tstab <TMP+1"
+		"\tstaa <TMP"
+		"\tldx <TMP"
 		"\tldab 1,x"
 		"\tldaa 0,x"
 					| %[a] | |
@@ -166,8 +166,8 @@ lal	| |
 		allocate(R16)
 		"\tldab #[$1].l"
 		"\tldaa #[$1].h"
-		"\taddb LB+1"
-		"\tadca LB"
+		"\taddb <LB+1"
+		"\tadca <LB"
 					| %[a] | |
 
 /* lae: load address external */
@@ -182,8 +182,8 @@ lae 	| |
 
 lxl $1==0	| |
 		allocate(R16)
-		"\tldab LB+1"
-		"\tldaa LB"
+		"\tldab <LB+1"
+		"\tldaa <LB"
 					| %[a] | |
 lxl $1<=255	| |		/* n restricted to a max of 255 */
 		allocate(R16)
@@ -195,8 +195,8 @@ lxl $1<=255	| |		/* n restricted to a max of 255 */
 
 lxa $1==0	| |
 		allocate(R16)
-		"\tldab LB+1"
-		"\tldaa LB"
+		"\tldab <LB+1"
+		"\tldaa <LB"
 		"\taddb #EM_BSIZE"
 		"\tadca #0"
 					| %[a] | |
@@ -209,23 +209,23 @@ lxa $1<=255	| |		/* n restricted to a max of 255 */
 /* load indirect, $1==size */
 
 loi $1==1	| R16 |
-		"\tstab TMP+1"
-		"\tstaa TMP"
-		"\tldx TMP"
+		"\tstab <TMP+1"
+		"\tstaa <TMP"
+		"\tldx <TMP"
 		"\tldab 0,x"
 		"\tclra"
 					| %[1] | |
 loi $1==2	| R16 |
-		"\tstab TMP+1"
-		"\tstaa TMP"
-		"\tldx TMP"
+		"\tstab <TMP+1"
+		"\tstaa <TMP"
+		"\tldx <TMP"
 		"\tldab 1,x"
 		"\tldaa 0,x"
 					| %[1] | |
 loi $1==4	| R16 |
-		"\tstab TMP+1"
-		"\tstaa TMP"
-		"\tldx TMP"
+		"\tstab <TMP+1"
+		"\tstaa <TMP"
+		"\tldx <TMP"
 		"\tldab 3,x"
 		"\tldaa 2,x"
 		"\tpshb"
@@ -236,20 +236,20 @@ loi $1==4	| R16 |
 		"\tpsha"
 					| | |
 loi 		| R16 |
-		"\tstab TMP+1"
-		"\tstaa TMP"
+		"\tstab <TMP+1"
+		"\tstaa <TMP"
 		"\tldx #$1"
-		"\tstx TMP2"
-		"\taddb TMP2+1"
-		"\tadca TMP2"
-		"\tstab TMP2+1"
-		"\tstaa TMP2"
-		"\tldx TMP2"
+		"\tstx <TMP2"
+		"\taddb <TMP2+1"
+		"\tadca <TMP2"
+		"\tstab <TMP2+1"
+		"\tstaa <TMP2"
+		"\tldx <TMP2"
 		"1:"
 		"\tdex"
 		"\tldab 0,x"
 		"\tpshb"
-		"\tcpx TMP"
+		"\tcpx <TMP"
 		"\tbne 1b"
 					| | |
 /* load from stack top, size==AccAB */
@@ -258,23 +258,23 @@ los $1==2	| R16 |
 		"\tldx 0,x"
 		"\tins"
 		"\tins"
-		"\tstx TMP"
-		"\taddb TMP+1"
-		"\tadca TMP"
-		"\tstab TMP2+1"
-		"\tstaa TMP2"
-		"\tldx TMP2"
+		"\tstx <TMP"
+		"\taddb <TMP+1"
+		"\tadca <TMP"
+		"\tstab <TMP2+1"
+		"\tstaa <TMP2"
+		"\tldx <TMP2"
 		"1:"
 		"\tdex"
 		"\tldab 0,x"
 		"\tpshb"
-		"\tcpx TMP"
+		"\tcpx <TMP"
 		"\tbne 1b"
 					| | |
 
 ldl IN($1)	| |
 		allocate(R16)
-		"\tldx LBl"
+		"\tldx <LBl"
 		"\tldab BASE+$1+3,x"
 		"\tldaa BASE+$1+2,x"
 		"\tpshb"
@@ -284,13 +284,13 @@ ldl IN($1)	| |
 					| %[a] | |
 ldl	| |
 		allocate(R16)
-		"\tldab LBl+1"
-		"\tldaa LBl"
+		"\tldab <LBl+1"
+		"\tldaa <LBl"
 		"\taddb #[$1].l"
 		"\tadca #[$1].h"
-		"\tstab TMP+1"
-		"\tstaa TMP"
-		"\tldx TMP"
+		"\tstab <TMP+1"
+		"\tstaa <TMP"
+		"\tldx <TMP"
 		"\tldab 3,x"
 		"\tldaa 2,x"
 		"\tpshb"
@@ -316,9 +316,9 @@ ldf	| |
 		"\tpulb"
 		"\taddb #[$1].l"
 		"\tadca #[$1].h"
-		"\tstab TMP+1"
-		"\tstaa TMP"
-		"\tldx TMP"
+		"\tstab <TMP+1"
+		"\tstaa <TMP"
+		"\tldx <TMP"
 		"\tldab 3,x"
 		"\tldaa 2,x"
 		"\tpshb"
@@ -338,7 +338,7 @@ lpi 	| |
 
 /* GROUP 2 - STORE */
 stl IN($1)	| R16 |
-                "\tldx LBl"
+                "\tldx <LBl"
                 "\tstab $1+BASE+1,x"
                 "\tstaa $1+BASE,x"
 					| | |
@@ -346,11 +346,11 @@ stl	| |
 		allocate(R16)
 		"\tldab #[$1].l"
 		"\tldaa #[$1].h"
-		"\taddb LB+1"
-		"\tadca LB"
-		"\tstab TMP+1"
-		"\tstaa TMP"
-		"\tldx TMP"
+		"\taddb <LB+1"
+		"\tadca <LB"
+		"\tstab <TMP+1"
+		"\tstaa <TMP"
+		"\tldx <TMP"
 		"\tpula"
 		"\tpulb"
 		"\tstab 1,x"
@@ -362,7 +362,7 @@ ste	| R16 |
 					| | |
 sil IN($1)	| |
 		allocate(R16)
-		"\tldx LBl"
+		"\tldx <LBl"
 		"\tldx BASE+$1,x"
 		"\tpula"
 		"\tpulb"
@@ -371,22 +371,22 @@ sil IN($1)	| |
 					| | |
 sil	| |
 		allocate(R16)
-		"\tldab LBl+1"
-		"\tldaa LBl"
+		"\tldab <LBl+1"
+		"\tldaa <LBl"
 		"\taddb #BASE+$1"
 		"\tadca #0"
-		"\tstab TMP+1"
-		"\tstaa TMP"
-		"\tldx TMP"
+		"\tstab <TMP+1"
+		"\tstaa <TMP"
+		"\tldx <TMP"
 		"\tpula"
 		"\tpulb"
 		"\tstab 1,x"
 		"\tstaa 0,x"
 					| | |
 stf $1==0	| R16 |
-		"\tstab TMP+1"
-		"\tstaa TMP"
-		"\tldx TMP"
+		"\tstab <TMP+1"
+		"\tstaa <TMP"
+		"\tldx <TMP"
 		"\tpula"
 		"\tpulb"
 		"\tstab 1,x"
@@ -398,35 +398,35 @@ stf	| |
 		"\tpulb"
 		"\taddb #[$1].h"
 		"\tadca #[$1].l"
-		"\tstab TMP+1"
-		"\tstaa TMP"
-		"\tldx TMP"
+		"\tstab <TMP+1"
+		"\tstaa <TMP"
+		"\tldx <TMP"
 		"\tpula"
 		"\tpulb"
 		"\tstab 1,x"
 		"\tstaa 0,x"
 					| | |
 sti $1==1	| R16 |
-		"\tstab TMP+1"
-		"\tstaa TMP"
-		"\tldx TMP"
+		"\tstab <TMP+1"
+		"\tstaa <TMP"
+		"\tldx <TMP"
 		"\tpula"
 		"\tpulb"
 		"\tstab 0,x"
 					| | |
 sti $1==2	| R16 |
-		"\tstab TMP+1"
-		"\tstaa TMP"
-		"\tldx TMP"
+		"\tstab <TMP+1"
+		"\tstaa <TMP"
+		"\tldx <TMP"
 		"\tpula"
 		"\tpulb"
 		"\tstab 1,x"
 		"\tstaa 0,x"
 					| | |
 sti $1==4	| R16 |
-		"\tstab TMP+1"
-		"\tstaa TMP"
-		"\tldx TMP"
+		"\tstab <TMP+1"
+		"\tstaa <TMP"
+		"\tldx <TMP"
 		"\tpula"
 		"\tpulb"
 		"\tstab 3,x"
@@ -439,20 +439,20 @@ sti $1==4	| R16 |
 /* TODO: pulb -> pula/pulb */
 
 sti 	| R16 |
-		"\tstab TMP+1"
-		"\tstaa TMP"
+		"\tstab <TMP+1"
+		"\tstaa <TMP"
 		"\tldx #$1"
-		"\tstx TMP2"
-		"\taddb TMP2+1"
-		"\tadca TMP2"
-		"\tstab TMP2+1"
-		"\tstaa TMP2"
-		"\tldx TMP"
+		"\tstx <TMP2"
+		"\taddb <TMP2+1"
+		"\tadca <TMP2"
+		"\tstab <TMP2+1"
+		"\tstaa <TMP2"
+		"\tldx <TMP"
 		"1:"
 		"\tpulb"
 		"\tstab 0,x"
 		"\tinx"
-		"\tcpx TMP2"
+		"\tcpx <TMP2"
 		"\tbne 1b"
 					| | |
 /* TODO: */
@@ -472,11 +472,11 @@ sdl	| |
 		allocate(R16)
 		"\tldab #[$1].l"
 		"\tldaa #[$1].h"
-		"\taddb LB+1"
-		"\tadca LB"
-		"\tstab TMP+1"
-		"\tstaa TMP"
-		"\tldx TMP"
+		"\taddb <LB+1"
+		"\tadca <LB"
+		"\tstab <TMP+1"
+		"\tstaa <TMP"
+		"\tldx <TMP"
 		"\tpula"
 		"\tpulb"
 		"\tstab BASE+$1+1,x"
@@ -495,9 +495,9 @@ sde	| R16 |
 		"\tstaa $1+2"
 					| | |
 sdf $1==0	| R16 |
-		"\tstab TMP+1"
-		"\tstaa TMP"
-		"\tldx TMP"
+		"\tstab <TMP+1"
+		"\tstaa <TMP"
+		"\tldx <TMP"
 		"\tpula"
 		"\tpulb"
 		"\tstab 1,x"
@@ -514,9 +514,9 @@ sdf	| |
 		"\tadca 0,x"
 		"\tins"
 		"\tins"
-		"\tstab TMP+1"
-		"\tstaa TMP"
-		"\tldx TMP"
+		"\tstab <TMP+1"
+		"\tstaa <TMP"
+		"\tldx <TMP"
 		"\tpula"
 		"\tpulb"
 		"\tstab 1,x"
@@ -532,7 +532,7 @@ sdf	| |
 
 loc lol adi (IN($2) && $3==2)	| |
 		allocate(R16)
-		"\tldx LBl"
+		"\tldx <LBl"
 		"\tldab #[$1].l"
 		"\tldaa #[$1].h"
 		"\taddb BASE+$2+1,x"
@@ -542,7 +542,7 @@ lol loc adi	| | | | loc $2 lol $1 adi $3 |
 
 lol lol adi (IN($1) && IN($2) && $3==2) | |
 		allocate(R16)
-		"\tldx LBl"
+		"\tldx <LBl"
 		"\tldab BASE+$1+1,x"
 		"\tldaa BASE+$1+0,x"
 		"\taddb BASE+$2+1,x"
@@ -550,7 +550,7 @@ lol lol adi (IN($1) && IN($2) && $3==2) | |
 					| %[a] | |
 lol loe adi (IN($1) && $3==2) | |
 		allocate(R16)
-		"\tldx LBl"
+		"\tldx <LBl"
 		"\tldab BASE+$1+1,x"
 		"\tldaa BASE+$1+0,x"
 		"\taddb $2+1"
@@ -574,7 +574,7 @@ loc loe adi $3==2	| |
 loe loc adi 	| | | | loc $2 loe $1 adi $3 |
 ldl adi IN($1) && $2==2	| |
 		allocate(R16)
-		"\tldx LBl"
+		"\tldx <LBl"
 		"\tldab BASE+$1+1,x"
 		"\tldaa BASE+$1+0,x"
 		"\taddb BASE+$1+3,x"
@@ -592,7 +592,7 @@ loc adi $2==2 | R16 |
 		"\tadca #[$1].h"
 					| %[1] | |
 lol adi IN($1) && $2==2 | R16 |
-		"\tldx LBl"
+		"\tldx <LBl"
 		"\tldab BASE+$1+1,x"
 		"\tldaa BASE+$1+0,x"
 					| %[1] | |
@@ -646,7 +646,7 @@ adi ND	| R16 |
 					| %[1] | |
 loc lol sbi (IN($2) && $3==2)	| |
 		allocate(R16)
-		"\tldx LBl"
+		"\tldx <LBl"
 		"\tldab #[$1].l"
 		"\tldaa #[$1].h"
 		"\tsubb BASE+$2+1,x"
@@ -655,7 +655,7 @@ loc lol sbi (IN($2) && $3==2)	| |
 lol loc sbi	| | | | lol $1 loc 0-$2 adi $3 |
 lol lol sbi (IN($1) && IN($2) && $3==2) | |
 		allocate(R16)
-		"\tldx LBl"
+		"\tldx <LBl"
 		"\tldab BASE+$1+1,x"
 		"\tldaa BASE+$1+0,x"
 		"\tsubb BASE+$2+1,x"
@@ -663,7 +663,7 @@ lol lol sbi (IN($1) && IN($2) && $3==2) | |
 					| %[a] | |
 lol loe sbi (IN($1) && $3==2) | |
 		allocate(R16)
-		"\tldx LBl"
+		"\tldx <LBl"
 		"\tldab BASE+$1+1,x"
 		"\tldaa BASE+$1+0,x"
 		"\tsubb $2+1"
@@ -671,7 +671,7 @@ lol loe sbi (IN($1) && $3==2) | |
 					| %[a] | |
 loe lol sbi (IN($2) && $3==2) | |
 		allocate(R16)
-		"\tldx LBl"
+		"\tldx <LBl"
 		"\tldab $2+1"
 		"\tldaa $2"
 		"\tsubb BASE+$1+1,x"
@@ -694,7 +694,7 @@ loc loe sbi $3==2	| |
 loe loc sbi 	| | | | loe $1 loc 0-$2 adi $3 |
 ldl sbi IN($1) && $2==2	| |
 		allocate(R16)
-		"\tldx LBl"
+		"\tldx <LBl"
 		"\tldab BASE+$1+3,x"
 		"\tldaa BASE+$1+2,x"
 		"\tsubb BASE+$1+1,x"
@@ -712,7 +712,7 @@ loc sbi $2==2	| R16 |
 		"\tsbca #[$1].h"
 					| %[1] | |
 lol sbi IN($1) && $2==2 | R16 |
-		"\tldx LBl"
+		"\tldx <LBl"
 		"\tsubb BASE+$1+1,x"
 		"\tsbca BASE+$1+0,x"
 					| %[1] | |
@@ -721,12 +721,12 @@ loe sbi $2==2 | R16 |
 		"\tsbca $1"
 					| %[1] | |
 sbi $1==2	| R16 |
-		"\tstab TMP+1"
-		"\tstaa TMP"
+		"\tstab <TMP+1"
+		"\tstaa <TMP"
 		"\tpula"
 		"\tpulb"
-		"\tsubb TMP+1"
-		"\tsbca TMP"
+		"\tsubb <TMP+1"
+		"\tsbca <TMP"
 					| %[1] | |
 sbi $1==4	| |
 		allocate(R16)
@@ -765,8 +765,8 @@ loc lol mli (IN($2) && $3==2)	| |
 		allocate(R16)
 		"\tldab #[$1].l"
 		"\tldaa #[$1].h"
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
 		"\tldx Lbl"
 		"\tldab BASE+$2+1,x"
 		"\tldaa BASE+$2+0,x"
@@ -778,19 +778,19 @@ lol lol mli (IN($1) && IN($2) && $3==2) | |
 		"\tldx Lbl"
 		"\tldab BASE+$1+1,x"
 		"\tldaa BASE+$1+0,x"
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
 		"\tldab BASE+$2+1,x"
 		"\tldaa BASE+$2+0,x"
 		"jsr Mlinp"
 					| %[a] | |
 lol loe mli (IN($1) && $3==2) | |
 		allocate(R16)
-		"\tldx LBl"
+		"\tldx <LBl"
 		"\tldab BASE+$1+1,x"
 		"\tldaa BASE+$1+0,x"
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
 		"\tldab $2+1"
 		"\tldaa $2"
 		"jsr Mlinp"
@@ -800,8 +800,8 @@ loe loe mli $3==2	| |
 		allocate(R16)
 		"ldab $1+1"
 		"ldaa $1"
-		"stab ARTH+1"
-		"staa ARTH"
+		"stab <ARTH+1"
+		"staa <ARTH"
 		"ldab $2+1"
 		"ldaa $2"
 		"jsr Mlinp"
@@ -810,8 +810,8 @@ loc loe mli $3==2	| |
 		allocate(R16)
 		"ldab #[$1].l"
 		"ldaa #[$1].h"
-		"stab ARTH+1"
-		"staa ARTH"
+		"stab <ARTH+1"
+		"staa <ARTH"
 		"ldab $2+1"
 		"ldaa $2"
 		"jsr Mlinp"
@@ -819,11 +819,11 @@ loc loe mli $3==2	| |
 loe loc mli 	| | | | loc $2 loe $1 mli $3 |
 ldl mli IN($1) && $2==2	| |
 		allocate(R16)
-		"\tldx LBl"
+		"\tldx <LBl"
 		"\tldab BASE+$1+1,x"
 		"\tldaa BASE+$1+0,x"
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
 		"\tldab BASE+$1+3,x"
 		"\tldaa BASE+$1+2,x"
 		"jsr Mlinp"
@@ -832,30 +832,30 @@ lde mli $2==2	| |
 		allocate(R16)
 		"\tldab $1+1"
 		"\tldaa $1"
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
 		"\tldab $1+3"
 		"\tldaa $1+2"
 		"\tjsr Mlinp"
 					| %[a] | |
 loc mli $2==2 | R16 |
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
 		"\tldab #[$1].l"
 		"\tldaa #[$1].h"
 		"\tjsr Mlinp"
 					| %[1] | |
 lol mli IN($1) && $2==2 | R16 |
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
 		"\tldx Lbl"
 		"\tldab BASE+$1+1,x"
 		"\tldaa BASE+$1+0,x"
 		"\tjsr Mlinp"
 					| %[1] | |
 loe mli $2==2	| R16 |
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
 		"\tldab $1+1"
 		"\tldaa $1"
 		"\tjsr Mlinp"
@@ -863,8 +863,8 @@ loe mli $2==2	| R16 |
 lol lol mli IN($1) && !IN($2) && $3==2
 		| | | | lol $2 lol $1 mli $3 |
 mli $1==2	| R16 |
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
 		"\tpula"
 		"\tpulb"
 		"jsr Mli2"
@@ -883,19 +883,19 @@ mli ND	| R16 |
 		"\ttsx"
 		"\tldab 3,x"
 		"\tldaa 2,x"
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
 		"\tpula"
 		"\tpulb"
 		"jsr Mli2"
 					| %[1] | |
 loc lol dvi (IN($2) && $3==2)	| |
 		allocate(R16)
-		"\tldx LBl"
+		"\tldx <LBl"
 		"\tldab BASE+$2+1"
 		"\tldaa BASE+$2"
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
 		"\tldab #[$1].l"
 		"\tldaa #[$1].h"
 		"\tjsr Dvi"
@@ -904,42 +904,42 @@ lol loc dvi (IN($1) && $3==2)	| |
 		allocate(R16)
 		"\tldab #[$2].l"
 		"\tldaa #[$2].h"
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
-		"\tldx LBl"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
+		"\tldx <LBl"
 		"\tldab BASE+$1+1,x"
 		"\tldaa BASE+$1+0,x"
 		"\tjsr Dvi"
  					| %[a] | |
 lol lol dvi (IN($1) && IN($2) && $3==2) | |
 		allocate(R16)
-		"\tldx LBl"
+		"\tldx <LBl"
 		"\tldab BASE+$2+1,x"
 		"\tldaa BASE+$2+0,x"
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
 		"\tldab BASE+$1+1,x"
 		"\tldaa BASE+$1+0,x"
 		"\tjsr Dvi"
 					| %[a] | |
 lol loe dvi (IN($1) && $3==2) | |
 		allocate(R16)
-		"\tldx LBl"
+		"\tldx <LBl"
 		"\tldab BASE+$1+1,x"
 		"\tldaa BASE+$1+0,x"
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
 		"\tldab $2+1"
 		"\tldaa $2"
 		"\tjsr Dvi"
 					| %[a] | |
 loe lol dvi (IN($2) && $3==2) | |
 		allocate(R16)
-		"\tldx LBl"
+		"\tldx <LBl"
 		"\tldab BASE+$2+1,x"
 		"\tldaa BASE+$2+0,x"
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
 		"\tldab $1+1"
 		"\tldaa $1"
 		"\tjsr Dvi"
@@ -948,8 +948,8 @@ loe loe dvi $3==2	| |
 		allocate(R16)
 		"\tldab $2+1"
 		"\tldaa $2"
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
 		"\tldab $1+1"
 		"\tldaa $1"
 		"\tjsr Dvi"
@@ -958,8 +958,8 @@ loc loe dvi $3==2	| |
 		allocate(R16)
 		"ldab #[$1].l"
 		"ldaa #[$1].h"
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
 		"\tldab $2+1"
 		"\tldaa $2"
 		"\tjsr Dvi"
@@ -968,19 +968,19 @@ loe loc dvi $3==2	| |
 		allocate(R16)
 		"ldab #[$2].l"
 		"ldaa #[$2].h"
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
 		"\tldab $1+1"
 		"\tldaa $1"
 		"\tjsr Dvi"
 					| %[a] | |
 ldl dvi IN($1) && $2==2	| |
 		allocate(R16)
-		"\tldx LBl"
+		"\tldx <LBl"
 		"\tldab #BASE+$1+1,x"
 		"\tldaa #BASE+$1+0,x"
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
 		"\tldab #BASE+$1+3,x"
 		"\tldaa #BASE+$1+2,x"
 		"\tjsr Dvi"
@@ -989,8 +989,8 @@ lde dvi $2==2	| |
 		allocate(R16)
 		"\tldab $1+1"
 		"\tldaa $1"
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
 		"\tldab $1+3"
 		"\tldaa $1+2"
 		"\tjsr Dvi"
@@ -1000,20 +1000,20 @@ loc dvi $2==2 | R16 |
 		"\tpsha"
 		"ldab #[$1].l"
 		"ldaa #[$1].h"
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
 		"\tpula"
 		"\tpulb"
 		"\tjsr Div"
 					| %[1] | |
 lol dvi IN($1) && $2==2 | R16 |
-		"\tldx LBl"
+		"\tldx <LBl"
 		"\tpshb"
 		"\tpsha"
 		"\tldab BASE+$1+1,x"
 		"\tldaa BASE+$1+0,x"
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
 		"\tpula"
 		"\tpulb"
 		"\tjsr Dvi"
@@ -1023,8 +1023,8 @@ loe dvi $2==2	| R16 |
 		"\tpsha"
 		"\tldab $1+1,x"
 		"\tldaa $1+0,x"
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
 		"\tpula"
 		"\tpulb"
 		"\tjsr Dvi"
@@ -1047,8 +1047,8 @@ dvi | R16 |
 		"\ttsx"
 		"\tldab 3,x"
 		"\tldaa 2,x"
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
 		"\tpula"
 		"\tpulb"
 		"\tjsr Dvi2"
@@ -1155,11 +1155,11 @@ sbu		| | | | sbi $1 |
 
 loc lol mlu (IN($2) && $3==2)	| |
 		allocate(R16)
-		"\tldx LBl"
+		"\tldx <LBl"
 		"\tldab #[$1].l"
 		"\tldaa #[$1].h"
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
 		"\tldab BASE+$2+1,x"
 		"\tldaa BASE+$2+0,x"
 		"\tjsr Mlu"
@@ -1167,22 +1167,22 @@ loc lol mlu (IN($2) && $3==2)	| |
 lol loc mlu	| | | | loc $2 lol $1 mlu $3 |
 lol lol mlu (IN($1) && IN($2) && $3==2) | |
 		allocate(R16)
-		"\ldx LBl"
+		"\ldx <LBl"
 		"\tldab BASE+$1+1,x"
 		"\tldaa BASE+$1+0,x"
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
 		"\tldab BASE+$2+1,x"
 		"\tldaa BASE+$2+0,x"
 		"\tjsr Mlu"
 					| %[a] | |
 lol loe mlu (IN($1) && $3==2) | |
 		allocate(R16)
-		"\tldx LBl"
+		"\tldx <LBl"
 		"\tldab BASE+$1+1,x"
 		"\tldaa BASE+$1+0,x"
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
 		"\tldab $2+1"
 		"\tldaa $2"
 		"\tjsr Mlu"
@@ -1192,8 +1192,8 @@ loe loe mlu $3==2	| |
 		allocate(R16)
 		"\tldab $1+1"
 		"\tldaa $1"
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
 		"\tldab $2+1"
 		"\tldaa $2"
 		"\tjsr Mlu"
@@ -1202,8 +1202,8 @@ loc loe mlu $3==2	| |
 		allocate(R16)
 		"\tldab #[$1].l"
 		"\tldaa #[$1].h"
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
 		"\tldab $1+1"
 		"\tldaa $1"
 		"\tjsr Mlu"
@@ -1211,11 +1211,11 @@ loc loe mlu $3==2	| |
 loe loc mlu 	| | | | loc $2 loe $1 mlu $3 |
 ldl mlu IN($1) && $2==2	| |
 		allocate(R16)
-		"\tldx LBl"
+		"\tldx <LBl"
 		"\tldab BASE+$1+1,x"
 		"\tldab BASE+$1+0,x"
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
 		"\tldab BASE+$1+3,x"
 		"\tldab BASE+$1+2,x"
 		"\tjsr Mlu"
@@ -1224,32 +1224,32 @@ lde mlu $2==2	| |
 		allocate(R16)
 		"\tldab $1+1"
 		"\tldaa $1+0"
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
 		"\tldab $1+3"
 		"\tldaa $1+2"
 		"\tjsr Mlu"
 					| %[a] | |
 loc mlu $2==2 | R16 |
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
 		"\tldab #[$1].l"
 		"\tldaa #[$1].h"
 		"\tjsr Mlu"
 					| %[1] | |
 lol mlu IN($1) && $2==2 | R16 |
-		"\tldx LBl"
+		"\tldx <LBl"
 		"\tldab BASE+$1+1,x"
 		"\tldaa BASE+$1+1,x"
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
 		"\tldab BASE+$1+3,x"
 		"\tldaa BASE+$1+2,x"
 		"\tjsr Mlu"
 					| %[1] | |
 loe mlu $2==2	| R16 |
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
 		"\tldab $1+1"
 		"\tldaa $1"
 		"\tjsr Mul"
@@ -1275,11 +1275,11 @@ mlu ND	| R16 |
 
 loc lol dvu (IN($2) && $3==2)	| |
 		allocate(R16)
-		"\tldx LBl"
+		"\tldx <LBl"
 		"\tldab BASE+$2+1,x"
 		"\tldaa BASE+$2+0,x"
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
 		"\tldab #[$1].h"
 		"\tldaa #[$1].l"
 		"\tjsr Dvu"
@@ -1288,42 +1288,42 @@ lol loc dvu (IN($1) && $3==2)	| |
 		allocate(R16)
 		"\tldab #[$2].l"
 		"\tldaa #[$2].h"
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
-		"\tldx LBl"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
+		"\tldx <LBl"
 		"\tldab #BASE+$1+1,x"
 		"\tldaa #BASE+$1+0,x"
 		"\tjsr Dvu"
  					| %[a] | |
 lol lol dvu (IN($1) && IN($2) && $3==2) | |
 		allocate(R16)
-		"\tldx LBl"
+		"\tldx <LBl"
 		"\tldab #BASE+$2+1,x"
 		"\tldaa #BASE+$2+0,x"
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
 		"\tldab #BASE+$1+1,x"
 		"\tldaa #BASE+$1+0,x"
 		"\tjsr Dvu"
 					| %[a] | |
 lol loe dvu (IN($1) && $3==2) | |
 		allocate(R16)
-		"\tldx LBl"
+		"\tldx <LBl"
 		"\tldab #BASE+$1+1,x"
 		"\tldaa #BASE+$1+0,x"
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
 		"\tldab $2+1"
 		"\tldaa $2"
 		"\tjsr Dvu"
 					| %[a] | |
 loe lol dvu (IN($2) && $3==2) | |
 		allocate(R16)
-		"\tldx LBl"
+		"\tldx <LBl"
 		"\tldab #BASE+$2+1,x"
 		"\tldaa #BASE+$2+0,x"
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
 		"\tldab $1+1"
 		"\tldaa $1"
 		"\tjsr Dvu"
@@ -1332,8 +1332,8 @@ loe loe dvu $3==2	| |
 		allocate(R16)
 		"\tldab $2+1"
 		"\tldaa $2"
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
 		"\tldab $1+1"
 		"\tldaa $1"
 		"\tjsr Dvu"
@@ -1342,8 +1342,8 @@ loc loe dvu $3==2	| |
 		allocate(R16)
 		"\tlda $2"
 		"\tlda $2+1"
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
 		"\tldab #[$1].l"
 		"\tldaa #[$1].h"
 		"\tjsr Dvu"
@@ -1352,19 +1352,19 @@ loe loc dvu $3==2	| |
 		allocate(R16)
 		"\tldab #[$2].l"
 		"\tldaa #[$2].h"
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
 		"\tldab $1+1"
 		"\tldaa $1"
 		"\tjsr Dvu"
 					| %[a] | |
 ldl dvu IN($1) && $2==2	| |
 		allocate(R16)
-		"\tldx LBl"
+		"\tldx <LBl"
 		"\tldab BASE+$1+1,x"
 		"\tldaa BASE+$1+0,x"
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
 		"\tldab BASE+$2+1,x"
 		"\tldaa BASE+$2+0,x"
 		"\tjsr Dvu"
@@ -1373,8 +1373,8 @@ lde dvu $2==2	| |
 		allocate(R16)
 		"\tldab $1+1"
 		"\tldaa $1"
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
 		"\tldab $1+3"
 		"\tldaa $1+2"
 		"\tjsr Dvu"
@@ -1384,8 +1384,8 @@ loc dvu $2==2 | R16 |
 		"\tpsha"
 		"\tldab #[$1].l"
 		"\tldaa #[$1].h"
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
 		"\tpula"
 		"\tpulb"
 		"\tjsr Dvu"
@@ -1393,11 +1393,11 @@ loc dvu $2==2 | R16 |
 lol dvu IN($1) && $2==2 | R16 |
 		"\tpshb"
 		"\tpsha"
-		"\tldx LBl"
+		"\tldx <LBl"
 		"\tldab BASE+$1+1,x"
 		"\tldaa BASE+$1+0,x"
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
 		"\tpula"
 		"\tpulb"
 		"\tjsr Dvu"
@@ -1407,8 +1407,8 @@ loe dvu $2==2	| R16 |
 		"\tpsha"
 		"\tldab $1+1"
 		"\tldaa $1"
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
 		"\tpula"
 		"\tpulb"
 		"\tjsr Dvu"
@@ -1480,12 +1480,12 @@ ads ND 	| R16 |
 		"\tins"
 					| %[1] | |
 sbs $1==2	| R16 |
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
 		"\tpula"
 		"\tpulb"
-		"\taddb ARTH+1"
-		"\tadca ARTH"
+		"\taddb <ARTH+1"
+		"\tadca <ARTH"
 					| %[1] | |
 sbs ND	| R16 |
 		"\ttsta"
@@ -1494,12 +1494,12 @@ sbs ND	| R16 |
 		"\tbeq 1f"
 		"\tjsr Trap"
 		"1:"
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
 		"\tpula"
 		"\tpulb"
-		"\taddb ARTH+1"
-		"\tadca ARTH"
+		"\taddb <ARTH+1"
+		"\tadca <ARTH"
 					| %[1] | |
 
 
@@ -1510,7 +1510,7 @@ inc	| R16 |
 		"\tadca #0"
 					| %[1] | |
 inl IN($1)	| |
-		"\tldx LBl"
+		"\tldx <LBl"
 		"\tinc BASE+$1+1,x"
 		"\tbne 1f"
 		"\tinc BASE+$1,x"
@@ -1519,14 +1519,14 @@ inl IN($1)	| |
 inl 	| |
 		allocate(R16)
 		"\tldx #$1"
-		"\tstx TMP"
-		"\tldab TMP+1"
-		"\tldaa TMP"
-		"\taddb LB+1"
-		"\tadca LB"
-		"\tstab TMP+1"
-		"\tstaa TMP"
-		"\tldx TMP"
+		"\tstx <TMP"
+		"\tldab <TMP+1"
+		"\tldaa <TMP"
+		"\taddb <LB+1"
+		"\tadca <LB"
+		"\tstab <TMP+1"
+		"\tstaa <TMP"
+		"\tldx <TMP"
 		"\tinc 1,x"
 		"\tbne 1f"
 		"\tinc 0,x"
@@ -1543,7 +1543,7 @@ dec	| R16 |
 					| %[1] | |
 del IN($1)	| |
 		allocate(R16)
-		"\tldx LBl"
+		"\tldx <LBl"
 		"\tldab BASE+$1+1,x"
 		"\tldaa BASE+$1+0,x"
 		"\tsubb #1"
@@ -1555,11 +1555,11 @@ del	| |
 		allocate(R16)
 		"\tldab #[$1].l"
 		"\tldaa #[$1].h"
-		"\taddb LB+1"
-		"\tadca LB"
-		"\tstab TMP+1"
-		"\tstaa TMP"
-		"\tldx TMP"
+		"\taddb <LB+1"
+		"\tadca <LB"
+		"\tstab <TMP+1"
+		"\tstaa <TMP"
+		"\tldx <TMP"
 		"\tldab 1,x"
 		"\tldaa 0,x"
 		"\tsubb #1"
@@ -1573,7 +1573,7 @@ dee 	| |
 		"\tstx $1"
 					| | |
 zrl IN($1)	| |
-		"\tldx LBl"
+		"\tldx <LBl"
 		"\tclr BASE+$1+1,x"
 		"\tclr BASE+$1+0,x"
 					| | |
@@ -1581,11 +1581,11 @@ zrl	| |
 		allocate(R16)
 		"\tldab #[$1].l"
 		"\tldaa #[$1].h"
-		"\taddb LB+1"
-		"\tadca LB"
-		"\tstab TMP+1"
-		"\tstaa TMP"
-		"\tldx TMP"
+		"\taddb <LB+1"
+		"\tadca <LB"
+		"\tstab <TMP+1"
+		"\tstaa <TMP"
+		"\tldx <TMP"
 		"\tclr 1,x"
 		"\tclr 0,x"
 					| | |
@@ -1651,20 +1651,20 @@ and ND	| R16 |
 		"\tins"
 		"\tins"
 		"\ttsx"
-		"\tstx ADDR"
+		"\tstx <ADDR"
 		"\taslb"
 		"\trola"
-		"\taddb ADDR+1"
-		"\tadca ADDR"
-		"\tstab ADDR+3"
-		"\tstaa ADDR+2"
-		"\tldx ADDR+2"
+		"\taddb <ADDR+1"
+		"\tadca <ADDR"
+		"\tstab <ADDR+3"
+		"\tstaa <ADDR+2"
+		"\tldx <ADDR+2"
 		"1:"
 		"\tpulb"
 		"\tandb 0,x"
 		"\tstab 0,x"
 		"\tinx"
-		"\tcpx ADDR+2"
+		"\tcpx <ADDR+2"
 		"\tbne 1b"
 					| | |
 ior $1==2	| R16 |
@@ -1678,20 +1678,20 @@ ior ND	| R16 |
 		"\tins"
 		"\tins"
 		"\ttsx"
-		"\tstx ADDR"
+		"\tstx <ADDR"
 		"\taslb"
 		"\trola"
-		"\taddb ADDR+1"
-		"\tadca ADDR"
-		"\tstab ADDR+3"
-		"\tstaa ADDR+2"
-		"\tldx ADDR+2"
+		"\taddb <ADDR+1"
+		"\tadca <ADDR"
+		"\tstab <ADDR+3"
+		"\tstaa <ADDR+2"
+		"\tldx <ADDR+2"
 		"1:"
 		"\tpulb"
 		"\torab 0,x"
 		"\tstab 0,x"
 		"\tinx"
-		"\tcpx ADDR+2"
+		"\tcpx <ADDR+2"
 		"\tbne 1b"
 					| | |
 xor $1==2	| R16 |
@@ -1705,20 +1705,20 @@ xor ND	| R16 |
 		"\tins"
 		"\tins"
 		"\ttsx"
-		"\tstx ADDR"
+		"\tstx <ADDR"
 		"\taslb"
 		"\trola"
-		"\taddb ADDR+1"
-		"\tadca ADDR"
-		"\tstab ADDR+3"
-		"\tstaa ADDR+2"
-		"\tldx ADDR+2"
+		"\taddb <ADDR+1"
+		"\tadca <ADDR"
+		"\tstab <ADDR+3"
+		"\tstaa <ADDR+2"
+		"\tldx <ADDR+2"
 		"1:"
 		"\tpulb"
 		"\teorb 0,x"
 		"\tstab 0,x"
 		"\tinx"
-		"\tcpx ADDR+2"
+		"\tcpx <ADDR+2"
 		"\tbne 1b"
 					| | |
 com $1==2	| R16 |
@@ -1727,15 +1727,15 @@ com $1==2	| R16 |
 					| %[1] | |
 com ND	| R16 |
 		"\ttsx"
-		"\tstx ADDR"
-		"\taddb ADDR+1"
-		"\tadca ADDR"
-		"\tstab ADDR+3"
-		"\tstaa ADDR+2"
+		"\tstx <ADDR"
+		"\taddb <ADDR+1"
+		"\tadca <ADDR"
+		"\tstab <ADDR+3"
+		"\tstaa <ADDR+2"
 		"1:"
 		"\tcom 0,x"
 		"\tinx"
-		"\tcpx ADDR+2"
+		"\tcpx <ADDR+2"
 		"\tbne 1b"
 					| | |
 rol $1==2	| R16 |
@@ -1751,17 +1751,17 @@ rol $1==4	| R16 |
 					| | |
 rol ND	| R16 |
 		"\ttsx"
-		"\tstx ADDR"
-		"\taddb ADDR+1"
-		"\tadca ADDR"
-		"\tstab ADDR+3"
-		"\tstaa ADDR+2"
-		"\tldx ADDR+2"
+		"\tstx <ADDR"
+		"\taddb <ADDR+1"
+		"\tadca <ADDR"
+		"\tstab <ADDR+3"
+		"\tstaa <ADDR+2"
+		"\tldx <ADDR+2"
 		"\tclc"
 		"1:"
 		"\tdex"
 		"\trol 0,x"
-		"\tcpx ADDR"
+		"\tcpx <ADDR"
 		"\tbne 1b"
 					| %[1] | |
 ror $1==2	| R16 |
@@ -1777,16 +1777,16 @@ ror $1==4	| R16 |
 					| | |
 ror ND	| R16 |
 		"\ttsx"
-		"\tstx ADDR"
-		"\taddb ADDR+1"
-		"\tadca ADDR"
-		"\tstab ADDR+3"
-		"\tstaa ADDR+2"
+		"\tstx <ADDR"
+		"\taddb <ADDR+1"
+		"\tadca <ADDR"
+		"\tstab <ADDR+3"
+		"\tstaa <ADDR+2"
 		"\tclc"
 		"1:"
 		"\tror 0,x"
 		"\tinx"
-		"\tcpx ADDR+2"
+		"\tcpx <ADDR+2"
 		"\tbne 1b"
 					| %[1] | |
 
@@ -1834,9 +1834,9 @@ loc inn zne $1>0 && $1<16 && $2==2	| R16 |
 		"\tbne $3 ! ???"
 					| | |
 inn $1==2	| R16 |
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
-		"\tldx ARTH"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
+		"\tldx <ARTH"
 		"\tpula"
 		"\tpulb"
 		"1:"
@@ -1848,9 +1848,9 @@ inn $1==2	| R16 |
 		"\tclra"
 				| %[1] | |
 inn zeq $1==2	| R16 |
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
-		"\tldx ARTH"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
+		"\tldx <ARTH"
 		"\tpula"
 		"\tpulb"
 		"1:"
@@ -1862,9 +1862,9 @@ inn zeq $1==2	| R16 |
 		"\tbeq $2"
 				| %[1] | |
 inn zne $1==2	| R16 |
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
-		"\tldx ARTH"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
+		"\tldx <ARTH"
 		"\tpula"
 		"\tpulb"
 		"1:"
@@ -1898,9 +1898,9 @@ loc set $2==2 && $1>=0 && $1<16	| |
 		"bne 1b"
 					| %[a] | |
 set $1==2	| R16 |
-		"\tstab ARTH+1"
-		"\tstaa ARTH"
-		"\tldx ARTH"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
+		"\tldx <ARTH"
 		"\tclrb"
 		"\tclra"
 		"\tsec"
@@ -2152,9 +2152,9 @@ zgt	| R16 |
 /* GROUP 14 - PROCEDURE CALL */
 
 cai	| R16 |
-		"\tstab ADDR+1"
-		"\tstaa ADDR"
-		"\tldx ADDR"
+		"\tstab <ADDR+1"
+		"\tstaa <ADDR"
+		"\tldx <ADDR"
 		"\tjsr 0,x"
 					| | |
 cal	| |
@@ -2163,17 +2163,17 @@ cal	| |
 					| | |
 lfr $1==2 | |
 		allocate(R16)
-		"\tldab RETURN+1"
-		"\tldaa RETURN"
+		"\tldab <RETURN+1"
+		"\tldaa <RETURN"
 					| %[a] | |
 lfr $1==4 | |
 		allocate(R16)
-		"\tldab RETURN+3"
-		"\tldaa RETURN+2"
+		"\tldab <RETURN+3"
+		"\tldaa <RETURN+2"
 		"\tpshb"
 		"\tpsha"
-		"\tldab RETURN+1"
-		"\tldaa RETURN"
+		"\tldab <RETURN+1"
+		"\tldaa <RETURN"
 		"\tpshb"
 		"\tpsha"
 					| | |
@@ -2187,20 +2187,20 @@ ret $1==2 | |
 		allocate(R16)
 		"\tpula"
 		"\tpulb"
-		"\tstab RETURN+1"	
-		"\tstaa RETURN"	
+		"\tstab <RETURN+1"	
+		"\tstaa <RETURN"	
 		"\trts"
 					| | |
 ret $1==4 	| |
 		allocate(R16)
 		"\tpula"
 		"\tpulb"
-		"\tstab RETURN+1"	
-		"\tstaa RETURN"	
+		"\tstab <RETURN+1"	
+		"\tstaa <RETURN"	
 		"\tpula"
 		"\tpulb"
-		"\tstab RETURN+3"	
-		"\tstaa RETURN+2"	
+		"\tstab <RETURN+3"	
+		"\tstaa <RETURN+2"	
 					| | |
 
 
@@ -2210,12 +2210,12 @@ asp	| |
 		allocate(R16)
 		"\tldab #[$1].l"
 		"\tldaa #[$1].h"
-		"\tsts TMP"
-		"\taddb TMP+1"
-		"\tadca TMP"
-		"\tstab TMP+1"
-		"\tstaa TMP"
-		"\tlds TMP"
+		"\tsts <TMP"
+		"\taddb <TMP+1"
+		"\tadca <TMP"
+		"\tstab <TMP+1"
+		"\tstaa <TMP"
+		"\tlds <TMP"
 					| | |
 ass $1==2	| R16 |
 		"\tjsr Asp"
@@ -2234,30 +2234,30 @@ ass ND	| R16 |
 blm $1==0	| | | | asp 4 |
 /*
 blm D	| R16 |
-		"\tstab ADDR+3"
-		"\tstaa ADDR+2"
+		"\tstab <ADDR+3"
+		"\tstaa <ADDR+2"
 		"\tpula"
 		"\tpulb"
-		"\tstab ADDR+1"
-		"\tstaa ADDR"
+		"\tstab <ADDR+1"
+		"\tstaa <ADDR"
 		"\tldab #[$1].l"
-		"\tstab NBYTES+1"
+		"\tstab <NBYTES+1"
 		"\tldaa #[$1].h"
-		"\tstaa NBYTES"
+		"\tstaa <NBYTES"
 		"\tjsr Blm"
 					| | |
 */
 bls $1==2	| R16 |
-		"\tstab NBYTES+1"
-		"\tstaa NBYTES"
+		"\tstab <NBYTES+1"
+		"\tstaa <NBYTES"
 		"\tpula"
 		"\tpulb"
-		"\tstab ADDR+3"
-		"\tstaa ADDR+2"
+		"\tstab <ADDR+3"
+		"\tstaa <ADDR+2"
 		"\tpula"
 		"\tpulb"
-		"\tstab ADDR+1"
-		"\tstaa ADDR"
+		"\tstab <ADDR+1"
+		"\tstaa <ADDR"
 		"\tjsr Blm"
 					| | |
 bls ND	| R16 |
@@ -2267,16 +2267,16 @@ bls ND	| R16 |
 		"\tbeq 1f"
 		"\tjsr Trap"
 		"1:"
-		"\tstab NBYTES+1"
-		"\tstaa NBYTES"
+		"\tstab <NBYTES+1"
+		"\tstaa <NBYTES"
 		"\tpula"
 		"\tpulb"
-		"\tstab ADDR+3"
-		"\tstaa ADDR+2"
+		"\tstab <ADDR+3"
+		"\tstaa <ADDR+2"
 		"\tpula"
 		"\tpulb"
-		"\tstab ADDR+1"
-		"\tstaa ADDR"
+		"\tstab <ADDR+1"
+		"\tstaa <ADDR"
 		"\tjsr Blm"
 					| | |
 csa	| R16 |
@@ -2332,15 +2332,15 @@ lni	| |
 					| | |
 lor $1==0	| |
 		allocate(R16)
-		"\tldab LB+1"
-		"\tldaa LB"
+		"\tldab <LB+1"
+		"\tldaa <LB"
 					| %[a] | |
 lor $1==1	| |
 		allocate(R16)
 		"\ttsx"
-		"\tstx TMP"
-		"\tldab TMP+1"
-		"\tldaa TMP"
+		"\tstx <TMP"
+		"\tldab <TMP+1"
+		"\tldaa <TMP"
 					| %[a] | |
 lor $1==2	| |
 		allocate(R16)
@@ -2382,17 +2382,17 @@ sim	| R16 |
 		"\tstaa IGNMASK"
 					| | |
 str $1==0	| R16 |
-		"\tstab LB+1"
-		"\tstaa LB"
+		"\tstab <LB+1"
+		"\tstaa <LB"
 		"\tsubb #BASE"
 		"\tsbca #0"
-		"\tstab LBl+1"
-		"\tstaa LBl"
+		"\tstab <LBl+1"
+		"\tstaa <LBl"
 					| | |
 str $1==1	| R16 |
-		"\tstab TMP+1"
-		"\tstaa TMP"
-		"\tldx TMP"
+		"\tstab <TMP+1"
+		"\tstaa <TMP"
+		"\tldx <TMP"
 		"\ttxs"
 					| | |
 str $1==2	| R16 |
