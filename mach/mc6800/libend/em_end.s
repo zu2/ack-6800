@@ -1,3 +1,4 @@
+.sect .zero
 .sect .text
 .sect .rom
 .sect .data

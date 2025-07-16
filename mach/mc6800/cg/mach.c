@@ -78,8 +78,10 @@ void mes(word type)
 }
 
 char    *segname[] = {
-	".sect .text",        /* SEGTXT */
-	".sect .data",        /* SEGCON */
-	".sect .rom",        /* SEGROM */
-	".sect .bss"          /* SEGBSS */
+	".sect .zero",		/* 0:SEGZERO */
+	".sect .text",        /* 1:SEGTXT */
+	".sect .rom",        /* 2:SEGROM */
+	".sect .data",        /* 3:SEGCON */
+	".sect .bss",          /* 4:SEGBSS */
+	".sect .end",		/* 5:SEGEND */
 };

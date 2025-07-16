@@ -27,7 +27,7 @@
 #define con_ilb(x)      fprintf(codefile,".data2\t%s\n",x)
 #define con_dlb(x)      fprintf(codefile,".data2\t%s\n",x)
 
-#define modhead         ".sect .zero; .sect .text; .sect .rom; .sect .data; .sect .bss\n"
+#define modhead         ".sect .text\n.sect .rom\n.sect .data\n.sect .bss\n.sect .zero\n"
 
 #define fmt_id(ft, fs)	sprintf(fs,"_%s",ft)
 

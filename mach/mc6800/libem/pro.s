@@ -1,8 +1,11 @@
 .define Pro
+.sect .zero
 .sect .text
 .sect .rom
 .sect .data
 .sect .bss
+.sect .end
+
 .sect .text
 
 ! This routine is called at the entry of a procedure.

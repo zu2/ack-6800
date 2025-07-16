@@ -9,7 +9,7 @@
 .sect .rom
 .sect .data
 .sect .bss
-.sect .text
+.sect .end
 
 BASE    = 240
 
@@ -25,6 +25,7 @@ RETURN: .space 4        ! the return area
 .sect .text
 !! .base 0x0100            ! where to start in the emu6800
 ! GENERAL PURPOSE ROUTINES
+
 start:
 	jsr	_main
 	rts
@@ -32,6 +33,6 @@ start:
 .sect .data
 PROGNAME:               ! for initialising the programname pointer
 .asciz "program"
+
 .sect .bss
 beginbss:
-

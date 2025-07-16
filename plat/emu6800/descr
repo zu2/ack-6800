@@ -20,7 +20,7 @@ var ARCH=mc6800
 var PLATFORM=emu6800
 var PLATFORMDIR={EM}/share/ack/{PLATFORM}
 var CPP_F=-D__emu6800
-var ALIGN=-a0:1 -a1:1 -a2:1 -a3:1 -b0:0x0100
+var ALIGN=-a0:1 -a1:1 -a2:1 -a3:1 -b0:0 -b1:0x100
 var MACHOPT_F=-m8
 
 # Override the setting in fe so that files compiled for linux386 can see
@@ -36,15 +36,15 @@ name be
 	stdout
 	need .e
 end
-name asopt
-        from .s
-        to .so
-        program /usr/bin/cat
-        args > <
-        optimizer
-        stdin
-        stdout
-end
+#name asopt
+#        from .s
+#        to .so
+#        program /usr/bin/cat
+#        args > <
+#        optimizer
+#        stdin
+#        stdout
+#end
 name as
 	from .s.so
         to .o
@@ -57,7 +57,7 @@ name led
 	to .out
 	program {EM}/lib/ack/em_led
 	mapflag -l* LNAME={PLATFORMDIR}/lib*
-	mapflag -i SEPID=-b1:0
+#	mapflag -i SEPID=-b1:0
 	mapflag -fp FLOATS={PLATFORMDIR}/libfp.a
 	args {ALIGN} {SEPID?} \
 		({RTS}:.b=-u _i_main) \
@@ -89,7 +89,7 @@ end
 name cv
 	from .out
 	to .img
-	program {EM}/bin/aslod
-	args < >
+	program {EM}/bin/aslod68
+	args -v -v < >
 	outfile emu6800.img
 end

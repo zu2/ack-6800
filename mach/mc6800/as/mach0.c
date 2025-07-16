@@ -13,3 +13,4 @@
 #define THREE_PASS
 #define	LISTING
 #define RELOCATION
+#define DEBUG 1
