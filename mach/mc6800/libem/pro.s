@@ -16,16 +16,16 @@
 
 
 Pro:
-	ldab LB+1	! get localbase (lowbyte)
-	ldaa LB		! get localbase (highbyte)
+	ldab <LB+1	! get localbase (lowbyte)
+	ldaa <LB		! get localbase (highbyte)
 	pshb
 	psha		! push localbase onto the stack
 	tsx		! get stackpointer
-	stx LB		! new localbase
-	ldab LB+1
-	ldaa LB
+	stx <LB		! new localbase
+	ldab <LB+1
+	ldaa <LB
 	subb #BASE
 	sbca #0
-	stab LBl+1	! second localbase (lowbyte)
-	staa LBl	! second localbase (highbyte)
+	stab <LBl+1	! second localbase (lowbyte)
+	staa <LBl	! second localbase (highbyte)
     	rts
