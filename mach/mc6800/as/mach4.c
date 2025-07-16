@@ -38,22 +38,25 @@ operation
 				case 0x0C:
 				case 0x0E:
 #ifdef RELOCATION
-						newrelo($3.typ, RELBR | RELO2);
+					if (rflag != 0 && PASS_RELO)
+						newrelo($3.typ, RELO2|RELBR);
 #endif
-						emit2($3.val);
-						break;
+					emit2($3.val);
+					break;
 				default:
 #ifdef RELOCATION
+					if (rflag != 0 && PASS_RELO)
 						newrelo($3.typ, RELO1);
 #endif
-						emit1($3.val);
+					emit1($3.val);
 				}
 			}
 	|
 		XOP '<' expr
 			{	emit1($1 - 0x10);
 #ifdef RELOCATION
-				newrelo($3.typ, RELO1);
+				if (rflag != 0 && PASS_RELO)
+					newrelo($3.typ, RELO1);
 #endif
 				emit1($3.val);
 			}
@@ -61,7 +64,8 @@ operation
 		memref expr
 			{	emit1($1 + 0x10);
 #ifdef RELOCATION
-				newrelo($2.typ, RELO2);
+				if (rflag != 0 && PASS_RELO)
+					newrelo($2.typ, RELO2|RELBR);
 #endif
 				emit2($2.val);
 			}
