@@ -32,9 +32,10 @@ $ make
 $ make install
 $ export PATH=/opt/pkg/ack/bin:$PATH
 $ cd examples
-$ ack -memu6800 -c.s mandelbrot.c
-
-
+$ vi main.c
+$ ack  -memu6800 -v -v  main.c
+$ f9dasm -6800 -offset 0x100 emu6800.img
+(debug: ashow main.o , anm main.o . etc...)
 
 
 The following is the original README.
