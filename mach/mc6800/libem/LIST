@@ -3,3 +3,5 @@ start.s
 pro.s
 ret.s
 lcs.s
+sbi.s
+mli.s

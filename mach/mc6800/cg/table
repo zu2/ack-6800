@@ -11,8 +11,8 @@
 /*
  * 6800 code generator
  *
- * word: 16bit
- * pointer: 16bit
+ * EM_WSIZE: machine word (16bit)
+ * EM_PSIZE: pointer size (16bit)
  * EM_BSIZE: Number of bytes in the hole between AB and LB.
  *           AB: Argment base, LB:Local Base
  */
@@ -460,7 +460,7 @@ sts $1==2	| R16 |
 		"\tjsr Sts"
 					| | |
 sdl IN($1)	| R16 |
-		"\tldx Lbl"
+		"\tldx LBl"
 		"\tstab BASE+$1+1,x"
 		"\tstaa BASE+$1+0,x"
 		"\tpula"
@@ -767,7 +767,7 @@ loc lol mli (IN($2) && $3==2)	| |
 		"\tldaa #[$1].h"
 		"\tstab <ARTH+1"
 		"\tstaa <ARTH"
-		"\tldx Lbl"
+		"\tldx LBl"
 		"\tldab BASE+$2+1,x"
 		"\tldaa BASE+$2+0,x"
 		"jsr Mlinp"
@@ -775,7 +775,7 @@ loc lol mli (IN($2) && $3==2)	| |
 lol loc mli	| | | | loc $2 lol $1 mli $3 |
 lol lol mli (IN($1) && IN($2) && $3==2) | |
 		allocate(R16)
-		"\tldx Lbl"
+		"\tldx LBl"
 		"\tldab BASE+$1+1,x"
 		"\tldaa BASE+$1+0,x"
 		"\tstab <ARTH+1"
@@ -848,7 +848,7 @@ loc mli $2==2 | R16 |
 lol mli IN($1) && $2==2 | R16 |
 		"\tstab <ARTH+1"
 		"\tstaa <ARTH"
-		"\tldx Lbl"
+		"\tldx LBl"
 		"\tldab BASE+$1+1,x"
 		"\tldaa BASE+$1+0,x"
 		"\tjsr Mlinp"
