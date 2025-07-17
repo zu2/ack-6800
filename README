@@ -5,7 +5,7 @@ The intended environment is emu6800 from the Fuzix Compiler Kit.
 
 ## Current status
 
-The system is not operational at this stage.
+While compilation and execution on emu6800 are possible, the lack of support routines and the presence of bugs currently prevent correct operation.
 
 ## TODO
 
@@ -33,9 +33,11 @@ $ make install
 $ export PATH=/opt/pkg/ack/bin:$PATH
 $ cd examples
 $ vi main.c
+$ dd if=/dev/zero of=prefix.dat bs=256 count=1
 $ ack  -memu6800 -v -v  main.c
-$ f9dasm -6800 -offset 0x100 emu6800.img
+$ f9dasm -6800 emu6800.img
 (debug: ashow main.o , anm main.o . etc...)
+$ emu6800 -d 6800   emu6800.img /dev/null 
 
 
 The following is the original README.
