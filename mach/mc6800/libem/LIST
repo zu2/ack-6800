@@ -2,3 +2,4 @@ libem_s.a
 start.s
 pro.s
 ret.s
+lcs.s

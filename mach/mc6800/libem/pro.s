@@ -16,8 +16,13 @@
 
 
 Pro:
+	tsx
+	ldx 0,x
+	stx TMP
+	ins
+	ins
 	ldab <LB+1	! get localbase (lowbyte)
-	ldaa <LB		! get localbase (highbyte)
+	ldaa <LB	! get localbase (highbyte)
 	pshb
 	psha		! push localbase onto the stack
 	tsx		! get stackpointer
@@ -28,4 +33,5 @@ Pro:
 	sbca #0
 	stab <LBl+1	! second localbase (lowbyte)
 	staa <LBl	! second localbase (highbyte)
-    	rts
+	ldx TMP
+    	jmp 0,x
