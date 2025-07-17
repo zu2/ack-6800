@@ -90,6 +90,6 @@ name cv
 	from .out
 	to .img
 	program {EM}/bin/aslod68
-	args -v -v < >
+	args -v -v -p prefix.dat < >
 	outfile emu6800.img
 end
