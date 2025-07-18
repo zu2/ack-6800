@@ -2088,7 +2088,7 @@ ble	| R16 |
 		"\tjsr Sbi2"
 		"\tbmi $1"
 		"\tbne 1f"
-		"\ttxa"
+		"\ttstb"
 		"\tbeq $1\n1:"
 					| | |
 beq	| R16 |
@@ -2377,11 +2377,27 @@ csb	| R16 |
 					| | |
 dch	| | | | loi 2 |
 dup $1==2	| R16 |
+		"! dup $1"
+		"\tpshb"
+		"\tpsha"
+					| %[1] | |
+dup $1==4	| R16 |
+		"! dup $1"
+		"\tstab TMP+1"
+		"\tstaa TMP"
+		"\ttsx"
+		"\tldab 3,x"
+		"\tldaa 2,x"
+		"\tpshb"
+		"\tpsha"
+		"\tldab TMP+1"
+		"\tldaa TMP"
 		"\tpshb"
 		"\tpsha"
 					| %[1] | |
 dup $1<=256	| |
 		allocate(R16)
+		"! dup $1"
 		"\tldx #[$1]"
 		"\tjsr Dup"
 					| | |
@@ -2390,10 +2406,19 @@ dus $1==2	| R16 |
 		"\tjsr Dup"
 					| | |
 exg $1==2	| R16 |
-		"\tjsr Exg2"
+		"! exg $1"
+		"\ttsx"
+		"\tldx 0,x"
+		"\tstx TMP"
+		"\ttsx"
+		"\tstab 1,x"
+		"\tstaa 0,x"
+		"\tldab TMP+1"
+		"\tldaa TMP"
 					| %[1] | |
 exg $1<=255	| |
 		allocate(R16)
+		"! exg $1"
 		"\tldx #$1"
 		"\tjsr Exg"
 					| | |
