@@ -66,7 +66,7 @@ loc ($1%256)==($1/256)	| |
 					| %[a] | |
 loc 	 | |
 		allocate(R16)
-		"! loc"
+		"! loc $1"
 		"\tldab #[$1].l"
 		"\tldaa #[$1].h"
 					| %[a] | |
@@ -212,6 +212,7 @@ lxa $1<=255	| |		/* n restricted to a max of 255 */
 /* load indirect, $1==size */
 
 loi $1==1	| R16 |
+		"! loi $1"
 		"\tstab <TMP+1"
 		"\tstaa <TMP"
 		"\tldx <TMP"
@@ -219,6 +220,7 @@ loi $1==1	| R16 |
 		"\tclra"
 					| %[1] | |
 loi $1==2	| R16 |
+		"! loi $1"
 		"\tstab <TMP+1"
 		"\tstaa <TMP"
 		"\tldx <TMP"
@@ -226,6 +228,7 @@ loi $1==2	| R16 |
 		"\tldaa 0,x"
 					| %[1] | |
 loi $1==4	| R16 |
+		"! loi $1"
 		"\tstab <TMP+1"
 		"\tstaa <TMP"
 		"\tldx <TMP"
@@ -239,6 +242,7 @@ loi $1==4	| R16 |
 		"\tpsha"
 					| | |
 loi 		| R16 |
+		"! loi $1"
 		"\tstab <TMP+1"
 		"\tstaa <TMP"
 		"\tldx #$1"
@@ -410,6 +414,7 @@ stf	| |
 		"\tstaa 0,x"
 					| | |
 sti $1==1	| R16 |
+		"! sti $1"
 		"\tstab <TMP+1"
 		"\tstaa <TMP"
 		"\tldx <TMP"
@@ -418,6 +423,7 @@ sti $1==1	| R16 |
 		"\tstab 0,x"
 					| | |
 sti $1==2	| R16 |
+		"! sti $1"
 		"\tstab <TMP+1"
 		"\tstaa <TMP"
 		"\tldx <TMP"
@@ -427,6 +433,7 @@ sti $1==2	| R16 |
 		"\tstaa 0,x"
 					| | |
 sti $1==4	| R16 |
+		"! sti $1"
 		"\tstab <TMP+1"
 		"\tstaa <TMP"
 		"\tldx <TMP"
@@ -1625,6 +1632,7 @@ zer $1>0 && $1<=256	| |
 /* GROUP 8 - CONVERT (stack: source, source size, dest. size (top)) */
 
 loc loc cii $1==1 && $2==2	| R16 |
+		"! loc loc cii $1==1 && $2==2"
 		"\tclra"
 		"\tasrb"
 		"\trolb"
@@ -2019,17 +2027,17 @@ cmp	| |
 					| | cmu 2 |
 cms $1==2	| |
 		allocate(R16)
-		"\tldx #2"
+		"\tldab #2"
 		"\tjsr Cms"
 					| %[a] | |
 cms $1==4	| |
 		allocate(R16)
-		"\tldx #4"
+		"\tldab #4"
 		"\tjsr Cms"
 					| %[a] | |
 cms ND	| R16 |
 		"\tjsr TestFFh"
-		"\tinx"
+		"\tincb"
 		"\tjsr Cms"
 					| %[1] | |
 tlt	| R16 |
@@ -2039,10 +2047,22 @@ tle	| R16 |
 		"\tjsr Tle"
 					| %[1] | |
 teq	| R16 |
-		"\tjsr Teq"
+		"! teq"
+		"\taba"
+		"\tadca #0"
+		"\tclrb"
+		"\tsuba #1"
+		"\trolb"
+		"\tclra"
 					| %[1] | |
 tne	| R16 |
-		"\tjsr Tne"
+		"! tne"
+		"\taba"
+		"\tadca #0"
+		"\tclrb"
+		"\tnega"
+		"\trolb"
+		"\tclra"
 					| %[1] | |
 tge	| R16 |
 		"\tjsr Tge"
@@ -2166,11 +2186,13 @@ cal	| |
 					| | |
 lfr $1==2 | |
 		allocate(R16)
+		"! lfr $1"
 		"\tldab <RETURN+1"
 		"\tldaa <RETURN"
 					| %[a] | |
 lfr $1==4 | |
 		allocate(R16)
+		"! lfr $1"
 		"\tldab <RETURN+3"
 		"\tldaa <RETURN+2"
 		"\tpshb"
@@ -2565,4 +2587,4 @@ ret $1==8	| STACK |
 
 MOVES:  (AAA,AAA,"nop")
 
-STACKS:  (R16, , "\tpshb\n\tpsha")
+STACKS:  (R16, , "\tpshb\n\tpsha  !STACKS")

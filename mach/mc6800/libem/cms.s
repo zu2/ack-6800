@@ -16,24 +16,22 @@
 
 
 Cms:
+	clra
+	tsx
 	ldx 0,x		! get return address
 	ins
 	ins
 	stx <TMP
-	cmpb #2
+	tsx
+	subb #2
 	bne Cms_4	! 4byte compare
 !
-	clrb
-	clra
-	tsx
 	ldx 0,x		! get first group
-	ldx 0,x
 	stx <ARTH
-	ins
-	ins
 	tsx
-	ldx 0,x		! get second group
-	ldx 0,x
+	ldx 2,x		! get second group
+	ins
+	ins
 	ins
 	ins
 !
@@ -47,27 +45,25 @@ Cms:
 !
 Cms_4:
 	clrb
-	clra
-	tsx
 	ldx 0,x		! get first group
-	ldx 0,x
 	stx <ARTH
 	tsx
-	ldx 0,x
 	ldx 2,x
 	stx <ARTH+2
 	ins
 	ins
+	ins
+	ins
 	tsx
-	ldx 0,x		! get second group
-	ldx 0,x
+	ldx 4,x		! get second group
 	stx <ARTH+4
 	tsx
-	ldx 0,x
-	ldx 2,x
+	ldx 6,x
+	ins
+	ins
+	ins
+	ins
 !	stx <ARTH+6
-	ins
-	ins
 !
 	cpx <ARTH+2
 	bne 1b

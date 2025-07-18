@@ -2,6 +2,7 @@ libem_s.a
 start.s
 pro.s
 pop.s
+pushx.s
 ret.s
 lcs.s
 sbi.s
@@ -9,3 +10,9 @@ mli.s
 dvi.s
 cii.s
 cms.s
+cmi.s
+tgt.s
+tlt.s
+tge.s
+tle.s
+csb.s

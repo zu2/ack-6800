@@ -10,8 +10,8 @@
 #define ex_ap(y)        fprintf(codefile,".extern %s !ex_ap\n",y)
 #define in_ap(y)        fprintf(codefile,"!in_ap %s\n",y)
 
-#define newilb(x)       fprintf(codefile,".sect .text\n%s: !newilb\n",x)
-#define newdlb(x)       fprintf(codefile,".sect .data\n%s: !newdlb\n",x)
+#define newilb(x)       fprintf(codefile,"%s: !newilb\n",x)
+#define newdlb(x)       fprintf(codefile,"%s: !newdlb\n",x)
 #define dlbdlb(x,y)     fprintf(codefile,"%s = %s !dldlib\n",x,y)
 #define newlbss(l,x)    fprintf(codefile,".comm %s,%u !newlbss\n",l,x);
 
