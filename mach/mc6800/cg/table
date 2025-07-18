@@ -132,16 +132,16 @@ lil IN($1)	| |
 lil 	| |
 		allocate(R16)
 		"! lil $1 !IN"
-		"ldab #[$1].l"
-		"ldaa #[$1].h"
-		"addb <LB+1"
-		"adca <LB"
-		"stab <TMP+1"
-		"staa <TMP"
-		"ldx <TMP"
-		"ldx 0,x"
-		"ldab 1,x"
-		"ldaa 0,x"
+		"\tldab #[$1].l"
+		"\tldaa #[$1].h"
+		"\taddb <LB+1"
+		"\tadca <LB"
+		"\tstab <TMP+1"
+		"\tstaa <TMP"
+		"\tldx <TMP"
+		"\tldx 0,x"
+		"\tldab 1,x"
+		"\tldaa 0,x"
 					| %[a] | |
 
 /* lof: load from address : AB=(AB) */
@@ -1015,7 +1015,7 @@ loc dvi $2==2 | R16 |
 		"\tstaa <ARTH"
 		"\tpula"
 		"\tpulb"
-		"\tjsr Div"
+		"\tjsr Dvi"
 					| %[1] | |
 lol dvi IN($1) && $2==2 | R16 |
 		"\tldx <LBl"

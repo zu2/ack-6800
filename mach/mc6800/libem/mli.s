@@ -12,14 +12,23 @@
 
 .sect .text
 Mli2:
-	stab ARTH+1
-	staa ARTH
+	stab <ARTH+1
+	staa <ARTH
+	tsx
+	ldx 0,x
+	stx <TMP
+	ins
+	ins
 	pula
 	pulb
-	stab ARTH+3
-	staa ARTH+2
-Mlinp:	
+	bsr Mul
+	tsx
+	ldx <TMP
+	jmp 0,x
 Mul:
+Mlinp:	
+	stab <ARTH+3
+	staa <ARTH+2
 	clrb
 	clra
     	ldx #16
@@ -29,8 +38,8 @@ Mul:
 	rol ARTH+1
 	rol ARTH
 	bcc 2f
-	addb ARTH+3
-	adca ARTH+2
+	addb <ARTH+3
+	adca <ARTH+2
 2:	dex
 	bne 1b
 	rts
