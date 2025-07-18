@@ -1,7 +1,8 @@
 .define BASE
 .define hol0, ADDR
 .define LB, LBl
-.define	ARTH, RETURN
+.define	ARTH, RETURN, SIGN
+.define RETSIZE, TRAPVAL, BRANCH
 .define START
 .define TMP, TMP2
 .define	_exit, _abort, doexit
@@ -23,6 +24,10 @@ LB: .space 2            ! the localbase
 LBl: .space 2           ! the second localbase (localbase-BASE)
 ARTH: .space 16         ! used for arithmetic
 RETURN: .space 4        ! the return area
+SIGN: .space 1
+RETSIZE: .space 1
+TRAPVAL: .space 1
+BRANCH: .space 2
 TMP: .space 2
 TMP2: .space 2
 exitsp: .space 2

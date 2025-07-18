@@ -1,7 +1,11 @@
 libem_s.a
 start.s
 pro.s
+pop.s
 ret.s
 lcs.s
 sbi.s
 mli.s
+dvi.s
+cii.s
+cms.s
