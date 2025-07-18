@@ -1,5 +1,5 @@
 "$Id$"
-#define em_bsize	2	/* must be equal to EM_BSIZE */
+#define em_bsize	4	/* must be equal to EM_BSIZE */
 #define	ND	!defined($1)
 #define	D	defined($1)
 #define	BASE	240
@@ -19,7 +19,7 @@
 
 EM_WSIZE = 2
 EM_PSIZE = 2
-EM_BSIZE = 2
+EM_BSIZE = 4
 
 REGISTERS:
 AA = ("a",1), REG.
