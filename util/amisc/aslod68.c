@@ -66,6 +66,15 @@ enum
 	NUM_SEGMENTS
 };
 
+/* plathome */
+
+enum
+{
+	NO_PLAT = 0,
+	EMU6800,
+};
+int plat = NO_PLAT;
+
 /* Produce an error message and exit. */
 
 void fatal(const char* s, ...)
@@ -158,6 +167,19 @@ void emitprefixfile(void)
 	fclose(fp);
 }
 
+/* add zero page padding */
+void emitemu6800header(void)
+{
+	char buffer[256];
+	int i;
+
+	for (i=0; i<256; i++) 
+	{
+		buffer[i] = 0;
+	}
+	writef(buffer, 1, 256);
+}
+
 /* Macros from modules/src/object/obj.h */
 #define Xchar(ch) ((ch)&0377)
 #define uget2(c) (Xchar((c)[0]) | ((unsigned)Xchar((c)[1]) << 8))
@@ -239,6 +261,13 @@ int main(int argc, char* argv[])
 				argv++;
 				argc--;
 				prefixfile = argv[1];
+				break;
+
+			case 'm':
+				if (!strcmp(&argv[1][2],"emu6800"))
+					plat = EMU6800;
+				else
+					fatal("bad plathome '%s'",&argv[1][2]);
 				break;
 
 			default:
@@ -327,6 +356,9 @@ int main(int argc, char* argv[])
 
 	if (prefixfile)
 		emitprefixfile();
+	if (plat == EMU6800)
+		emitemu6800header();
+
 	emits(&outsect[TEXT], &outsect[ROM]);
 	emits(&outsect[ROM], &outsect[DATA]);
 	emits(&outsect[DATA], NULL);
