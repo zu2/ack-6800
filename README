@@ -37,11 +37,14 @@ $ make install
 $ export PATH=/opt/pkg/ack/bin:$PATH
 $ cd examples
 $ vi main.c
-$ dd if=/dev/zero of=prefix.dat bs=256 count=1
 $ ack  -memu6800 -v -v  main.c
 $ f9dasm -6800 emu6800.img
 (debug: ashow main.o , anm main.o . etc...)
 $ emu6800 -d 6800   emu6800.img /dev/null 
+
+
+emu6800: https://github.com/EtchedPixels/Fuzix-Compiler-Kit/test/
+f9dasm:  https://github.com/Arakula/f9dasm
 
 
 The following is the original README.
