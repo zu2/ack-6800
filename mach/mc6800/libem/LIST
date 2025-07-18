@@ -16,3 +16,9 @@ tlt.s
 tge.s
 tle.s
 csb.s
+sli.s
+sli4.s
+sri.s
+sri4.s
+sru.s
+sru4.s

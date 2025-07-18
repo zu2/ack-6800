@@ -82,8 +82,9 @@ ldc highw(1)==loww(1) && (loww(1)%256)==(loww(1)/256) | |
 					| %[a] | |
 ldc	 | |
 		allocate(R16)
-		"\tldab #[%(loww(1)%)].h"
-		"\tldaa #[%(loww(1)%)].l"
+		"! ldc $1"
+		"\tldab #[%(loww(1)%)].l"
+		"\tldaa #[%(loww(1)%)].h"
 		"\tpshb"
 		"\tpsha"
 		"\tldab #[%(highw(1)%)].l"
@@ -95,8 +96,8 @@ ldc	 | |
 lol IN($1)	| |
 		allocate(R16)
 		"\tldx <LBl"
-		"\tldab $1+BASE+1,x"
-		"\tldaa $1+BASE,x"
+		"\tldab BASE+$1+1,x"
+		"\tldaa BASE+$1+0,x"
 					| %[a] | |
 lol 	| |
 		allocate(R16)
@@ -287,7 +288,7 @@ ldl IN($1)	| |
 		"\tpshb"
 		"\tpsha"
 		"\tldab BASE+$1+1,x"
-		"\tldaa BASE+$1,x"
+		"\tldaa BASE+$1+0,x"
 					| %[a] | |
 ldl	| |
 		allocate(R16)
@@ -346,8 +347,8 @@ lpi 	| |
 /* GROUP 2 - STORE */
 stl IN($1)	| R16 |
                 "\tldx <LBl"
-                "\tstab $1+BASE+1,x"
-                "\tstaa $1+BASE,x"
+                "\tstab BASE+$1+1,x"
+                "\tstaa BASE+$1+0,x"
 					| | |
 stl	| |
 		allocate(R16)
@@ -439,12 +440,12 @@ sti $1==4	| R16 |
 		"\tldx <TMP"
 		"\tpula"
 		"\tpulb"
-		"\tstab 3,x"
-		"\tstaa 2,x"
-		"\tpula"
-		"\tpulb"
 		"\tstab 1,x"
 		"\tstaa 0,x"
+		"\tpula"
+		"\tpulb"
+		"\tstab 3,x"
+		"\tstaa 2,x"
 					| | |
 /* TODO: pulb -> pula/pulb */
 
@@ -2102,7 +2103,7 @@ beq	| R16 |
 					| | |
 bne	| R16 |
 		"\tstab BRANCH+1"
-		"\tstxb BRANCH"
+		"\tstaa BRANCH"
 		"\tpula"
 		"\tpulb"
 		"\tcmpb BRANCH+1"

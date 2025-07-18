@@ -55,10 +55,10 @@ Cms_4:
 	ins
 	ins
 	tsx
-	ldx 4,x		! get second group
+	ldx 0,x		! get second group
 	stx <ARTH+4
 	tsx
-	ldx 6,x
+	ldx 2,x
 	ins
 	ins
 	ins
