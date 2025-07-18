@@ -33,6 +33,7 @@ $ git clone https://github.com/zu2/ack-6800.git
 $ cd ack-6800
 $ make
 (debug:  make V=1 -j1)
+(Set PLATS = emu6800 in the Makefile if compilation takes too long.)
 $ make install
 $ export PATH=/opt/pkg/ack/bin:$PATH
 $ cd examples
