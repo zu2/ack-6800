@@ -59,8 +59,9 @@ loc $1==0	| |
 		"\tclrb"
 		"\tclra"
 					| %[a] | |
-loc ($1%256)==($1/256)	| |
+loc ($1%256)==($1>>8)	| |
 		allocate(R16)
+		"! loc high==low"
 		"\tldab #[$1].l"
 		"\ttba"
 					| %[a] | |
@@ -73,7 +74,7 @@ loc 	 | |
 
 /* ldc: load 32bit constant */
 
-ldc highw(1)==loww(1) && (loww(1)%256)==(loww(1)/256) | |
+ldc highw(1)==loww(1) && (loww(1)%256)==(loww(1)>>8) | |
 		allocate(R16)
 		"\tldab #[%(loww(1)%)].l"
 		"\ttba"
@@ -634,7 +635,7 @@ adi $1==4	| |
 		"\tadcb 1,x"
 		"\tadca 0,x"
 		"\tstab 5,x"
-		"\tsraa 4,x"
+		"\tstaa 4,x"
 		"\tins"
 		"\tins"
 		"\tins"
