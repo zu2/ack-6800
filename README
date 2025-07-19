@@ -7,6 +7,42 @@ The target environment is emu6800 from the Fuzix Compiler Kit.
 
 Executable files can now be generated, and they can be executed; however, running them currently results in errors because most support routines have not yet been implemented. While the toolchain produces output, successful execution is not yet possible.
 
+The implementation has passed the tarai (Takeuchi) function test.
+Below are the execution cycles compared to other C compilers for the 6800.
+
+```
+33,849,146,442	ack
+26,566,321,956	CC68
+21,832,185,026	Fuzix CC
+16,339,666,935	chibicc-6800 -O2
+23,601,741,099	chibicc -Os
+```
+
+Test program:
+
+```
+int tarai(int x, int y, int z)
+{
+
+	if (x>y){
+		return tarai(
+			tarai(x-1,y,z),
+			tarai(y-1,z,x),
+			tarai(z-1,x,y));
+	}
+	return y;
+}
+
+int main(int argc, char **argv)
+{
+	if(tarai(13,7,0)!=13)		// call 91924989 times
+		return 1;
+
+	return 0;
+}
+```
+
+
 ## TODO
 
 - Add essential source files under plat/emu6800/
@@ -16,7 +52,7 @@ Executable files can now be generated, and they can be executed; however, runnin
 ## DONE
 
 - The directory was renamed from mach/6800 to mach/mc6800 as planned, though it is not clear if this is the best approach.
-- Compilation of a main function that performs no operations is now possible.
+- Compilation of a tarai function.
 
 ## Note on Disk Space
 
@@ -25,8 +61,6 @@ This project generates a large number of files, which can lead to i-node exhaust
 ## Install & compile
 
 To participate in development, follow these steps to test code generation. The environment assumed is Ubuntu Linux.
-
-At present, only assembler source is generated; execution of compiled programs is not yet functional.
 
 $ sudo apt install git make gcc pkg-config lua5.4 flex bison
 $ git clone https://github.com/zu2/ack-6800.git
