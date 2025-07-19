@@ -7,34 +7,37 @@
 .sect .text
 
 ! This subroutine compares on two integers.
-! If T is pushed first and than S, the routine will return:
 !   -1  if S < T,
 !    0  if S = T,
 !    1  if S > T.
 
+! AccAB: T
+! stack:
+! +0:	return address
+! +2:	S
+
 
 Cmi:
 	tsx
+	subb 3,x	! T - S
+	sbca 2,x
+	blt 1f		! S > T
+	bgt 3f		! S < T
+	tstb
+	bne 3f		! S != T  (i.e S < T)
+			! S == T, AccAB already zero.
+2:
 	ldx 0,x
 	ins
 	ins
-	stab ARTH+1	! save second operand (highbyte)
-	staa ARTH	! save second operand (lowbyte)
-	pula
-	pulb
-	subb ARTH+1	! subtract second operand (lowbyte)
-	sbca ARTH	! subtract second operand (highbyte)
-	bpl 1f		! S >= T
-	ldab #0x0FF	! S < T
-	tba		! AX becomes -1
+	ins
+	ins
 	jmp 0,x
-    1:	beq 2f
-    3:	ldab #1		! S > T
-	clra		! AX becomes 1
-	jmp 0,x
-    2:	tstb
-	bne 3b
-	jmp 0,x
-
-
-
+1:
+	ldab #1		! S > T
+	clra		! AB becomes 1
+	bra 2b
+3:
+	ldab #0xff	! S < T
+	tba		! AB becomes -1
+	bra 2b

@@ -1640,7 +1640,7 @@ loc loc cii $1==1 && $2==2	| R16 |
 		"\tsbca #0"
 					| %[1] | |
 cii 	| R16 |
-		"jsr Cii"
+		"\tjsr Cii"
 					| | |
 cui 	| | | | cii |
 ciu	| | | | cii |
@@ -2210,9 +2210,11 @@ ret $1==0 | |
 		"\tjmp Ret0"
 					| | |
 ret $1==2 | |
+		allocate(R16)
 		"\tjmp Ret2"
 					| | |
 ret $1==4 	| |
+		allocate(R16)
 		"\tjmp Ret4"
 					| | |
 
