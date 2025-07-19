@@ -683,11 +683,12 @@ lol loe sbi (IN($1) && $3==2) | |
 					| %[a] | |
 loe lol sbi (IN($2) && $3==2) | |
 		allocate(R16)
+		"! loe lol sbi"
 		"\tldx <LBl"
-		"\tldab $2+1"
-		"\tldaa $2"
-		"\tsubb BASE+$1+1,x"
-		"\tsbca BASE+$1+0,x"
+		"\tldab $1+1"
+		"\tldaa $1"
+		"\tsubb BASE+$2+1,x"
+		"\tsbca BASE+$2+0,x"
 					| %[a] | |
 loe loe sbi $3==2	| |
 		allocate(R16)
