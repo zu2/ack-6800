@@ -18,16 +18,11 @@ Sli2:
 	ins
 	ins
 	stab <TMP+1	! shift count
-	bne 1f
-	pula		! zero shift, return input
+	pula
 	pulb
-	jmp 0,x
-    1:	pula
-	pulb
-    2:	aslb
+	beq 2f
+1:	aslb
 	rola		! shift left
 	dec TMP+1
-	bne 2b
-	jmp 0,x
-
-
+	bne 1b
+2:	jmp 0,x
