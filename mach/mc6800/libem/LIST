@@ -7,6 +7,7 @@ ret.s
 lcs.s
 sbi.s
 mli.s
+mli4.s
 dvi.s
 cii.s
 cms.s

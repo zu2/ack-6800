@@ -328,8 +328,8 @@ ldl IN($1)	| |
 ldl	| |
 		allocate(R16)
 		"! ldl $1"
-		"\tldab <LBl+1"
-		"\tldaa <LBl"
+		"\tldab <LB+1"
+		"\tldaa <LB"
 		"\taddb #[$1].l"
 		"\tadca #[$1].h"
 		"\tstab <TMP+1"
@@ -341,7 +341,7 @@ ldl	| |
 		"\tpsha"
 		"\tldab 1,x"
 		"\tldaa 0,x"
-					| | |
+					| %[a] | |
 lde	| |
 		allocate(R16)
 		"! lde $1"
@@ -664,8 +664,8 @@ loc adi $2==2 | R16 |
 lol adi IN($1) && $2==2 | R16 |
 		"! lol adi IN($1) $2"
 		"\tldx <LBl"
-		"\tldab BASE+$1+1,x"
-		"\tldaa BASE+$1+0,x"
+		"\taddb BASE+$1+1,x"
+		"\tadca BASE+$1+0,x"
 					| %[1] | |
 loe adi $2==2	| R16 |
 		"! loe adi $2"
@@ -819,18 +819,22 @@ sbi $1==4	| |
 		allocate(R16)
 		"! sbi $1"
 		"\ttsx"
-		"\tldab 3,x"
-		"\tldaa 2,x"
-		"\tsubb 7,x"
-		"\tsbca 6,x"
+		"\tldab 7,x"
+		"\tldaa 6,x"
+		"\tsubb 3,x"
+		"\tsbca 2,x"
 		"\tstab 7,x"
 		"\tstaa 6,x"
-		"\tldab 1,x"
-		"\tldaa 0,x"
-		"\tsbcb 5,x"
-		"\tsbca 4,x"
+		"\tldab 5,x"
+		"\tldaa 4,x"
+		"\tsbcb 1,x"
+		"\tsbca 0,x"
 		"\tstab 5,x"
 		"\tstaa 4,x"
+		"\tins"
+		"\tins"
+		"\tins"
+		"\tins"
 					| | |
 sbi ND	| R16 |
 		"! sbi ND"
@@ -1787,13 +1791,36 @@ loc loc cuu $1==2 && $2==4 | | | | loc 0 |
 /* GROUP 9 - LOGICAL */
 
 and $1==2	| R16 |
+		"! and $1"
 		"\ttsx"
 		"\tandb 1,x"
 		"\tanda 0,x"
 		"\tins"
 		"\tins"
 					| %[1] | |
+and $1==4	| |
+		allocate(R16)
+		"! and $1"
+		"\ttsx"
+		"\tldab 7,x"
+		"\tldaa 6,x"
+		"\tandb 3,x"
+		"\tanda 2,x"
+		"\tstab 7,x"
+		"\tstaa 6,x"
+		"\tldab 5,x"
+		"\tldaa 4,x"
+		"\tandb 1,x"
+		"\tanda 0,x"
+		"\tstab 5,x"
+		"\tstaa 4,x"
+		"\tins"
+		"\tins"
+		"\tins"
+		"\tins"
+					| | |
 and ND	| R16 |
+		"! and ND"
 		"\tins"
 		"\tins"
 		"\ttsx"
@@ -1841,12 +1868,34 @@ ior ND	| R16 |
 		"\tbne 1b"
 					| | |
 xor $1==2	| R16 |
+		"! xor $1"
 		"\ttsx"
 		"\teorb 1,x"
 		"\teora 0,x"
 		"\tins"
 		"\tins"
 					| %[1] | |
+xor $1==4	| |
+		allocate(R16)
+		"! xor $1"
+		"\ttsx"
+		"\tldab 7,x"
+		"\tldaa 6,x"
+		"\teorb 3,x"
+		"\teora 2,x"
+		"\tstab 7,x"
+		"\tstaa 6,x"
+		"\tldab 5,x"
+		"\tldaa 4,x"
+		"\teorb 1,x"
+		"\teora 0,x"
+		"\tstab 5,x"
+		"\tstaa 4,x"
+		"\tins"
+		"\tins"
+		"\tins"
+		"\tins"
+					| | |
 xor ND	| R16 |
 		"\tins"
 		"\tins"
@@ -2321,6 +2370,12 @@ zgt	| R16 |
 
 /* GROUP 14 - PROCEDURE CALL */
 
+loe cai | |
+		allocate(R16)
+		"! loe cai"
+		"\tldx $1"
+		"\tjsr 0,x"
+					| | |
 cai	| R16 |
 		"! cai"
 		"\tstab <ADDR+1"
