@@ -13,8 +13,6 @@
 .sect .text
 Mli4:
 Mlu4:
-	stab <ARTH+1
-	staa <ARTH
 	tsx
 	ldx 0,x
 	stx <TMP
@@ -22,21 +20,25 @@ Mlu4:
 	ins
 	pula
 	pulb
+	stab <ARTH+1
+	staa <ARTH+0
+	pula
+	pulb
 	stab <ARTH+3
 	staa <ARTH+2
 	pula
 	pulb
 	stab <ARTH+5
-	stab <ARTH+4
+	staa <ARTH+4
 	pula
 	pulb
 	stab <ARTH+7
-	stab <ARTH+6
+	staa <ARTH+6
+!
 	bsr Mul4
+!
 	tsx
 	ldx <TMP
-	ldab <ARTH+11
-	ldaa <ARTH+10
 	pshb
 	psha
 	ldab <ARTH+9

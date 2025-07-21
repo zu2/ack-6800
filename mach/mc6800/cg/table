@@ -144,7 +144,7 @@ lil IN($1)	| |
 		allocate(R16)
 		"! lil IN($1)"
 		"\tldx <LBl"
-		"\tldx [BASE+$1],x"
+		"\tldx BASE+$1,x"
 		"\tldab 1,x"
 		"\tldaa 0,x"
 					| %[a] | |
@@ -173,8 +173,7 @@ lof $1==0	| R16 |
 		"\tldab 1,x"
 		"\tldaa 0,x"
 					| %[1] | |
-lof    | |
-		allocate(R16)
+lof    | R16 |
 		"! lof $1"
 		"\taddb #[$1].l"
 		"\tadca #[$1].h"
@@ -183,7 +182,7 @@ lof    | |
 		"\tldx <TMP"
 		"\tldab 1,x"
 		"\tldaa 0,x"
-					| %[a] | |
+					| %[1] | |
 
 /* lal: load address local */
 lal	| |

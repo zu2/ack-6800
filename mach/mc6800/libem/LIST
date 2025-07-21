@@ -9,10 +9,13 @@ sbi.s
 mli.s
 mli4.s
 dvi.s
+dvi4.s
 cii.s
 cms.s
 cmi.s
 cmi4.s
+cmu.s
+cmu4.s
 tgt.s
 tlt.s
 tge.s

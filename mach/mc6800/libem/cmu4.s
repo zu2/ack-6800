@@ -1,4 +1,4 @@
-.define Cmi4
+.define Cmu4
 .sect .zero
 .sect .text
 .sect .rom
@@ -16,12 +16,12 @@
 ! +2 to +5 : T
 ! +6 to +9 : S
 
-Cmi4:
+Cmu4:
 	tsx
 	ldab 6,x
 	cmpb 2,x
-	blt 2f
-	bgt 3f
+	bcs 2f
+	bhi 3f
 	ldab 7,x
 	cmpb 3,x
 	bcs 2f
