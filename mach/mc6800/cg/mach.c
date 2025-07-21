@@ -3,16 +3,19 @@
  * (c) copyright 1987 by the Vrije Universiteit, Amsterdam, The Netherlands.
  * See the copyright notice in the ACK home directory, in the file "Copyright".
  */
-void con_part(int sz, word w)
-{
+void
+con_part(int sz, word w) {
+
 	while (part_size % sz)
 		part_size++;
 	if (part_size == TEM_WSIZE)
 		part_flush();
 	if (sz == 1) {
 		w &= 0xFF;
-		if (part_size)
+		if (part_size == 0) {
+			/* Shift 8 for m68k2, 16 otherwise */
 			w <<= 8;
+		}
 		part_word |= w;
 	} else {
 		assert(sz == 2);

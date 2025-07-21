@@ -237,6 +237,14 @@ lxa $1<=255	| |		/* n restricted to a max of 255 */
 
 /* load indirect, $1==size */
 
+lol loi IN($1) && $2==1 | |
+		allocate(R16)
+		"! lol loi IN($1) $2"
+		"\tldx LBl"
+		"\tldx BASE+$1,x"
+		"\tldab 0,x"
+		"\tclra"
+					| %[a] | |
 loi $1==1	| R16 |
 		"! loi $1"
 		"\tstab <TMP+1"
