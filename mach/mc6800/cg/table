@@ -108,7 +108,19 @@ ldc	 | |
 					| %[a] | |
 
 /* lol: load local var or arg, $1==offset*/
-
+lol sti IN($1) && $2==1 | R16 |
+		"! lol sti IN($1) && $2==1"
+		"\tldx <LBl"
+		"\tldx BASE+$1+0,x"
+		"\tstab 0,x"
+					| | |
+lol sti IN($1) && $2==2 | R16 |
+		"! lol sti IN($1) && $2==2"
+		"\tldx <LBl"
+		"\tldx BASE+$1+0,x"
+		"\tstab 1,x"
+		"\tstaa 0,x"
+					| | |
 lol IN($1)	| |
 		allocate(R16)
 		"! lol IN($1)"
@@ -185,6 +197,31 @@ lof    | R16 |
 					| %[1] | |
 
 /* lal: load address local */
+lal sti IN($1) && $2==1 | R16 |
+		"! lal sti IN($1) && $2==1"
+		"\tldx <LBl"
+		"\tstab BASE+$1,x"
+					| | |
+lal sti IN($1) && $2==2 | R16 |
+		"! lal sti IN($1) && $2==2"
+		"\tldx <LBl"
+		"\tstab BASE+$1+1,x"
+		"\tstaa BASE+$1+0,x"
+					| | |
+lal loi IN($1) && $2==1 | |
+		allocate(R16)
+		"! lal loi IN($1) && $2==1"
+		"\tldx <LBl"
+		"\tldab BASE+$1,x"
+		"\tclra"
+					| %[a] | |
+lal loi IN($1) && $2==2 | |
+		allocate(R16)
+		"! lal loi IN($1) && $2==2"
+		"\tldx <LBl"
+		"\tldab BASE+$1+1,x"
+		"\tldaa BASE+$1+0,x"
+					| %[a]| |
 lal	| |
 		allocate(R16)
 		"! lal $1"
@@ -195,6 +232,15 @@ lal	| |
 					| %[a] | |
 
 /* lae: load address external */
+lae sti $2==1 | R16 |
+		"! lae sti $2"
+		"\tstab $1"
+					| | |
+lae sti $2==2 | R16 |
+		"! lae sti $2"
+		"\tstab $1+1"
+		"\tstaa $1+0"
+					| | |
 lae 	| |
 		allocate(R16)
 		"! lae"
@@ -386,6 +432,12 @@ lpi 	| |
 
 
 /* GROUP 2 - STORE */
+dup stl $1==2 && IN($2) | R16 |
+		"! dup stl $1==2 && IN($2)"
+		"\tldx <LBl"
+                "\tstab BASE+$2+1,x"
+                "\tstaa BASE+$2+0,x"
+					| %[1] | |
 stl IN($1)	| R16 |
 		"! stl IN($1)"
                 "\tldx <LBl"
@@ -940,6 +992,7 @@ lde mli $2==2	| |
 		"\tjsr Mlinp"
 					| %[a] | |
 loc mli $2==2 | R16 |
+		"! loc mli $2==2"
 		"\tstab <ARTH+1"
 		"\tstaa <ARTH"
 		"\tldab #[$1].l"
@@ -1818,6 +1871,11 @@ loc loc cuu $1==2 && $2==4 | | "! loc loc cuu" | | loc 0 |
 
 /* GROUP 9 - LOGICAL */
 
+loc and	$2==2	| R16 |
+		"! loc and $2==2"
+		"\tandb #[$1].l"
+		"\tanda #[$1].h"
+					| %[1] | |
 and $1==2	| R16 |
 		"! and $1"
 		"\ttsx"
