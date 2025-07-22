@@ -1209,28 +1209,27 @@ ngi ND	| R16 |
 		"1:"
 		"\tjsr Ngi2"
 					| %[1] | |
-loc sli $1==1 && $2==2	| R16 |
+loc sli ($1==1 && $2==2)	| R16 |
 		"! loc sli $1 $2"
 		"\taslb"
 		"\trola"
 					| %[1] | |
-loc sli $1==2 && $2==2	| R16 |
-		"! loc sli $1 $2"
-		"\taslb"
-		"\trola"
-		"\taslb"
-		"\trola"
-					| %[1] | |
-loc sli $1==3 && $2==2	| R16 |
+loc sli ($1==2 && $2==2)	| R16 |
 		"! loc sli $1 $2"
 		"\taslb"
 		"\trola"
 		"\taslb"
 		"\trola"
+					| %[1] | |
+loc sli ($1==3 && $2==2)	| R16 |
+		"! loc sli $1 $2"
+		"\taslb"
+		"\trola"
+		"\taslb"
+		"\trola"
 		"\taslb"
 		"\trola"
 					| %[1] | |
-
 sli $1==2	| R16 |
 		"! sli $1"
 		"\tjsr Sli2"
@@ -1779,12 +1778,12 @@ loc loc cii $1==1 && $2==2	| R16 |
 cii 	| R16 |
 		"\tjsr Cii"
 					| | |
-cui 	| | | | cii |
-ciu	| | | | cii |
-cuu 	| | | | cii |
-loc loc cui $1==$2	| | | | |
-loc loc ciu $1==$2	| | | | |
-loc loc cuu $1==2 && $2==4 | | | | loc 0 |
+cui 	| | "! cui to cii" | | cii |
+ciu	| | "! ciu to cii" | | cii |
+cuu 	| | "! cuu to cii" | | cii |
+loc loc cui $1==$2	| | "! loc loc cui" | | |
+loc loc ciu $1==$2	| | "! loc loc ciu" | | |
+loc loc cuu $1==2 && $2==4 | | "! loc loc cuu" | | loc 0 |
 
 
 /* GROUP 9 - LOGICAL */
@@ -2731,7 +2730,6 @@ str $1==2	| R16 |
 trp	| R16 |
 		"\tjsr Trap"
 					| | |
-/* lol lal sti $1==$2 && $3==1 | | | | | /* throw away funny C-proc-prolog */
 lol lal sti IN($1) && $1==$2 && $3==1 | |
 		"! Code to adjust the byte order."
 		"! lol lal sti IN($1) $2 $3"
