@@ -239,7 +239,7 @@ lxa $1<=255	| |		/* n restricted to a max of 255 */
 lol loi IN($1) && $2==1 | |
 		allocate(R16)
 		"! lol loi IN($1) $2"
-		"\tldx LBl"
+		"\tldx <LBl"
 		"\tldx BASE+$1,x"
 		"\tldab 0,x"
 		"\tclra"
@@ -518,7 +518,7 @@ sts $1==2	| R16 |
 					| | |
 sdl IN($1)	| R16 |
 		"! sdl IN($1)"
-		"\tldx LBl"
+		"\tldx <LBl"
 		"\tstab BASE+$1+1,x"
 		"\tstaa BASE+$1+0,x"
 		"\tpula"
@@ -860,7 +860,7 @@ loc lol mli (IN($2) && $3==2)	| |
 		"\tldaa #[$1].h"
 		"\tstab <ARTH+1"
 		"\tstaa <ARTH"
-		"\tldx LBl"
+		"\tldx <LBl"
 		"\tldab BASE+$2+1,x"
 		"\tldaa BASE+$2+0,x"
 		"\tjsr Mlinp"
@@ -869,7 +869,7 @@ lol loc mli	| | | | loc $2 lol $1 mli $3 |
 lol lol mli (IN($1) && IN($2) && $3==2) | |
 		allocate(R16)
 		"! lol lol mli IN($1) IN($2) $3"
-		"\tldx LBl"
+		"\tldx <LBl"
 		"\tldab BASE+$1+1,x"
 		"\tldaa BASE+$1+0,x"
 		"\tstab <ARTH+1"
@@ -948,7 +948,7 @@ lol mli IN($1) && $2==2 | R16 |
 		"! lol mli IN($1) $2"
 		"\tstab <ARTH+1"
 		"\tstaa <ARTH"
-		"\tldx LBl"
+		"\tldx <LBl"
 		"\tldab BASE+$1+1,x"
 		"\tldaa BASE+$1+0,x"
 		"\tjsr Mlinp"
@@ -1607,6 +1607,7 @@ sru ND	| R16 |
 adp $1==0	| | | | |
 adp	| | | | loc $1 adi 2 |
 ads $1==2	| R16 |
+		"! ads $1"
 		"\ttsx"
 		"\taddb 1,x"
 		"\tadca 0,x"
@@ -1614,6 +1615,7 @@ ads $1==2	| R16 |
 		"\tins"
 					| %[1] | |
 ads ND 	| R16 |
+		"! ads ND"
 		"\ttsta"
 		"\tbeq 1f"
 		"\tcmpb #2"
@@ -1627,6 +1629,7 @@ ads ND 	| R16 |
 		"\tins"
 					| %[1] | |
 sbs $1==2	| R16 |
+		"! sbs $1"
 		"\tstab <ARTH+1"
 		"\tstaa <ARTH"
 		"\tpula"
@@ -1635,6 +1638,7 @@ sbs $1==2	| R16 |
 		"\tadca <ARTH"
 					| %[1] | |
 sbs ND	| R16 |
+		"! sbs ND"
 		"\ttsta"
 		"\tbeq 1f"
 		"\tcmpb #2"
@@ -1653,10 +1657,12 @@ sbs ND	| R16 |
 /* GROUP 7 INCREMENT/DECREMENT/ZERO */
 
 inc	| R16 |
+		"! inc"
 		"\taddb #1"
 		"\tadca #0"
 					| %[1] | |
 inl IN($1)	| |
+		"! inl IN($1)"
 		"\tldx <LBl"
 		"\tinc BASE+$1+1,x"
 		"\tbne 1f"
@@ -1665,6 +1671,7 @@ inl IN($1)	| |
 					| | |
 inl 	| |
 		allocate(R16)
+		"! inl"
 		"\tldx #$1"
 		"\tstx <TMP"
 		"\tldab <TMP+1"
@@ -1680,16 +1687,19 @@ inl 	| |
 		"1:"
 					| | |
 ine	| |
+		"! ine"
 		"\tldx $1"
 		"\tinx"
 		"\tstx $1"
 					| | |
 dec	| R16 |
+		"! dec"
 		"\tsubb #1"
 		"\tsbca #0"
 					| %[1] | |
 del IN($1)	| |
 		allocate(R16)
+		"! del IN($1)"
 		"\tldx <LBl"
 		"\tldab BASE+$1+1,x"
 		"\tldaa BASE+$1+0,x"
@@ -1700,6 +1710,7 @@ del IN($1)	| |
 					| | |
 del	| |
 		allocate(R16)
+		"! del"
 		"\tldab #[$1].l"
 		"\tldaa #[$1].h"
 		"\taddb <LB+1"
@@ -1715,17 +1726,20 @@ del	| |
 		"\tstaa 0,x"
 					| | |
 dee 	| |
+		"! dee"
 		"\tldx $1"
 		"\tdex"
 		"\tstx $1"
 					| | |
 zrl IN($1)	| |
+		"! zrl IN($1)"
 		"\tldx <LBl"
 		"\tclr BASE+$1+1,x"
 		"\tclr BASE+$1+0,x"
 					| | |
 zrl	| |
 		allocate(R16)
+		"! zrl"
 		"\tldab #[$1].l"
 		"\tldaa #[$1].h"
 		"\taddb <LB+1"
@@ -1737,16 +1751,19 @@ zrl	| |
 		"\tclr 0,x"
 					| | |
 zre	| |
+		"! zre"
 		"\tclr $1+1"
 		"\tclr $1"
 					| | |
 zer $1==2	| |
 		allocate(R16)
+		"! zer $1"
 		"\tclrb"
 		"\tclra"
 					| %[a] | |
 zer $1==4	| |
 		allocate(R16)
+		"! zer $1"
 		"\tclrb"
 		"\tclra"
 		"\tpshb"
@@ -1754,6 +1771,7 @@ zer $1==4	| |
 					| %[a] | |
 zer $1>0 && $1<=256	| |
 		allocate(R16)
+		"! zer $1"
 		"\tclra"
 		"\tldab $1"
 		"\tlsrb"
@@ -1776,6 +1794,7 @@ loc loc cii $1==1 && $2==2	| R16 |
 		"\tsbca #0"
 					| %[1] | |
 cii 	| R16 |
+		"! cii"
 		"\tjsr Cii"
 					| | |
 cui 	| | "! cui to cii" | | cii |
@@ -1895,6 +1914,7 @@ xor $1==4	| |
 		"\tins"
 					| | |
 xor ND	| R16 |
+		"! xor ND"
 		"\tins"
 		"\tins"
 		"\ttsx"
@@ -1915,10 +1935,12 @@ xor ND	| R16 |
 		"\tbne 1b"
 					| | |
 com $1==2	| R16 |
+		"! com $1"
 		"\tcomb"
 		"\tcoma"
 					| %[1] | |
 com ND	| R16 |
+		"! com ND"
 		"\ttsx"
 		"\tstx <ADDR"
 		"\taddb <ADDR+1"
@@ -1932,10 +1954,12 @@ com ND	| R16 |
 		"\tbne 1b"
 					| | |
 rol $1==2	| R16 |
+		"! rol $1"
 		"\taslb"
 		"\trola"
 					| %[1] | |
 rol $1==4	| R16 |
+		"! rol $1"
 		"\ttsx"
 		"\tasl 1,1"
 		"\trol 0,1"
@@ -1943,6 +1967,7 @@ rol $1==4	| R16 |
 		"\trola"
 					| | |
 rol ND	| R16 |
+		"! rol ND"
 		"\ttsx"
 		"\tstx <ADDR"
 		"\taddb <ADDR+1"
@@ -1958,10 +1983,12 @@ rol ND	| R16 |
 		"\tbne 1b"
 					| %[1] | |
 ror $1==2	| R16 |
+		"! ror $1"
 		"\tasra"
 		"\trorb"
 					| %[1] | |
 ror $1==4	| R16 |
+		"! ror $1"
 		"\ttsx"
 		"\tasra"
 		"\trorb"
@@ -1969,6 +1996,7 @@ ror $1==4	| R16 |
 		"\tror 1,x"
 					| | |
 ror ND	| R16 |
+		"! ror ND"
 		"\ttsx"
 		"\tstx <ADDR"
 		"\taddb <ADDR+1"
@@ -1989,14 +2017,17 @@ ror ND	| R16 |
 /* if bit $1 is on, AB=1 else AB=0 */
 
 loc inn $1<0 && $2==2	| R16 |
+		"! loc inn $1 $2"
 		"\tclrb"
 		"\tclra"
 					| %[1] | |
 loc inn	$2==2 && $1==0	| R16 |
+		"! loc inn $1 $2"
 		"\andb #1"
 		"\tclra"
 					| %[1] | |
 loc inn	$2==2 && $1>0 && $1<16	| R16 |
+		"! loc inn $1 $2"
 		"\tldx #$1"
 		"1:"
 		"\tlsra"
@@ -2017,6 +2048,7 @@ loc inn zeq $1>0 && $1<16 && $2==2	| R16 |
 		"\tbeq $3 ! ???"
 					| | |
 loc inn zne $1>0 && $1<16 && $2==2	| R16 |
+		"! loc inn zne $1 $2"
 		"\tldx #$1"
 		"1:"
 		"\tlsra"
@@ -2027,6 +2059,7 @@ loc inn zne $1>0 && $1<16 && $2==2	| R16 |
 		"\tbne $3 ! ???"
 					| | |
 inn $1==2	| R16 |
+		"! inn $1"
 		"\tstab <ARTH+1"
 		"\tstaa <ARTH"
 		"\tldx <ARTH"
@@ -2041,6 +2074,7 @@ inn $1==2	| R16 |
 		"\tclra"
 				| %[1] | |
 inn zeq $1==2	| R16 |
+		"! inn zeq $1"
 		"\tstab <ARTH+1"
 		"\tstaa <ARTH"
 		"\tldx <ARTH"
@@ -2055,6 +2089,7 @@ inn zeq $1==2	| R16 |
 		"\tbeq $2"
 				| %[1] | |
 inn zne $1==2	| R16 |
+		"! inn zne $1"
 		"\tstab <ARTH+1"
 		"\tstaa <ARTH"
 		"\tldx <ARTH"
@@ -2069,10 +2104,12 @@ inn zne $1==2	| R16 |
 		"\tbne $2"
 				| %[1] | |
 inn $1<=256	| R16 |
+		"! inn $1"
 		"\tldx #$1-1"
 		"\tjsr Inn"
 					| %[1] | |
 inn ND	| R16 |
+		"! inn ND"
 		"\tjsr TestFFh"
 		"\tpula"
 		"\tpulb"
@@ -2080,6 +2117,7 @@ inn ND	| R16 |
 					| %[1] | |
 loc set $2==2 && $1>=0 && $1<16	| |
 		allocate(R16)
+		"! loc set $1 $2"
 		"\tldx #$1"
 		"\tclrb"
 		"\tclra"
@@ -2091,6 +2129,7 @@ loc set $2==2 && $1>=0 && $1<16	| |
 		"bne 1b"
 					| %[a] | |
 set $1==2	| R16 |
+		"! set $1"
 		"\tstab <ARTH+1"
 		"\tstaa <ARTH"
 		"\tldx <ARTH"
@@ -2104,10 +2143,12 @@ set $1==2	| R16 |
 		"\tbne 1b"
 					| %[1] | |
 set $1<=256	| R16 |
+		"! set $1"
 		"\tldx #$1-1"
 		"\tjsr Set"
 					| | |
 set ND	| R16 |
+		"! set ND"
 		"\tjsr TestFFh"
 		"\tjsr Pop"
 		"\tjsr Set"
@@ -2118,9 +2159,11 @@ set ND	| R16 |
 
 lae lar defined(rom(1,3)) | | | | lae $1 aar $2 loi rom(1,3) |
 lar $1==2	| R16 |
+		"! lar $1"
 		"\tjsr Lar"
 					| | |
 lar ND	| R16 |
+		"! lar ND"
 		"\ttsta"
 		"\tbeq 1f"
 		"\tcmpb #2"
@@ -2131,9 +2174,11 @@ lar ND	| R16 |
 					| | |
 lae sar defined(rom(1,3)) | | | | lae $1 aar $2 sti rom(1,3) |
 sar $1==2	| R16 |
+		"! Sar $1"
 		"\tjsr Sar"
 					| | |
 sar ND	| R16 |
+		"! Sar ND"
 		"\ttsta"
 		"\tbeq 1f"
 		"\tcmpb #2"
@@ -2146,10 +2191,12 @@ lae aar $2==2 && rom(1,3)==1 && rom(1,1)==0 | | | | adi 2 |
 lae aar $2==2 && rom(1,3)==1 && rom(1,1)!=0 | |
 				    | | adi 2 adp 0-rom(1,1) |
 lae aar $2==2 && rom(1,3)==2 && rom(1,1)==0 | R16 |
+		"! lae aar $1 $2"
 		"\taslb"
 		"\trola"
 					| %[1] | adi 2 |
 lae aar $2==2 && rom(1,3)==2 && rom(1,1)!=0 | R16 |
+		"! lae aar $1 $2"
 		"\taslb"
 		"\trola"
 				    | %[1] | adi 2 adp (0-rom(1,1))*2 |
@@ -2158,9 +2205,11 @@ lae aar $2==2 && rom(1,3)>2 && rom(1,1)==0 | |
 lae aar $2==2 && rom(1,3)>2 && rom(1,1)!=0 | |
 		| | loc rom(1,3) mli 2 adi 2 adp (0-rom(1,1))*rom(1,3) |
 aar $1==2	| R16 |
+		"! aar $1"
 		"\tjsr Aar"
 					| %[1] | |
 aar ND	| R16 |
+		"! aar ND"
 		"\ttsta"
 		"\tbeq 1f"
 		"\tcmpb #2"
@@ -2174,13 +2223,16 @@ aar ND	| R16 |
 /* GROUP 12 - COMPARE */
 
 cmi $1==2	| R16 |
+		"! cmi $1"
 		"\tjsr Cmi"
 					| %[1] | |
 cmi $1==4	| |
 		allocate(R16)
+		"! cmi $1"
 		"\tjsr Cmi4"
 					| %[a] | |
 cmi ND	| R16 |
+		"! cmi R16"
 		"\ttsta"
 		"\tbeq 1f"
 		"\tcmpb #2"
@@ -2190,13 +2242,16 @@ cmi ND	| R16 |
 		"\tjsr Cmi"
 					| %[1] | |
 cmu $1==2	| R16 |
+		"! cmu $1"
 		"\tjsr Cmu2"
 					| %[1] | |
 cmu $1==4	| |
 		allocate(R16)
+		"! cmu $1"
 		"\tjsr Cmu4"
 					| %[a] | |
 cmu ND	| R16 |
+		"! cmu ND"
 		"\ttsta"
 		"\tbeq 1f"
 		"\tcmpb #2"
@@ -2209,23 +2264,28 @@ cmp	| |
 					| | cmu 2 |
 cms $1==2	| |
 		allocate(R16)
+		"! cms $1"
 		"\tldab #2"
 		"\tjsr Cms"
 					| %[a] | |
 cms $1==4	| |
 		allocate(R16)
+		"! cms $1"
 		"\tldab #4"
 		"\tjsr Cms"
 					| %[a] | |
 cms ND	| R16 |
+		"! cms ND"
 		"\tjsr TestFFh"
 		"\tincb"
 		"\tjsr Cms"
 					| %[1] | |
 tlt	| R16 |
+		"! tlt"
 		"\tjsr Tlt"
 					| %[1] | |
 tle	| R16 |
+		"! tle"
 		"\tjsr Tle"
 					| %[1] | |
 teq	| R16 |
@@ -2247,9 +2307,11 @@ tne	| R16 |
 		"\tclra"
 					| %[1] | |
 tge	| R16 |
+		"! tge"
 		"\tjsr Tge"
 					| %[1] | |
 tgt	| R16 |
+		"! tgt"
 		"\tjsr Tgt"
 					| %[1] | |
 
@@ -2258,6 +2320,7 @@ tgt	| R16 |
 
 bra	| |
 		remove(ALL)
+		"! bra"
 		"\tjmp $1"
 					| | |
 loc blt | R16 |
@@ -2793,7 +2856,7 @@ trp	| R16 |
 lol lal sti IN($1) && $1==$2 && $3==1 | |
 		"! Code to adjust the byte order."
 		"! lol lal sti IN($1) $2 $3"
-		"\tldx LBl"
+		"\tldx <LBl"
 		"\tldab BASE+$1+1,x"
 		"\tstab BASE+$1,x"
 					 | | |
