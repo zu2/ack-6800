@@ -378,8 +378,10 @@ ldf	| |
 lpi 	| |
 		allocate(R16)
 		"! lpi $1"
-		"\tldab #[$1].l"
-		"\tldaa #[$1].h"
+		"\tldx #$1"
+		"\tstx <TMP"
+		"\tldab <TMP+1"
+		"\tldaa <TMP"
 					| %[a] | |
 
 
