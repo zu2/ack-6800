@@ -2260,11 +2260,44 @@ bra	| |
 		remove(ALL)
 		"\tjmp $1"
 					| | |
-
+loc blt | R16 |
+		"! loc blt $1"
+		"\tsubb #[$1].l"
+		"\tsbca #[$1].h"
+		"\tbmi $2"
+					| | |
+lol blt IN($1) | R16 |
+		"! lol blt IN($1)"
+		"\tldx <LBl"
+		"\tsubb BASE+$1+1,x"
+		"\tsbca BASE+$1+0,x"
+		"\tbmi $2"
+					| | |
 blt	| R16 |
 		"! blt"
 		"\tjsr Sbi2"
 		"\tbmi $1"
+					| | |
+loc ble | R16 |
+		"! loc ble $1"
+		"\tsubb #[$1].l"
+		"\tsbca #[$1].h"
+		"\tbmi $2"
+		"\tbne 1f"
+		"\ttstb"
+		"\tbeq $2"
+		"1:"
+					| | |
+lol ble IN($1) | R16 |
+		"! lol ble IN($1)"
+		"\tldx <LBl"
+		"\tsubb BASE+$1+1,x"
+		"\tsbca BASE+$1+0,x"
+		"\tbmi $2"
+		"\tbne 1f"
+		"\ttstb"
+		"\tbeq $2"
+		"1:"
 					| | |
 ble	| R16 |
 		"! ble"
@@ -2272,7 +2305,32 @@ ble	| R16 |
 		"\tbmi $1"
 		"\tbne 1f"
 		"\ttstb"
-		"\tbeq $1\n1:"
+		"\tbeq $1"
+		"1:"
+					| | |
+lol loc beq IN($1) | |
+		"! lol loc beq"
+		"\tldx <LBl"
+		"\tldx BASE+$1,x"
+		"\tcpx #$2"
+		"\tbeq $3"
+					| | |
+loc beq | R16 |
+		"! loc beq"
+		"\tcmpb #[$1].l"
+		"\tbne 1f"
+		"\tcmpa #[$1].h"
+		"\tbeq $2"
+		"1:"
+					| | |
+lol beq IN($1) | R16 |
+		"! lol beq IN($1)"
+		"\tldx <LBl"
+		"\tcmpb BASE+$1+1,x"
+		"\tbne 1f"
+		"\tcmpa BASE+$1+0,x"
+		"\tbeq $2"
+		"1:"
 					| | |
 beq	| R16 |
 		"! beq"
@@ -2283,7 +2341,8 @@ beq	| R16 |
 		"\tcmpb BRANCH+1"
 		"\tbne 1f"
 		"\tcmpa BRANCH"
-		"\tbeq $1\n1:"
+		"\tbeq $1"
+		"1:"
 					| | |
 bne	| R16 |
 		"! bne"
@@ -2307,7 +2366,8 @@ bgt	| R16 |
 		"\tbmi 1f"
 		"\tbne $1"
 		"\ttstb"
-		"\tbne $1\n1:"
+		"\tbne $1"
+		"1:"
 					| | |
 
 cmi zlt $1==2 | | | | blt $2 |
