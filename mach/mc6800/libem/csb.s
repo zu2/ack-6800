@@ -1,4 +1,4 @@
-.define Csb
+.define Csb,CsbX
 .sect .zero
 .sect .text
 .sect .rom
@@ -26,6 +26,7 @@ Csb:
 	stab <ADDR+1	! address of descriptor (lowbyte)
 	staa <ADDR	! address of descriptor (highbyte)
 	ldx <ADDR
+CsbX:	stx <ADDR
 	inx
 	inx
 	ldab 1,x	! number of entries (lowbyte)

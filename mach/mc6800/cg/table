@@ -440,7 +440,7 @@ dup stl $1==2 && IN($2) | R16 |
 					| %[1] | |
 stl IN($1)	| R16 |
 		"! stl IN($1)"
-                "\tldx <LBl"
+		"\tldx <LBl"
                 "\tstab BASE+$1+1,x"
                 "\tstaa BASE+$1+0,x"
 					| | |
@@ -2312,7 +2312,7 @@ cmi ND	| R16 |
 					| %[1] | |
 cmu $1==2	| R16 |
 		"! cmu $1"
-		"\tjsr Cmu2"
+		"\tjsr Cmu"
 					| %[1] | |
 cmu $1==4	| |
 		allocate(R16)
@@ -2599,17 +2599,14 @@ lfr $1==4 | |
 lfr ret $1==$2	| | | | ret 0 |
 asp lfr ret $2==$3 | | | | ret 0 |
 ret $1==0 | |
-		allocate(R16)
 		"! ret $1"
 		"\tjmp Ret0"
 					| | |
-ret $1==2 | |
-		allocate(R16)
+ret $1==2 | R16 |
 		"! ret $1"
 		"\tjmp Ret2"
 					| | |
-ret $1==4 	| |
-		allocate(R16)
+ret $1==4 	| R16 |
 		"! ret $1"
 		"\tjmp Ret4"
 					| | |
@@ -2783,6 +2780,18 @@ bls ND	| R16 |
 		"\tstab <ADDR+1"
 		"\tstaa <ADDR"
 		"\tjsr Blm"
+					| | |
+lae csa | |
+		allocate(R16)
+		"! lae"
+		"\tldx #$1"
+		"\tjmp CsaX"
+					| | |
+lae csb	| |
+		allocate(R16)
+		"! lae"
+		"\tldx #$1"
+		"\tjmp CsbX"
 					| | |
 csa	| R16 |
 		"\tjmp Csa"

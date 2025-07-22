@@ -20,6 +20,7 @@ tgt.s
 tlt.s
 tge.s
 tle.s
+csa.s
 csb.s
 sli.s
 sli4.s

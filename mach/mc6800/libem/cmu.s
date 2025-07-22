@@ -17,7 +17,7 @@
 ! +2:	S
 
 
-Cmi:
+Cmu:
 	tsx
 	subb 3,x	! T - S
 	sbca 2,x

@@ -15,14 +15,10 @@ Ret1:
 	stab	<RETURN
 	bra	1f
 Ret2:
-	pula
-	pulb
 	stab	<RETURN+1
 	staa	<RETURN
 	bra	1f
 Ret4:
-	pula
-	pulb
 	stab	<RETURN+1
 	staa	<RETURN
 	pula
