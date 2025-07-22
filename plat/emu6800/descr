@@ -21,7 +21,8 @@ var PLATFORM=emu6800
 var PLATFORMDIR={EM}/share/ack/{PLATFORM}
 var CPP_F=-D__emu6800
 var ALIGN=-a0:1 -a1:1 -a2:1 -a3:1 -b0:0 -b1:0x100
-var MACHOPT_F=-m8
+# see. util/opt/em_opt.6: replace multiplies with constants n times.
+var MACHOPT_F=-m0
 
 # Override the setting in fe so that files compiled for linux386 can see
 # the platform-specific headers.
