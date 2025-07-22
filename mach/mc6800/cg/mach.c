@@ -49,9 +49,16 @@ static int been_here;
 
 void prolog(full nlocals)
 {
+	int i;
+
 	fprintf(codefile,"\tjsr Pro\n");
+	fprintf(codefile,"! nlocals %d\n",nlocals);
 	if (nlocals == 0)
 		return;
+	else if (nlocals < 8)
+		for (i=0; i<nlocals; i++) {
+			fprintf(codefile,"\tdes\n");
+		}
 	else
 		fprintf(codefile,
 	"\tldab #[%d].l\n\tldaa #[%d].h\n\tjsr Lcs\n",
