@@ -90,6 +90,7 @@ Cycle time of Mandelbrot.
 ## TODO
 
 - Add essential source files under plat/emu6800/
+- Avoid generating redundant ldx LB/LBlinstructions.
 - Adjust the build process to allow compilation with ack -memu6800 (execution is not yet possible)
 - Further development is needed, as almost no support routines are implemented at this time.
 
