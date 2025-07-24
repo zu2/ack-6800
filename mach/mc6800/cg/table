@@ -1145,12 +1145,12 @@ ldl dvi IN($1) && $2==2	| |
 		allocate(R16)
 		"! ldl dvi IN($1) $2"
 		"\tldx <LBl"
-		"\tldab #BASE+$1+1,x"
-		"\tldaa #BASE+$1+0,x"
+		"\tldab BASE+$1+1,x"
+		"\tldaa BASE+$1+0,x"
 		"\tstab <ARTH+1"
 		"\tstaa <ARTH"
-		"\tldab #BASE+$1+3,x"
-		"\tldaa #BASE+$1+2,x"
+		"\tldab BASE+$1+3,x"
+		"\tldaa BASE+$1+2,x"
 		"\tjsr Dvi"
 					| %[a] | |
 lde dvi $2==2	| |
@@ -1493,26 +1493,26 @@ lol loc dvu (IN($1) && $3==2)	| |
 		"\tstab <ARTH+1"
 		"\tstaa <ARTH"
 		"\tldx <LBl"
-		"\tldab #BASE+$1+1,x"
-		"\tldaa #BASE+$1+0,x"
+		"\tldab BASE+$1+1,x"
+		"\tldaa BASE+$1+0,x"
 		"\tjsr Dvu2"
  					| %[a] | |
 lol lol dvu (IN($1) && IN($2) && $3==2) | |
 		allocate(R16)
 		"\tldx <LBl"
-		"\tldab #BASE+$2+1,x"
-		"\tldaa #BASE+$2+0,x"
+		"\tldab BASE+$2+1,x"
+		"\tldaa BASE+$2+0,x"
 		"\tstab <ARTH+1"
 		"\tstaa <ARTH"
-		"\tldab #BASE+$1+1,x"
-		"\tldaa #BASE+$1+0,x"
+		"\tldab BASE+$1+1,x"
+		"\tldaa BASE+$1+0,x"
 		"\tjsr Dvu2"
 					| %[a] | |
 lol loe dvu (IN($1) && $3==2) | |
 		allocate(R16)
 		"\tldx <LBl"
-		"\tldab #BASE+$1+1,x"
-		"\tldaa #BASE+$1+0,x"
+		"\tldab BASE+$1+1,x"
+		"\tldaa BASE+$1+0,x"
 		"\tstab <ARTH+1"
 		"\tstaa <ARTH"
 		"\tldab $2+1"
@@ -1522,8 +1522,8 @@ lol loe dvu (IN($1) && $3==2) | |
 loe lol dvu (IN($2) && $3==2) | |
 		allocate(R16)
 		"\tldx <LBl"
-		"\tldab #BASE+$2+1,x"
-		"\tldaa #BASE+$2+0,x"
+		"\tldab BASE+$2+1,x"
+		"\tldaa BASE+$2+0,x"
 		"\tstab <ARTH+1"
 		"\tstaa <ARTH"
 		"\tldab $1+1"
@@ -2684,21 +2684,14 @@ ass ND	| R16 |
 		"\tjsr Asp"
 					| | |
 blm $1==0	| | | | asp 4 |
-/*
+
 blm D	| R16 |
 		"! blm D"
-		"\tstab <ADDR+3"
-		"\tstaa <ADDR+2"
-		"\tpula"
-		"\tpulb"
-		"\tstab <ADDR+1"
-		"\tstaa <ADDR"
-		"\tldab #[$1].l"
-		"\tstab <NBYTES+1"
-		"\tldaa #[$1].h"
-		"\tstaa <NBYTES"
+		"\tldx #$1"
+		"\tstx <NBYTES"
 		"\tjsr Blm"
 					| | |
+/*
 asp $1==2 | |
 		allocate(R16)
 		"! asp $1"
