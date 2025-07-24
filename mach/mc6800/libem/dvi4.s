@@ -151,7 +151,7 @@ Rmi4:
 	ldaa <ARTH+4
 	staa <SIGN
 	bpl 2f
-	ldx #ARTH
+	ldx #ARTH+4
 	jsr neg4
 2:
 	jsr Div32x32

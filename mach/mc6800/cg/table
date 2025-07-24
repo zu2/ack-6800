@@ -1249,10 +1249,20 @@ ngi $1==2	| R16 |
 		"\tnegb"
 		"\tsbca #0"
 					| %[1] | |
-ngi $1==4	| |
-		allocate(R16)
+ngi $1==4	| R16 |
 		"! ngi $1"
-		"\tjsr Ngi4"
+		"\ttsx"
+		"\tcoma"
+		"\tcomb"
+		"\tcom 0,x"
+		"\tneg 1,x"
+		"\tbne 9f"
+		"\tinc 0,x"
+		"\tbne 9f"
+		"\tincb"
+		"\tbne 9f"
+		"\tinca"
+		"9:"
 					| | |
 ngi ND	| R16 |
 		"! ngi ND"
@@ -1927,13 +1937,36 @@ and ND	| R16 |
 		"\tbne 1b"
 					| | |
 ior $1==2	| R16 |
+		"! ior $1"
 		"\ttsx"
 		"\torab 1,x"
 		"\toraa 0,x"
 		"\tins"
 		"\tins"
 					| %[1] | |
+ior $1<=254	| R16 |
+		"! ior $1"
+		"\tins"
+		"\tins"
+		"\ttsx"
+		"\tstx <ADDR"
+		"\taslb"
+		"\trola"
+		"\taddb <ADDR+1"
+		"\tadca <ADDR"
+		"\tstab <ADDR+3"
+		"\tstaa <ADDR+2"
+		"\tldx <ADDR+2"
+		"1:"
+		"\tpulb"
+		"\torab 0,x"
+		"\tstab 0,x"
+		"\tinx"
+		"\tcpx <ADDR+2"
+		"\tbne 1b"
+					| | |
 ior ND	| R16 |
+		"! ior $1"
 		"\tins"
 		"\tins"
 		"\ttsx"
@@ -2396,19 +2429,19 @@ loc blt | R16 |
 		"! loc blt $1"
 		"\tsubb #[$1].l"
 		"\tsbca #[$1].h"
-		"\tbmi $2"
+		"\tblt $2"
 					| | |
 lol blt IN($1) | R16 |
 		"! lol blt IN($1)"
 		"\tldx <LBl"
 		"\tsubb BASE+$1+1,x"
 		"\tsbca BASE+$1+0,x"
-		"\tbmi $2"
+		"\tblt $2"
 					| | |
 blt	| R16 |
 		"! blt"
 		"\tjsr Sbi2"
-		"\tbmi $1"
+		"\tblt $1"
 					| | |
 loc ble | R16 |
 		"! loc ble $1"
@@ -2507,17 +2540,18 @@ cmp zlt	| | | | blt $2 |
 zlt	| R16 |
 		"! zlt"
 		"\ttsta"
-		"\tbmi $1"
+		"\tblt $1"
 					| | |
 cmi zle $1==2 | | | | ble $2 |
 cmp zle | | | | ble $2 |
 zle	| R16 |
 		"! zle"
 		"\ttsta"
-		"\tbmi $1"
-		"\tbne 1f"
+		"\tblt $1"
+		"\tbgt 1f"
 		"\ttstb"
-		"\tbeq $1\n1:"
+		"\tbeq $1"
+		"1:"
 					| | |
 cmi zeq $1==2 | | | | beq $2 |
 cmp zeq | | | | beq $2 |
