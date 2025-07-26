@@ -1,12 +1,14 @@
-.define BASE
+.define BASE, NBYTES
 .define hol0, ADDR
 .define LB, LBl
 .define	ARTH, RETURN, SIGN
 .define RETSIZE, TRAPVAL, BRANCH
 .define START
 .define TMP, TMP2
-.define	_exit, _abort, doexit
-.define	_putchar, _getchar, _print, _cpu_counter
+.define	__exit, _abort, doexit
+.define	_putchar, _getchar, _print, _cpu_counter, _errno
+.define _putstr, _puthexl,_puthexi, _puthexc
+.define _emu6800_conout, _emu6800_conin
 BASE    = 240
 
 .sect .zero
@@ -28,9 +30,12 @@ SIGN: .space 1
 RETSIZE: .space 1
 TRAPVAL: .space 1
 BRANCH: .space 2
+NBYTES: .space 2
 TMP: .space 2
 TMP2: .space 2
 exitsp: .space 2
+
+_errno: .space 2
 
 !.base 0x0100            ! where to start in the emu6800
 .sect .text
@@ -38,18 +43,21 @@ exitsp: .space 2
 START:
 	sts	exitsp
 	lds	#0xefff
+!
 	clrb
 	clra
-	pshb
+	pshb		! envp
 	psha
-	pshb
+	pshb		! argv
 	psha
-	jsr     _main
+	pshb		! argc
+	psha
+	jsr     __m_a_i_n
 	ins
 	ins
 	ins
 	ins
-_exit:
+__exit:
 _abort:
 doexit:
 	lds exitsp
@@ -60,10 +68,58 @@ doexit:
 !
 !	minimal I/O routine
 !
+_puthexc:
+	tsx
+	bra	_puthexi3
+_puthexl:
+	tsx
+	bsr	_puthexi2
+	inx
+	inx
+	bra	_puthexi2
+_puthexi:
+	tsx
+_puthexi2:
+	ldaa	2,x
+	bsr	_puthex2
+_puthexi3:
+	ldaa	3,x
+_puthex2:			! put AccA in 2 hexdigit
+	bsr	_puthexhi
+	bra	_puthexlo
+_puthexhi:
+	tab
+	lsrb
+	lsrb
+	lsrb
+	lsrb
+_puthexlo:
+	andb	#0x0f
+	cmpb	#0x0a
+	bcs	1f
+	addb	#'A'-'9'-1
+1:	addb	#'0'
+	stab	0xfefe
+	rts
+_putstr:
+	stab	<TMP+1
+	staa	<TMP
+	ldx	<TMP
+	bra	2f
+1:	stab	0xfefe
+	inx
+2:	ldab	0,x
+	bne	1b
+	rts
+_emu6800_conout:
 _putchar:
 	tsx
 	ldab	3,x
 	stab	0xfefe
+	rts
+_emu6800_conin:
+	ldab	#0xff
+	tba
 	rts
 _getchar:
 	ldab	#95		! '_'
@@ -80,6 +136,8 @@ _cpu_counter:
 	staa	0xfefb
 	rts
 .sect .data
+.define _emu6800_ram
+_emu6800_ram: .data2 __end
 PROGNAME:               ! for initialising the programname pointer
 .asciz "program"
 .sect .bss
