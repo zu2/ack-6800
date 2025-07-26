@@ -2920,35 +2920,42 @@ exg $1<=255	| |
 		"\tjsr Exg"
 					| | |
 fil	| |
+		"! fil"
 		"\tldx #$1"
 		"\tstx hol0+4"
 					| | |
 gto	| |
 		allocate(R16)
+		"! gto"
 		"\tldx #$1"
 		"\tjmp Gto"
 					| | |
 lim	| |
 		allocate(R16)
+		"! lim"
 		"\tldab IGNMASK+1"
 		"\tldaa IGNMASK"
 					| %[a] | |
 lin	| |
+		"! lin"
 		"\tldx #$1"
 		"\tstx hol0"
 					| | |
 lni	| |
+		"! lni"
 		"\tldx hol0"
 		"\tinx"
 		"\tstx hol0"
 					| | |
 lor $1==0	| |
 		allocate(R16)
+		"! lor $1"
 		"\tldab <LB+1"
 		"\tldaa <LB"
 					| %[a] | |
 lor $1==1	| |
 		allocate(R16)
+		"! lor $1"
 		"\ttsx"
 		"\tstx <TMP"
 		"\tldab <TMP+1"
@@ -2956,25 +2963,30 @@ lor $1==1	| |
 					| %[a] | |
 lor $1==2	| |
 		allocate(R16)
+		"! lor $1"
 		"\tldab HP+1"
 		"\tldaa HP"
 					| %[a] | |
 lpb	| | | | adp 2 |
 mon	| R16 |
+		"! mon"
 		"\tjsr Mon"
 					| %[1] | |
 nop	| STACK |
 #ifdef DEBUG
 		allocate(R16)
+		"! nop"
 		"\tjsr Printstack"
 #endif
 					| | |
 rck	| R16 | | | |
 rtt	| |
 		remove(ALL)
+		"! rtt"
 		"\tjmp Rtt"
 					| | |
 sig 	| R16 |
+		"! sig"
 		"\tdes"
 		"\tdes"
 		"\ttsx"
@@ -2990,6 +3002,7 @@ sig 	| R16 |
 		"\tstaa ERRPROC"
 					| | |
 sim	| R16 |
+		"! sim"
 		"\tstab IGNMASK+1"
 		"\tstaa IGNMASK"
 					| | |
