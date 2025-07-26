@@ -3,12 +3,12 @@ from glob import glob
 
 ackclibrary(
     name="libsys",
-    plat="emu6800",
+    plat="e6800",
     srcs=(
-        glob("plat/emu6800/libsys/*.s")
-        + glob("plat/emu6800/libsys/*.c")
-        + glob("plat/emu6800/libsys/*.h")
+        glob("plat/e6800/libsys/*.s")
+        + glob("plat/e6800/libsys/*.c")
+        + glob("plat/e6800/libsys/*.h")
     ),
-    deps=["lang/cem/libcc.ansi/headers", "plat/emu6800/include"],
+    deps=["lang/cem/libcc.ansi/headers", "plat/e6800/include"],
 )
 

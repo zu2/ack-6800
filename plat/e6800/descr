@@ -17,9 +17,9 @@ var da=2
 var x=8
 var xa=2
 var ARCH=mc6800
-var PLATFORM=emu6800
+var PLATFORM=e6800
 var PLATFORMDIR={EM}/share/ack/{PLATFORM}
-var CPP_F=-D__emu6800
+var CPP_F=-D__unix
 var ALIGN=-a0:1 -a1:1 -a2:1 -a3:1 -b0:0 -b1:0x100
 # see. util/opt/em_opt.6: replace multiplies with constants n times.
 var MACHOPT_F=-m0
@@ -63,34 +63,22 @@ name led
 	args {ALIGN} {SEPID?} \
 		({RTS}:.b=-u _i_main) \
 	    (.e:{HEAD}={PLATFORMDIR}/boot.o) \
+		({RTS}:.c={PLATFORMDIR}/c-ansi.o) \
 		-o > < \
-		(.e:{TAIL}={PLATFORMDIR}/libem.a)
+		(.ocm.bas.mod.b.c.p:{TAIL}={PLATFORMDIR}/libc.a) \
+		{FLOATS?} \
+		(.e:{TAIL}={PLATFORMDIR}/libem.a \
+		           {PLATFORMDIR}/libsys.a \
+				   {PLATFORMDIR}/libc.a \
+				   {PLATFORMDIR}/libem.a \
+		           {PLATFORMDIR}/libsys.a \
+		           {PLATFORMDIR}/libend.a)
 	linker
 end
-#		({RTS}:.ocm.bas.b={PLATFORMDIR}/c-ansi.o) \
-#		({RTS}:.c={PLATFORMDIR}/c-ansi.o) \
-#		({RTS}:.mod={PLATFORMDIR}/modula2.o) \
-#		({RTS}:.p={PLATFORMDIR}/pascal.o) \
-#
-#		(.p:{TAIL}={PLATFORMDIR}/libpascal.a) \
-#		(.b:{TAIL}={PLATFORMDIR}/libb.a) \
-#		(.bas:{TAIL}={PLATFORMDIR}/libbasic.a) \
-#		(.mod:{TAIL}={PLATFORMDIR}/libmodula2.a) \
-#		(.ocm:{TAIL}={PLATFORMDIR}/liboccam.a) \
-#		(.ocm.bas.mod.b.c.p:{TAIL}={PLATFORMDIR}/libc.a) \
-#		{FLOATS?} \
-#
-#		(.e:{TAIL}={PLATFORMDIR}/libem.a \
-#		           {PLATFORMDIR}/libsys.a \
-#				   {PLATFORMDIR}/libc.a \
-#				   {PLATFORMDIR}/libem.a \
-#		           {PLATFORMDIR}/libsys.a \
-#		           {PLATFORMDIR}/libend.a)
-#
 name cv
 	from .out
 	to .img
 	program {EM}/bin/aslod68
-	args -v -v -memu6800 < >
-	outfile emu6800.img
+	args -v -v -me6800 < >
+	outfile e6800.img
 end

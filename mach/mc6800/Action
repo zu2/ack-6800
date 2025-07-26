@@ -16,6 +16,6 @@ end
 name "Motorola 6800 MON library"
 dir libmon
 end
-#name "Motorola 6800 system call library"
-#dir libsys
-#end
+name "Motorola 6800 system call library"
+dir libsys
+end

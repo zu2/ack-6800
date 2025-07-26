@@ -264,7 +264,7 @@ int main(int argc, char* argv[])
 				break;
 
 			case 'm':
-				if (!strcmp(&argv[1][2],"emu6800"))
+				if (!strcmp(&argv[1][2],"e6800"))
 					plat = EMU6800;
 				else
 					fatal("bad plathome '%s'",&argv[1][2]);

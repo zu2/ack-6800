@@ -1,5 +1,5 @@
 .define BASE, NBYTES
-.define hol0, ADDR
+.define hol0, IGNMASK, ADDR, PROGNAME
 .define LB, LBl
 .define	ARTH, RETURN, SIGN
 .define RETSIZE, TRAPVAL, BRANCH
@@ -21,6 +21,7 @@ BASE    = 240
 
 .sect .zero
 hol0:   .space 16       ! the hol0 block
+IGNMASK: .space 2	! can hold the ingnore mask
 ADDR: .space 4          ! used for indirect addressing
 LB: .space 2            ! the localbase
 LBl: .space 2           ! the second localbase (localbase-BASE)
@@ -139,6 +140,6 @@ _cpu_counter:
 .define _emu6800_ram
 _emu6800_ram: .data2 __end
 PROGNAME:               ! for initialising the programname pointer
-.asciz "program"
+.asciz "emu6800"
 .sect .bss
 beginbss:
