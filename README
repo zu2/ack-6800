@@ -49,7 +49,7 @@ Now, passed 8queen and knight tour, Mandelbrot(integer version).
 - https://github.com/zu2/chibicc-6800-v1/blob/main/ztest/9017-asciiart.c
 
 ```
-emu6800 -d 6800 emu6800.img /dev/null
+emu6800 -d 6800 e6800.img /dev/null
 CPU cycles = 210
 111111111111111111222222222333334568BC67443322222211111111111000000000000000000
 11111111111111111122222222233344598C  77943333222221111111110000000000000000000
@@ -89,9 +89,10 @@ Cycle time of Mandelbrot.
 
 ## TODO
 
-- Add essential source files under plat/emu6800/
+- Add essential source files under plat/e6800/
+  - Renamed to prevent the program from treating names starting with 'em' as EM code platforms.
 - Avoid generating redundant ldx LB/LBlinstructions.
-- Adjust the build process to allow compilation with ack -memu6800 (execution is not yet possible)
+- Adjust the build process to allow compilation with ack -me6800 (execution is not yet possible)
 - Further development is needed, as almost no support routines are implemented at this time.
 
 ## DONE
@@ -112,15 +113,15 @@ $ git clone https://github.com/zu2/ack-6800.git
 $ cd ack-6800
 $ make
 (debug:  make V=1 -j1)
-(Set PLATS = emu6800 in the Makefile if compilation takes too long.)
+(Set PLATS = e6800 in the Makefile if compilation takes too long.)
 $ make install
 $ export PATH=/opt/pkg/ack/bin:$PATH
 $ cd examples
 $ vi main.c
-$ ack  -memu6800 -v -v  main.c
-$ f9dasm -6800 emu6800.img
+$ ack  -me6800 -v -v  main.c
+$ f9dasm -6800 e6800.img
 (debug: ashow main.o , anm main.o . etc...)
-$ emu6800 -d 6800   emu6800.img /dev/null 
+$ emu6800 -d 6800   e6800.img /dev/null 
 
 
 emu6800: https://github.com/EtchedPixels/Fuzix-Compiler-Kit/test/
