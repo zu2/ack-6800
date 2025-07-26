@@ -39,4 +39,4 @@ void con_part(int sz, word w);
 void mes(word type);
 void prolog(full nlocals);
 
-
+#define	DEBUG	1

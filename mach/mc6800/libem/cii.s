@@ -26,48 +26,50 @@ Cii:
 	beq Cii_2	! a conversion from ? to 2
 	pula		! a conversion from ? to 4
 	pulb
-	cmpb #4
-	beq 8f		! a conversion 4 to 4 (skip)
-	cmpb #1
+!
+Cii_4:	cmpb #4
+	bne 1f		! a conversion 4 to 4 (skip)
+	pula		! top half word to R16
+	pulb
+	jmp 0,x
+!
+1:	cmpb #1
 	bne 2f
 	pula		! a conversion 1 to 4
 	pulb
-	pshb
-	clra
+	pshb		! save lower byte
+	clra		! sign extend
 	aslb
 	sbca #0
 	psha
-	psha
-	psha
+	tab
 	jmp 0,x
 2:	pulb		! a conversion 2 to 4
 	pshb
 	clra
 	aslb
 	sbca #0		! sign extend
-7:	psha
-	psha
-8:	jmp 0,x
+	tab
+	jmp 0,x
+!
 Cii_1:			! a conversion from ? to 1
 	pula
 	pulb
 	cmpb #1
-	beq 8f		! a conversion from 1 to 1 (skip)
-	cmpb #2
-	bne 4f
-	pula		! a conversion from  2 to 1
+	beq 5f		! a conversion from 1 to 1 (skip)
+3:	cmpb #2
+	beq 5f 		! a conversion from 2 to 1
+4:	pula		! a conversion from 4 to 1
+	pulb
+5:	pula
+	pulb
 	clra
-	psha
 	jmp 0,x
-4:	pula		! a conversion from  4 to 1
-	pulb
-	pula
-	pulb
-	bra 7f
+!
 Cii_2:			! a conversion from ? to 2
 	pula
 	pulb
-	cmpb #1		! a conversion from 1 to 2
+	cmpb #1		! a conversion from 1 to 2 ?
 	bne 2f
 	pula
 	pulb
@@ -75,13 +77,12 @@ Cii_2:			! a conversion from ? to 2
 	asrb
 	rolb
 	sbca #0
-	bra 7f
+	jmp 0,x
+!
 2:	cmpb #2
-	beq 8f		! a conversion from 2 to 2 (skip)
+	beq 3f		! a conversion from 2 to 2 (skip)
 	ins		! strip upper word
 	ins
-	pula		! get lower word
+3:	pula		! get lower word
 	pulb
-7:	pshb		! push result
-	psha
 8:	jmp 0,x

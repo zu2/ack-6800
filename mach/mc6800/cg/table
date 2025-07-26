@@ -1870,7 +1870,7 @@ loc loc cii $1==2 && $2==4	| R16 |
 cii 	| R16 |
 		"! cii"
 		"\tjsr Cii"
-					| | |
+					| %[1] | |
 cui 	| | "! cui to cii" | | cii |
 ciu	| | "! ciu to cii" | | cii |
 cuu 	| | "! cuu to cii" | | cii |
@@ -2326,7 +2326,7 @@ aar ND	| R16 |
 
 cmi $1==2	| R16 |
 		"! cmi $1"
-		"\tjsr Cmi"
+		"\tjsr Cmi2"
 					| %[1] | |
 cmi $1==4	| |
 		allocate(R16)
@@ -2343,16 +2343,18 @@ cmi ND	| R16 |
 		"1:"
 		"\tjsr Cmi"
 					| %[1] | |
+/* compare unsigned */
 cmu $1==2	| R16 |
 		"! cmu $1"
-		"\tjsr Cmu"
+		"\tjsr Cmu2"
 					| %[1] | |
 cmu $1==4	| |
 		allocate(R16)
 		"! cmu $1"
 		"\tjsr Cmu4"
 					| %[a] | |
-cmu ND	| R16 |
+cmu ND	| |
+		allocate(R16)
 		"! cmu ND"
 		"\ttsta"
 		"\tbeq 1f"
@@ -2447,8 +2449,8 @@ loc ble | R16 |
 		"! loc ble $1"
 		"\tsubb #[$1].l"
 		"\tsbca #[$1].h"
-		"\tbmi $2"
-		"\tbne 1f"
+		"\tblt $2"
+		"\tbgt 1f"
 		"\ttstb"
 		"\tbeq $2"
 		"1:"
@@ -2458,8 +2460,8 @@ lol ble IN($1) | R16 |
 		"\tldx <LBl"
 		"\tsubb BASE+$1+1,x"
 		"\tsbca BASE+$1+0,x"
-		"\tbmi $2"
-		"\tbne 1f"
+		"\tblt $2"
+		"\tbgt 1f"
 		"\ttstb"
 		"\tbeq $2"
 		"1:"
@@ -2467,8 +2469,8 @@ lol ble IN($1) | R16 |
 ble	| R16 |
 		"! ble"
 		"\tjsr Sbi2"
-		"\tbmi $1"
-		"\tbne 1f"
+		"\tblt $1"
+		"\tbgt 1f"
 		"\ttstb"
 		"\tbeq $1"
 		"1:"
@@ -2499,25 +2501,24 @@ lol beq IN($1) | R16 |
 					| | |
 beq	| R16 |
 		"! beq"
-		"\tstab BRANCH+1"
-		"\tstaa BRANCH"
-		"\tpula"
-		"\tpulb"
-		"\tcmpb BRANCH+1"
-		"\tbne 1f"
-		"\tcmpa BRANCH"
+		"\tstab <BRANCH+1"
+		"\tstaa <BRANCH"
+		"\ttsx"
+		"\tldx 0,x"
+		"\tins"
+		"\tins"
+		"\tcpx <BRANCH"
 		"\tbeq $1"
-		"1:"
 					| | |
 bne	| R16 |
 		"! bne"
-		"\tstab BRANCH+1"
-		"\tstaa BRANCH"
-		"\tpula"
-		"\tpulb"
-		"\tcmpb BRANCH+1"
-		"\tbne $1"
-		"\tcmpa BRANCH"
+		"\tstab <BRANCH+1"
+		"\tstaa <BRANCH"
+		"\ttsx"
+		"\tldx 0,x"
+		"\tins"
+		"\tins"
+		"\tcpx <BRANCH"
 		"\tbne $1"
 					| | |
 bge	| R16 |
@@ -2536,14 +2537,12 @@ bgt	| R16 |
 					| | |
 
 cmi zlt $1==2 | | | | blt $2 |
-cmp zlt	| | | | blt $2 |
 zlt	| R16 |
 		"! zlt"
 		"\ttsta"
 		"\tblt $1"
 					| | |
 cmi zle $1==2 | | | | ble $2 |
-cmp zle | | | | ble $2 |
 zle	| R16 |
 		"! zle"
 		"\ttsta"
@@ -2574,14 +2573,12 @@ zne	| R16 |
 		"\tbne $1"
 					| | |
 cmi zge $1==2 | | | | bge $2 |
-cmp zge | | | | bge $2 |
 zge	| R16 |
 		"! zge"
 		"\ttsta"
 		"\tbpl $1"
 					| | |
 cmi zgt $1==2 | | | | bgt $2 |
-cmp zgt | | | | bgt $2 |
 zgt	| R16 |
 		"! zgt"
 		"\ttsta"
@@ -2590,7 +2587,63 @@ zgt	| R16 |
 		"\ttstb"
 		"\tbne $1\n1:"
 					| | |
-
+/*
+ * cmp: AccAB - TOS
+ *	a>b	-1
+ *	a==b	0
+ *	a<b	1
+ *
+ * cmp zlt	AccAB > TOS?
+ * cmp zle	AccAB >= TOS?
+ * cmp zge	AccAB =< TOS?
+ * cmp zgt	AccAB < TOS?
+ */
+/*
+cmp zlt	| R16 |
+		"! cmp zlt"
+		"\ttsx"
+		"\tsubb 1,x"
+		"\tsbca 0,x"
+		"\tins"
+		"\tins"
+		"\tbhi $1"
+		"\tbcs 1f"
+		"\ttstb"
+		"\tbne $1"
+		"1:"
+					| | |
+cmp zle | R16 |
+		"! cmp zle"
+		"\ttsx"
+		"\tsubb 1,x"
+		"\tsbca 0,x"
+		"\tins"
+		"\tins"
+		"\tbcc $1"
+					| | |
+cmp zge | R16 |
+		"! cmp zge"
+		"\ttsx"
+		"\tsubb 1,x"
+		"\tsbca 0,x"
+		"\tins"
+		"\tins"
+		"\tbcs $1"
+		"\tbhi 1f"
+		"\ttstb"
+		"\tbeq $1"
+		"1:"
+					| | |
+cmp zgt | R16 |
+		"! cmp zgt"
+		"\ttsx"
+		"\tsubb 1,x"
+		"\tsbca 0,x"
+		"\tins"
+		"\tins"
+		"\tbcs $1"
+					| | |
+*/
 
 /* GROUP 14 - PROCEDURE CALL */
 
@@ -2717,15 +2770,6 @@ ass ND	| R16 |
 		"\tpulb"
 		"\tjsr Asp"
 					| | |
-blm $1==0	| | | | asp 4 |
-
-blm D	| R16 |
-		"! blm D"
-		"\tldx #$1"
-		"\tstx <NBYTES"
-		"\tjsr Blm"
-					| | |
-/*
 asp $1==2 | |
 		allocate(R16)
 		"! asp $1"
@@ -2761,35 +2805,27 @@ ass ND	| R16 |
 		"\tjsr Asp"
 					| | |
 blm $1==0	| | | | asp 4 |
-/*
-blm D	| R16 |
-		"\tstab <ADDR+3"
-		"\tstaa <ADDR+2"
-		"\tpula"
-		"\tpulb"
-		"\tstab <ADDR+1"
-		"\tstaa <ADDR"
-		"\tldab #[$1].l"
+blm ND	| R16 |
+		"! blm ND $1"
 		"\tstab <NBYTES+1"
-		"\tldaa #[$1].h"
 		"\tstaa <NBYTES"
 		"\tjsr Blm"
 					| | |
-*/
-bls $1==2	| R16 |
+blm D	| R16 |
+		"! blm D $1"
 		"\tstab <NBYTES+1"
 		"\tstaa <NBYTES"
-		"\tpula"
-		"\tpulb"
-		"\tstab <ADDR+3"
-		"\tstaa <ADDR+2"
-		"\tpula"
-		"\tpulb"
-		"\tstab <ADDR+1"
-		"\tstaa <ADDR"
+		"\tjsr Blm"
+					| | |
+bls $1==2	| |
+		allocate(R16)
+		"! bls $1"
+		"\tldx #$1"
+		"\tstx <NBYTES"
 		"\tjsr Blm"
 					| | |
 bls ND	| R16 |
+		"! bls ND"
 		"\ttsta"
 		"\tbeq 1f"
 		"\tcmpb #2"
@@ -2832,18 +2868,38 @@ dup $1==2	| R16 |
 		"\tpshb"
 		"\tpsha"
 					| %[1] | |
-dup $1==4	| R16 |
+dup $1==4	| |
+		allocate(R16)
 		"! dup $1"
 		"\tjsr Dup4"
-					| %[1] | |
+					| | |
 dup $1<=256	| |
 		allocate(R16)
 		"! dup $1"
-		"\tldx #[$1]"
+		"\tldx #$1"
+		"\tjsr Dup"
+					| | |
+dup 		| R16 |
+		"! dup ND"
+		"\tldx #$1"
 		"\tjsr Dup"
 					| | |
 dus $1==2	| R16 |
+		"! dus $1"
 		"\tjsr TestFFh"
+		"\ttsx"
+		"\tldx 0,x"
+		"\tins"
+		"\tins"
+		"\tjsr Dup"
+					| | |
+dus 		| R16 |
+		"! dus $1"
+		"\tjsr TestFFh"
+		"\ttsx"
+		"\tldx 0,x"
+		"\tins"
+		"\tins"
 		"\tjsr Dup"
 					| | |
 exg $1==2	| R16 |
@@ -2864,12 +2920,12 @@ exg $1<=255	| |
 		"\tjsr Exg"
 					| | |
 fil	| |
-		"\tldx #[$1]"
+		"\tldx #$1"
 		"\tstx hol0+4"
 					| | |
 gto	| |
 		allocate(R16)
-		"\tldx #[$1]"
+		"\tldx #$1"
 		"\tjmp Gto"
 					| | |
 lim	| |
@@ -2878,7 +2934,7 @@ lim	| |
 		"\tldaa IGNMASK"
 					| %[a] | |
 lin	| |
-		"\tldx #[$1]"
+		"\tldx #$1"
 		"\tstx hol0"
 					| | |
 lni	| |
@@ -2937,6 +2993,9 @@ sim	| R16 |
 		"\tstab IGNMASK+1"
 		"\tstaa IGNMASK"
 					| | |
+/*
+ * str modifies internal pointer registers (lb, sp, hp) in the EM interpreter
+ */
 str $1==0	| R16 |
 		"\tstab <LB+1"
 		"\tstaa <LB"

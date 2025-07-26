@@ -1,4 +1,4 @@
-.define Dup4
+.define Dup
 .sect .zero
 .sect .text
 .sect .rom
@@ -8,18 +8,23 @@
 
 ! This subroutine duplicate's the top 4 bytes.
 
-Dup4:
+! IX:		n: number of bytes to copy
+! Stack:
+! +0		return address
+! +2..+5	copy data
+
+Dup:
 	tsx
-	ldx 0,x
-	stx TMP
-        tsx
-	stab 1,x
-        staa 0,x
-        ldab 3,x
-        ldaa 2,x
-        pshb
-        psha
-        ldab 1,x
-        ldaa 0,x
-	ldx TMP
-	jmp 0,x
+	ldx	0,x
+	stx	TMP
+	ins
+	ins
+	ldab	5,x
+	ldaa	4,x
+	pshb
+	psha
+	ldab	3,x
+	ldaa	2,x
+	pshb
+	psha
+	jmp	0,x

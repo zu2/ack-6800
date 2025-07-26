@@ -32,13 +32,15 @@ CsbX:	stx <ADDR
 	ldab 1,x	! number of entries (lowbyte)
 	ldaa 0,x
 	stab <TMP+1
-	staa <TMP
+	beq 1f
+	inca
+1:	staa <TMP
 	inx
 	inx	
 !
 	pula		! get switch value
 	pulb
-1:
+2:
 	cmpb 1,x
 	bne 3f		! next case
 	cmpa 0,x
@@ -53,7 +55,7 @@ CsbX:	stx <ADDR
 	inx
 	inx
 	dec TMP+1
-	bne 1b
+	bne 2b
 ! default
 	ldx <ADDR
 	ldx 0,x
