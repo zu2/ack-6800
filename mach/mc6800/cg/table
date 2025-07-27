@@ -503,8 +503,8 @@ stf	| |
 		"! stf $1"
 		"\tpula"
 		"\tpulb"
-		"\taddb #[$1].h"
-		"\tadca #[$1].l"
+		"\taddb #[$1].l"
+		"\tadca #[$1].h"
 		"\tstab <TMP+1"
 		"\tstaa <TMP"
 		"\tldx <TMP"
@@ -1497,8 +1497,8 @@ loc lol dvu (IN($2) && $3==2)	| |
 		"\tldaa BASE+$2+0,x"
 		"\tstab <ARTH+1"
 		"\tstaa <ARTH"
-		"\tldab #[$1].h"
-		"\tldaa #[$1].l"
+		"\tldab #[$1].l"
+		"\tldaa #[$1].h"
 		"\tjsr Dvu2"
  					| %[a] | |
 lol loc dvu (IN($1) && $3==2)	| |
