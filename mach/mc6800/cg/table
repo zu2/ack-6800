@@ -1699,8 +1699,8 @@ sbs $1==2	| R16 |
 		"\tstaa <ARTH"
 		"\tpula"
 		"\tpulb"
-		"\taddb <ARTH+1"
-		"\tadca <ARTH"
+		"\tsubb <ARTH+1"
+		"\tsbca <ARTH"
 					| %[1] | |
 sbs ND	| R16 |
 		"! sbs ND"
@@ -1714,8 +1714,8 @@ sbs ND	| R16 |
 		"\tstaa <ARTH"
 		"\tpula"
 		"\tpulb"
-		"\taddb <ARTH+1"
-		"\tadca <ARTH"
+		"\tsubb <ARTH+1"
+		"\tsbca <ARTH"
 					| %[1] | |
 
 
