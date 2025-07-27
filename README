@@ -7,6 +7,9 @@ The target environment is emu6800 from the Fuzix Compiler Kit.
 
 Executable files can now be generated, and they can be executed; however, running them currently results in errors because most support routines have not yet been implemented. While the toolchain produces output, successful execution is not yet possible.
 
+Can compile the C library, but actual execution fails—programs.
+Use plat/e6800/boot.s (emu6800_conout,putstr,print) routines do work
+
 The implementation has passed the tarai (Takeuchi) function test.
 Below are the execution cycles compared to other C compilers for the 6800.
 
@@ -123,7 +126,22 @@ $ f9dasm -6800 e6800.img
 (debug: ashow main.o , anm main.o . etc...)
 $ emu6800 -d 6800   e6800.img /dev/null 
 
+By default, 'make' builds for all CPUs and platforms, leading to long build times. To compile only mc6800/e6800, update the Makefile as shown below.
 
+```
+@@ -10,8 +10,9 @@ DEFAULT_PLATFORM ?= pc86
+ # Which architectures should get built?
+ 
+ $(if $(PLATS), $(error Don't set PLATS on the command line, because reasons. Edit the Makefile instead.))
+-PLATS = all
++#PLATS = all
+ # PLATS = linux386 linuxppc linuxmips
++PLATS = e6800
+ 
+ # Where should the ACK put its temporary files?
+```
+
+### links
 emu6800: https://github.com/EtchedPixels/Fuzix-Compiler-Kit/test/
 f9dasm:  https://github.com/Arakula/f9dasm
 
