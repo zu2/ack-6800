@@ -1,4 +1,5 @@
 .define Mli2, Mlinp, Mul
+.define Mlu2, Mlinp, Mlu
 .sect .zero
 .sect .text
 .sect .rom
@@ -12,6 +13,7 @@
 
 .sect .text
 Mli2:
+Mlu2:
 	stab <ARTH+1
 	staa <ARTH
 	tsx
@@ -26,6 +28,7 @@ Mli2:
 	ldx <TMP
 	jmp 0,x
 Mul:
+Mlu:
 Mlinp:	
 	stab <ARTH+3
 	staa <ARTH+2
