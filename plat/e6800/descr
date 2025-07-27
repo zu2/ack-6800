@@ -19,7 +19,7 @@ var xa=2
 var ARCH=mc6800
 var PLATFORM=e6800
 var PLATFORMDIR={EM}/share/ack/{PLATFORM}
-var CPP_F=-D__unix
+#var CPP_F=-D__unix
 var ALIGN=-a0:1 -a1:1 -a2:1 -a3:1 -b0:0 -b1:0x100
 # see. util/opt/em_opt.6: replace multiplies with constants n times.
 var MACHOPT_F=-m0

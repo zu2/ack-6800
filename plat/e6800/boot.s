@@ -53,7 +53,7 @@ START:
 	psha
 	pshb		! argc
 	psha
-	jsr     __m_a_i_n
+	jsr     __m_a_i_n	! see.  lang/cem/libcc/gen/head_cc.e
 	ins
 	ins
 	ins
@@ -87,6 +87,7 @@ _puthexi3:
 	ldaa	3,x
 _puthex2:			! put AccA in 2 hexdigit
 	bsr	_puthexhi
+	tab
 	bra	_puthexlo
 _puthexhi:
 	tab

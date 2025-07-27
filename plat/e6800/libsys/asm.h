@@ -3,6 +3,7 @@
 
 ! Declare segments (the order is important).
 
+.sect .zero
 .sect .text
 .sect .rom
 .sect .data
