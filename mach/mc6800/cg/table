@@ -2894,8 +2894,16 @@ dup $1==2	| R16 |
 					| %[1] | |
 dup $1==4	| |
 		allocate(R16)
-		"! dup $1"
-		"\tjsr Dup4"
+		"! dup $1==4"
+		"\ttsx"
+		"\tldab 3,x"
+		"\tldaa 2,x"
+		"\tpshb"
+		"\tpsha"
+		"\tldab 1,x"
+		"\tldaa 0,x"
+		"\tpshb"
+		"\tpsha"
 					| | |
 dup $1<=256	| |
 		allocate(R16)
