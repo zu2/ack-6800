@@ -143,6 +143,40 @@ By default, 'make' builds for all CPUs and platforms, leading to long build time
  # Where should the ACK put its temporary files?
 ```
 
+The following patch is required to use stdin on emu6800.
+
+```
+--- a/test/emu6800.c
++++ b/test/emu6800.c
+@@ -5,6 +5,7 @@
+ #include <unistd.h>
+ #include <fcntl.h>
+ #include "6800.h"
++#include <termios.h>
+ 
+ static uint8_t ram[65536];
+ 
+@@ -76,6 +77,19 @@ uint8_t m6800_debug_read(struct m6800 *cpu, uint16_t addr)
+ 
+ uint8_t m6800_read(struct m6800 *cpu, uint16_t addr)
+ {
++       switch(addr) {
++           case 0xFEFE: {
++               struct termios old,new;
++               int c;
++               tcgetattr(STDIN_FILENO, &old);
++               new = old;
++               new.c_lflag &= ~(ICANON);
++               tcsetattr(STDIN_FILENO, TCSANOW, &new);
++               c = getchar();
++               tcsetattr(STDIN_FILENO, TCSANOW, &old);
++               return c;
++           }
++       }
+        return m6800_read_op(cpu, addr, 0);
+ }
+```
+
 ### links
 emu6800: https://github.com/EtchedPixels/Fuzix-Compiler-Kit/test/
 f9dasm:  https://github.com/Arakula/f9dasm
