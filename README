@@ -119,11 +119,8 @@ $ make
 $ make install
 $ export PATH=/opt/pkg/ack/bin:$PATH
 $ cd examples
-$ vi main.c
-$ ack  -me6800 -v -v  main.c
-$ f9dasm -6800 e6800.img
-(debug: ashow main.o , anm main.o . etc...)
-$ emu6800 -d 6800   e6800.img /dev/null 
+$ ack  -me6800 -v -v  hilo.c
+$ emu6800 6800   e6800.img /dev/null 
 
 By default, 'make' builds for all CPUs and platforms, leading to long build times. To compile only mc6800/e6800, update the Makefile as shown below.
 
@@ -173,6 +170,18 @@ The following patch is required to use stdin on emu6800.
         return m6800_read_op(cpu, addr, 0);
  }
 ```
+
+### debugging
+
+make map file:
+  map file: ack -e6800 -c.out test.c
+  anm test.out > test.map
+
+disassemble:
+  f9dasm -6800 e6800.img
+
+run with disassembler:
+  emu6800 6800   e6800.img /dev/null 
 
 ### links
 
