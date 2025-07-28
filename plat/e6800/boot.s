@@ -123,12 +123,10 @@ _putchar:
 	stab	0xfefe
 	rts
 _emu6800_conin:
-	ldab	#0xff
-	tba
-	rts
 _getchar:
-	ldab	#95		! '_'
-	stab	0xfefe
+	ldab	0xfefe
+	stab	RETURN+1
+	clr	RETURN
 	rts
 _print:
 	tsx
