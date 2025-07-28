@@ -5,10 +5,12 @@ The target environment is emu6800 from the Fuzix Compiler Kit.
 
 ## Current status
 
-Executable files can now be generated, and they can be executed; however, running them currently results in errors because most support routines have not yet been implemented. While the toolchain produces output, successful execution is not yet possible.
+Executable files can now be generated, and they can be executed;
+however, running them currently results in errors because most support routines have not yet been implemented. 
 
-Can compile the C library, but actual execution fails—programs.
-Use plat/e6800/boot.s (emu6800_conout,putstr,print) routines do work
+In the emu6800 environment (-me6800), support for stdin, stdout, and stderr has been added.
+Currently, examples/hilo.c and paranoia.c are working.
+On emu6800, no file system, so FILE I/O is unavailable.
 
 The implementation has passed the tarai (Takeuchi) function test.
 Below are the execution cycles compared to other C compilers for the 6800.
