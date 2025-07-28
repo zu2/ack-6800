@@ -5,8 +5,7 @@ The target environment is emu6800 from the Fuzix Compiler Kit.
 
 ## Current status
 
-Executable files can now be generated, and they can be executed;
-however, running them currently results in errors because most support routines have not yet been implemented. 
+Most support routines have not yet been implemented. 
 
 In the emu6800 environment (-me6800), support for stdin, stdout, and stderr has been added.
 Currently, examples/hilo.c and paranoia.c are working.
@@ -97,13 +96,12 @@ Cycle time of Mandelbrot.
 - Add essential source files under plat/e6800/
   - Renamed to prevent the program from treating names starting with 'em' as EM code platforms.
 - Avoid generating redundant ldx LB/LBlinstructions.
-- Adjust the build process to allow compilation with ack -me6800 (execution is not yet possible)
-- Further development is needed, as almost no support routines are implemented at this time.
+- Support routines need to be extended further. 
 
 ## DONE
 
-- The directory was renamed from mach/6800 to mach/mc6800 as planned, though it is not clear if this is the best approach.
-- Compilation of a tarai function.
+- The directory was renamed from mach/6800 to mach/mc6800, though it is not clear if this is the best approach.
+- Compilation of some test program.
 
 ## Note on Disk Space
 
@@ -118,7 +116,6 @@ $ git clone https://github.com/zu2/ack-6800.git
 $ cd ack-6800
 $ make
 (debug:  make V=1 -j1)
-(Set PLATS = e6800 in the Makefile if compilation takes too long.)
 $ make install
 $ export PATH=/opt/pkg/ack/bin:$PATH
 $ cd examples
@@ -178,6 +175,7 @@ The following patch is required to use stdin on emu6800.
 ```
 
 ### links
+
 emu6800: https://github.com/EtchedPixels/Fuzix-Compiler-Kit/test/
 f9dasm:  https://github.com/Arakula/f9dasm
 
