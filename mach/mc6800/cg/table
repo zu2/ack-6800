@@ -6,6 +6,7 @@
 #define MIN	(0-BASE)
 #define MAX	(254-em_bsize-BASE)
 #define IN(x)	(x>=MIN && x<=(MAX-2))
+#define INP(x)	(x>=0 && x<=(254-em_bsize))
 
 
 /*
@@ -401,11 +402,8 @@ ldf $1==0	| R16 |
 		"! ldf $1"
 		"\tjsr Ldi"
 					| | |
-ldf	| |
-		allocate(R16)
+ldf	| R16 |
 		"! ldf $1"
-		"\tpula"
-		"\tpulb"
 		"\taddb #[$1].l"
 		"\tadca #[$1].h"
 		"\tstab <TMP+1"
@@ -417,7 +415,7 @@ ldf	| |
 		"\tpsha"
 		"\tldab 1,x"
 		"\tldaa 0,x"
-					| | |
+					| %[1] | |
 
 /* lpi: load pointer immdiate */
 
@@ -3069,11 +3067,18 @@ lol lal sti IN($1) && $1==$2 && $3==1 | |
 		"\tldab BASE+$1+1,x"
 		"\tstab BASE+$1,x"
 					 | | |
+lol lal sti INP($1) && $1==$2 && $3==1 | |
+		"! Code to adjust the byte order."
+		"! lol lal sti INP($1) $2 $3"
+		"\tldx <LB"
+		"\tldab $1+1,x"
+		"\tstab $1,x"
+					 | | |
 lol lal sti $1==$2 && $3==1 | |
 		"! Code to adjust the byte order."
-		"! lol lal sti IN($1) $2 $3"
+		"! lol lal sti $1==$2 $3==1"
 		"\tldab <LB+1"
-		"\tldaa <LB+1"
+		"\tldaa <LB"
 		"\taddb #[$1].l"
 		"\tadca #[$1].h"
 		"\tstab TMP+1"

@@ -5,7 +5,7 @@
 .define RETSIZE, TRAPVAL, BRANCH
 .define START
 .define TMP, TMP2
-.define	__exit, _abort, doexit
+.define	__exit
 .define	_putchar, _getchar, _print, _cpu_counter, _errno
 .define _putstr, _puthexl,_puthexi, _puthexc
 .define _emu6800_conout, _emu6800_conin
@@ -58,14 +58,17 @@ START:
 	ins
 	ins
 	ins
-__exit:
-_abort:
-doexit:
+___exit:
 	lds exitsp
 	staa 0xfefb
 	ldab RETURN+1
 	stab 0xfeff
 	rts
+__exit:
+	tsx
+	ldab 3,x
+	stab RETURN+1
+	bra ___exit
 !
 !	minimal I/O routine
 !
