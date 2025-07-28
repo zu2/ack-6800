@@ -34,23 +34,31 @@ Dotrap:
 	ldx <ERRPROC
 	bne 1f
 	jmp Mtrap
-1:	ldaa #RETURN
-	ldab #0
-	jsr Ldi		! save return area
+1:	ldx #RETURN	! save return area
+	ldab 3,x
+	ldaa 2,x
+	pshb
+	psha
+	ldab 1,x
+	ldaa 0,x
+	pshb
+	psha
 	ldab <hol0+5
 	ldaa <hol0+4
-	jsr Push	! save filename pointer
+	pshb		! save filename pointer
+	psha
 	ldab <hol0+1
 	ldaa <hol0
-	jsr Push	! save linenumber
+	pshb		! save linenumber
+	psha
 	ldx <ERRPROC	! address of errorhandler
 	stx <ADDR	
 	ldx #0
 	stx <ERRPROC	! reset ERRPROC
 	ldab <TRAPVAL
 	ldaa #0
-	jsr Push
-	ldx ADDR
+	pshb
+	psha
 	jmp 0,x		! proceed with errorhandler
 
 .sect .data
@@ -91,9 +99,8 @@ Mtrap:
 	beq errorend
 2:	cmpb 0,x
 	bne 1b
-	ldab 2,x
-	ldaa 1,x
-	jsr Mprint
+	ldx 1,x
+	jsr _putstr
 	jmp errorend
 errorend:
 	ldx TRAPVAL

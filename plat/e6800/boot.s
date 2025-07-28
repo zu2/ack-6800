@@ -1,14 +1,15 @@
 .define BASE, NBYTES
 .define hol0, IGNMASK, ADDR, PROGNAME
-.define LB, LBl
+.define LB, LBl, ERRPROC
 .define	ARTH, RETURN, SIGN
 .define RETSIZE, TRAPVAL, BRANCH
 .define START
 .define TMP, TMP2
-.define	__exit
+.define	__exit, EXIT
 .define	_putchar, _getchar, _print, _cpu_counter, _errno
 .define _putstr, _puthexl,_puthexi, _puthexc
 .define _emu6800_conout, _emu6800_conin
+
 BASE    = 240
 
 .sect .zero
@@ -25,6 +26,7 @@ IGNMASK: .space 2	! can hold the ingnore mask
 ADDR: .space 4          ! used for indirect addressing
 LB: .space 2            ! the localbase
 LBl: .space 2           ! the second localbase (localbase-BASE)
+ERRPROC: .space 2	! can hold the address of the error handler
 ARTH: .space 16         ! used for arithmetic
 RETURN: .space 4        ! the return area
 SIGN: .space 1
@@ -37,6 +39,30 @@ TMP2: .space 2
 exitsp: .space 2
 
 _errno: .space 2
+
+.define Earray, Erange, Eset
+.define Eiovfl, Eidivz, Eiund, Econv
+.define Estack, Eheap, Eillins, Eoddz
+.define Ecase , Ebadmon
+.define Ebadlin, Ebadgto
+Earray  = 0
+Erange  = 1
+Eset    = 2
+Eiovfl  = 3
+Eidivz  = 6
+Eiund   = 8
+Econv   = 10
+Estack  = 16
+Eheap   = 17
+Eillins = 18
+Eoddz   = 19 
+Ecase   = 20
+Ebadmon = 25
+Ebadlin = 26
+Ebadgto = 27
+
+.define F_DUM
+F_DUM	= 0		! Dummy floating point constant
 
 !.base 0x0100            ! where to start in the emu6800
 .sect .text
@@ -59,6 +85,7 @@ START:
 	ins
 	ins
 ___exit:
+EXIT:
 	lds exitsp
 	staa 0xfefb
 	ldab RETURN+1

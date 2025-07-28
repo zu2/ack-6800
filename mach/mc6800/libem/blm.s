@@ -1,4 +1,4 @@
-.define Blm, Blmnp
+.define Blm
 .sect .zero
 .sect .text
 .sect .rom
