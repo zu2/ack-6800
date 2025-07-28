@@ -181,7 +181,7 @@ disassemble:
   f9dasm -6800 e6800.img
 
 run with disassembler:
-  emu6800 6800   e6800.img /dev/null 
+  emu6800 -d 6800 e6800.img /dev/null 
 
 ### links
 
