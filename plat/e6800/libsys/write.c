@@ -9,7 +9,7 @@
 #include <string.h>
 #include <emu6800.h>
 
-void _sys_write_tty(char c)
+void _sys_write_tty(unsigned char c)
 {
 	if (c == '\n')
 		emu6800_conout('\r');
