@@ -14,7 +14,7 @@
 ! new localbase in the real_stack while adjusting the hardware_stack.
 
 !
-! IX:	address of descripto
+! IX:	address of descriptor
 !
 ! IX+0:	new PC
 ! IX+2:	new SP
@@ -22,30 +22,17 @@
 
 Gto:
 	stx <ADDR
-!	ins		! remove __gto return address. (?)
-!	ins
-	ldx 4,x		! same procedure ?
-	cpx <LB
-	beq 2f
-	stx <ARTH	! save new LB
-1:	ldx <LB
-	cpx <ARTH
-	beq 2f
-	ldx 0,x		! search next
-	bra 1b
-!
-2:	stx <LB
+	ldx 4,x
+	stx <LB
 	ldab <LB+1
 	ldaa <LB
 	subb #BASE
 	sbca #0
 	stab <LBl+1
 	staa <LBl
-!
-	ldx <ADDR	! new stackpointer
+	ldx <ADDR
 	ldx 2,x
 	txs
-!
-	ldx <ADDR
+	ldx  <ADDR
 	ldx 0,x
 	jmp 0,x

@@ -107,7 +107,6 @@ ldc	 | |
 		"\tldab #[%(highw(1)%)].l"
 		"\tldaa #[%(highw(1)%)].h"
 					| %[a] | |
-
 /* lol: load local var or arg, $1==offset*/
 lol sti IN($1) && $2==1 | R16 |
 		"! lol sti IN($1) && $2==1"
@@ -479,6 +478,12 @@ stl	| |
 		"\tstab 1,x"
 		"\tstaa 0,x"
 					| | |
+stl lol IN($1) && $1==$2 | R16 |
+		"! stl lol IN($1) && $1==$2"
+		"\tldx <LBl"
+                "\tstab BASE+$1+1,x"
+                "\tstaa BASE+$1+0,x"
+					| %[1] | |
 dup ste $1==2 | R16 |
 		"! dup ste $1==2"
 		"\tstab $2+1"
@@ -2568,7 +2573,7 @@ beq	| R16 |
 		"\tbeq $1"
 					| | |
 loc bne | R16 |
-		"! loc bne "
+		"! loc bne"
 		"\tcmpb #[$1].l"
 		"\tbne $2"
 		"\tcmpa #[$1].h"
@@ -2585,10 +2590,16 @@ bne	| R16 |
 		"\tcpx <BRANCH"
 		"\tbne $1"
 					| | |
+loc bge | R16 |
+		"! loc bge"
+		"\tsubb #[$1].l"
+		"\tsbca #[$1].h"
+		"\tbge $2"
+					| | |
 bge	| R16 |
 		"! bge"
 		"\tjsr Sbi2"
-		"\tbpl $1"
+		"\tbge $1"
 					| | |
 bgt	| R16 |
 		"! bgt"
@@ -2619,6 +2630,14 @@ zle	| R16 |
 cmi zeq $1==2 | | | | beq $2 |
 cmp zeq | | | | beq $2 |
 cms zeq $1==2 | | | | beq $2 |
+loi zeq $1==1 | R16 |
+		"! loi zeq $1==1"
+		"\tstab <TMP+1"
+		"\tstaa <TMP"
+		"\tldx <TMP"
+		"\ttst 0,x"
+		"\tbeq $2"
+					| | |
 zeq	| R16 |
 		"! zeq"
 		"\ttstb"
@@ -2837,44 +2856,22 @@ ass ND	| R16 |
 		"\tlds <TMP"
 					| | |
 blm $1==0	| | | | asp 4 |
-blm ND	| R16 |
-		"! blm ND $1"
-		"\tstab <NBYTES+1"
-		"\tstaa <NBYTES"
-		"\tjsr Blm"
-					| | |
-blm D	| R16 |
-		"! blm D $1"
-		"\tstab <NBYTES+1"
-		"\tstaa <NBYTES"
-		"\tjsr Blm"
-					| | |
-bls $1==2	| |
+blm $1>0	| |
 		allocate(R16)
-		"! bls $1"
+		"! blm $1>0"
 		"\tldx #$1"
 		"\tstx <NBYTES"
 		"\tjsr Blm"
 					| | |
-bls ND	| R16 |
-		"! bls ND"
-		"\ttsta"
-		"\tbeq 1f"
-		"\tcmpb #2"
-		"\tbeq 1f"
-		"\tjsr Trap"
-		"1:"
+bls $1==2	| R16 |
+		"! bls $1"
 		"\tstab <NBYTES+1"
 		"\tstaa <NBYTES"
-		"\tpula"
-		"\tpulb"
-		"\tstab <ADDR+3"
-		"\tstaa <ADDR+2"
-		"\tpula"
-		"\tpulb"
-		"\tstab <ADDR+1"
-		"\tstaa <ADDR"
 		"\tjsr Blm"
+					| | |
+/* The argument of bls must be 2. */
+bls | R16 |
+		"\tjsr Trap"
 					| | |
 lae csa | |
 		allocate(R16)

@@ -16,7 +16,7 @@
 ! addresses are already in zeropage.
 
 ! NBYTES:
-!	number of bytes to transfer
+!	number of bytes to transfer (n>0)
 ! Stack:
 ! +0	return addrrss
 ! +2	destination address
@@ -25,11 +25,13 @@
 Blm:
 	tsx
 	ldx 0,x
-	stx <TMP
+	stx <TMP	! return addrrss
+	tsx
 	ldx 2,x
 	stx <ADDR+2	! destination address
 	tsx
 	ldx 4,x		! source address
+	stx <ADDR
 	ldab <NBYTES+1
 	beq 1f
 	inc NBYTES
@@ -51,5 +53,6 @@ Blm:
 	ins
 	ins
 	ins
+	ldx <TMP
 	jmp 0,x
 
