@@ -1,4 +1,5 @@
-.define BASE, NBYTES
+.define BASE, EM_BSIZE
+.define NBYTES
 .define hol0, IGNMASK, ADDR, PROGNAME
 .define LB, LBl, ERRPROC
 .define	ARTH, RETURN, SIGN
@@ -11,6 +12,7 @@
 .define _emu6800_conout, _emu6800_conin
 
 BASE    = 240
+EM_BSIZE = 4
 
 .sect .zero
 .sect .text

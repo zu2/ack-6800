@@ -1,4 +1,4 @@
-.define START
+.define START,EM_BSIZE
 
 .sect .zero
 .sect .text
@@ -8,6 +8,7 @@
 .sect .end
 
 BASE    = 240
+EM_BSIZE = 4
 
 .sect .text
 !.base 0x0100            ! where to start in the emu6800

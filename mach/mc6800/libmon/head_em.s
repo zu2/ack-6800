@@ -1,4 +1,4 @@
-.define BASE
+.define BASE, EM_BSIZE
 .define hol0, ADDR
 .define LB, LBl
 .define	ARTH, RETURN, RETSIZE
@@ -14,6 +14,7 @@
 .sect .end
 
 BASE    = 240
+EM_BSIZE = 4
 
 .sect .zero
 hol0:   .space 16       ! the hol0 block
@@ -31,7 +32,7 @@ NBYTES: .space 1
 !! .base 0x0100            ! where to start in the emu6800
 ! GENERAL PURPOSE ROUTINES
 
-start:
+START:
 	jmp	_main
 
 .sect .data
