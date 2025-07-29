@@ -137,6 +137,11 @@ By default, 'make' builds for all CPUs and platforms, leading to long build time
  # Where should the ACK put its temporary files?
 ```
 
+During the initial 'make', build.py scans for compilation dependencies and generates the Makefile.
+When files are added or removed, regenerating the Makefile requires a 'make clean'.
+This is just my guess; there might be a better approach.
+
+
 The following patch is required to use stdin on emu6800.
 
 ```
