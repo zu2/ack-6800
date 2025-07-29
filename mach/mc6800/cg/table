@@ -63,19 +63,19 @@ loc $1==0	| |
 		"\tclrb"
 		"\tclra"
 					| %[a] | |
-loc ($1>>8)==0	| |
+loc $1!=0 && ($1>>8)==0	| |
 		allocate(R16)
 		"! loc ($1>>8)==0"
 		"\tldab #[$1].l"
 		"\tclra"
 					| %[a] | |
-loc ($1%256)==0	| |
+loc $1!=0 && ($1%256)==0	| |
 		allocate(R16)
 		"! loc ($1 mod 256)==0"
 		"\tclrb"
 		"\tldaa #[$1].h"
 					| %[a] | |
-loc ($1%256)==($1>>8)	| |
+loc $1!=0 && ($1%256)==($1>>8)	| |
 		allocate(R16)
 		"! loc high==low"
 		"\tldab #[$1].l"
@@ -90,8 +90,18 @@ loc 	 | |
 
 /* ldc: load 32bit constant */
 
+ldc highw(1)==0 && loww(1)==0 | |
+		allocate(R16)
+		"! ldc $1==0"
+		"\tclrb"
+		"\tclra"
+		"\tpshb"
+		"\tpsha"
+					| %[a] | |
+
 ldc highw(1)==loww(1) && (loww(1)%256)==(loww(1)>>8) | |
 		allocate(R16)
+		"! ldc $1"
 		"\tldab #[%(loww(1)%)].l"
 		"\ttba"
 		"\tpshb"
@@ -678,6 +688,7 @@ sdf	| |
 
 loc lol adi (IN($2) && $3==2)	| |
 		allocate(R16)
+		"! loc lol adi (IN($2) && $3==2)"
 		"\tldx <LBl"
 		"\tldab #[$1].l"
 		"\tldaa #[$1].h"
@@ -1232,10 +1243,12 @@ loe dvi $2==2	| R16 |
 		"\tjsr Dvi"
 					| %[1] | |
 dvi $1==2	| R16 |
+		"! dvi $1==2"
 		"\tjsr Dvi2"
 					| %[1] | |
 dvi $1==4	| |
 		allocate(R16)
+		"! div $1==4"
 		"\tjsr Dvi4"
 					| | |
 
@@ -1293,7 +1306,7 @@ ngi $1==4	| R16 |
 		"\tbne 9f"
 		"\tinca"
 		"9:"
-					| | |
+					| %[1] | |
 ngi ND	| R16 |
 		"! ngi ND"
 		"\ttsta"
