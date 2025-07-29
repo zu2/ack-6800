@@ -129,6 +129,13 @@ lol IN($1)	| |
 		"\tldab BASE+$1+1,x"
 		"\tldaa BASE+$1+0,x"
 					| %[a] | |
+lol INP($1)	| |
+		allocate(R16)
+		"! lol INP($1)"
+		"\tldx <LB"
+		"\tldab $1+1,x"
+		"\tldaa $1+0,x"
+					| %[a] | |
 lol 	| |
 		allocate(R16)
 		"! lol $1 !IN"
@@ -150,6 +157,12 @@ loe	| |
 		"\tldab $1+1"
 		"\tldaa $1"
 					| %[a] | |
+loe sti $2==2 | R16 |
+		"! loe sti $2==2"
+		"\tldx $1"
+		"\tstab 1,x"
+		"\tstaa 0,x"
+					| | |
 
 /* lil: load indirect from local var */
 
@@ -466,6 +479,11 @@ stl	| |
 		"\tstab 1,x"
 		"\tstaa 0,x"
 					| | |
+dup ste $1==2 | R16 |
+		"! dup ste $1==2"
+		"\tstab $2+1"
+		"\tstaa $2"
+					| %[1] | |
 ste	| R16 |
 		"! ste $1"
 		"\tstab $1+1"
@@ -728,7 +746,7 @@ lol adi IN($1) && $2==2 | R16 |
 		"\tadca BASE+$1+0,x"
 					| %[1] | |
 loe adi $2==2	| R16 |
-		"! loe adi $2"
+		"! loe adi $2==2"
 		"\taddb $1+1"
 		"\tadca $1"
 					| %[1] | |
@@ -2530,6 +2548,14 @@ lol beq IN($1) | R16 |
 		"\tbeq $2"
 		"1:"
 					| | |
+loc beq | R16 |
+		"! loc bne "
+		"\tcmpb #[$1].l"
+		"\tbne 1f"
+		"\tcmpa #[$1].h"
+		"\tbeq $2"
+		"1:"
+					| | |
 beq	| R16 |
 		"! beq"
 		"\tstab <BRANCH+1"
@@ -2540,6 +2566,13 @@ beq	| R16 |
 		"\tins"
 		"\tcpx <BRANCH"
 		"\tbeq $1"
+					| | |
+loc bne | R16 |
+		"! loc bne "
+		"\tcmpb #[$1].l"
+		"\tbne $2"
+		"\tcmpa #[$1].h"
+		"\tbne $2"
 					| | |
 bne	| R16 |
 		"! bne"
@@ -2786,32 +2819,7 @@ asp	| |
 		"\tlds <TMP"
 					| | |
 ass $1==2	| R16 |
-		"! ass $1"
-		"\tjsr Asp"
-					| | |
-ass ND	| R16 |
-		"! ass ND"
-		"\ttsta"
-		"\tbeq 1f"
-		"\tcmpb #2"
-		"\tbeq 1f"
-		"\tjsr Trap"
-		"1:"
-		"\tpula"
-		"\tpulb"
-		"\tjsr Asp"
-					| | |
-asp $1==2 | |
-		allocate(R16)
-		"! asp $1"
-		"\tins"
-		"\tins"
-					| | |
-asp	| |
-		allocate(R16)
-		"! asp"
-		"\tldab #[$1].l"
-		"\tldaa #[$1].h"
+		"! ass $1==2"
 		"\tsts <TMP"
 		"\taddb <TMP+1"
 		"\tadca <TMP"
@@ -2819,21 +2827,14 @@ asp	| |
 		"\tstaa <TMP"
 		"\tlds <TMP"
 					| | |
-ass $1==2	| R16 |
-		"! ass $1"
-		"\tjsr Asp"
-					| | |
 ass ND	| R16 |
 		"! ass ND"
-		"\ttsta"
-		"\tbeq 1f"
-		"\tcmpb #2"
-		"\tbeq 1f"
-		"\tjsr Trap"
-		"1:"
-		"\tpula"
-		"\tpulb"
-		"\tjsr Asp"
+		"\tsts <TMP"
+		"\taddb <TMP+1"
+		"\tadca <TMP"
+		"\tstab <TMP+1"
+		"\tstaa <TMP"
+		"\tlds <TMP"
 					| | |
 blm $1==0	| | | | asp 4 |
 blm ND	| R16 |
