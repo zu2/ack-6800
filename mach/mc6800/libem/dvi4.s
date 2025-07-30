@@ -105,7 +105,10 @@ Dvu4:
 Div32x32:
 	ldx #32		! loop counter
 	clra
-	clrb		! carry is also cleared
+	clrb
+	clr ARTH+9
+	clr ARTH+8
+			! here, carry = 0
 2:
 	asl ARTH+7	! shift divient
 	rol ARTH+6
