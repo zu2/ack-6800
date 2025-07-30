@@ -172,9 +172,6 @@ loe sti $2==2 | R16 |
 		"\tstab 1,x"
 		"\tstaa 0,x"
 					| | |
-
-/* lil: load indirect from local var */
-
 lil IN($1)	| |
 		allocate(R16)
 		"! lil IN($1)"
@@ -504,12 +501,17 @@ ste	| R16 |
 		"\tstab $1+1"
 		"\tstaa $1"
 					| | |
-sil IN($1)	| |
-		allocate(R16)
+dup sil $1==2 && IN($2)		| R16 |
+		"! dup sil IN($1)"
+		"\tldx <LBl"
+		"\tldx BASE+$2,x"
+		"\tstab 1,x"
+		"\tstaa 0,x"
+					| %[1] | |
+sil IN($1)	| R16 |
+		"! sil IN($1)"
 		"\tldx <LBl"
 		"\tldx BASE+$1,x"
-		"\tpula"
-		"\tpulb"
 		"\tstab 1,x"
 		"\tstaa 0,x"
 					| | |
@@ -751,7 +753,7 @@ lde adi $2==2	| |
 		"\tadca $1+2"
 					| %[a] | |
 loc adi $2==2 | R16 |
-		"! loc adi $2"
+		"! loc adi $2==$2"
 		"\taddb #[$1].l"
 		"\tadca #[$1].h"
 					| %[1] | |
