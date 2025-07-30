@@ -1034,6 +1034,15 @@ lde mli $2==2	| |
 		"\tldaa $1+2"
 		"\tjsr Mlinp"
 					| %[a] | |
+loc mli $1==3 && $2==2 | R16 |
+		"! loc mli $1==3 && $2==2"
+		"\tstab <ARTH+1"
+		"\tstaa <ARTH"
+		"\taslb"
+		"\trola"
+		"\taddb <ARTH+1"
+		"\tadca <ARTH"
+					| %[1] | |
 loc mli $2==2 | R16 |
 		"! loc mli $2==2"
 		"\tstab <ARTH+1"
@@ -1102,6 +1111,19 @@ loc lol dvi (IN($2) && $3==2)	| |
 		"\tldab #[$1].l"
 		"\tldaa #[$1].h"
 		"\tjsr Dvi"
+ 					| %[a] | |
+lol loc dvi (IN($1) && $2==2 && $3==2)	| |
+		allocate(R16)
+		"! lol loc dvi IN($1) & $2==2 && $3==2"
+		"\tldx <LBl"
+		"\tldab BASE+$1+1,x"
+		"\tldaa BASE+$1+0,x"
+		"\tbpl 1f"
+		"\taddb #1"
+		"\tadca #0"
+		"1:"
+		"\tasra"
+		"\trorb"
  					| %[a] | |
 lol loc dvi (IN($1) && $3==2)	| |
 		allocate(R16)
@@ -1207,6 +1229,16 @@ lde dvi $2==2	| |
 		"\tldaa $1+2"
 		"\tjsr Dvi"
 					| %[a] | |
+loc dvi $1==2 && $2==2 | R16 |
+		"! loc dvi $1==2 && $2==2"
+		"\ttsta"
+		"\tbpl 1f"
+		"\taddb #1"
+		"\tadca #0"
+		"1:"
+		"\tasra"
+		"\trorb"
+					| %[1] | |
 loc dvi $2==2 | R16 |
 		"! loc dvi $2"
 		"\tpshb"
@@ -1544,7 +1576,7 @@ loc lol dvu (IN($2) && $3==2)	| |
 		"\tstaa <ARTH"
 		"\tldab #[$1].l"
 		"\tldaa #[$1].h"
-		"\tjsr Dvu2"
+		"\tjsr Dvu"
  					| %[a] | |
 lol loc dvu (IN($1) && $3==2)	| |
 		allocate(R16)
@@ -1556,7 +1588,7 @@ lol loc dvu (IN($1) && $3==2)	| |
 		"\tldx <LBl"
 		"\tldab BASE+$1+1,x"
 		"\tldaa BASE+$1+0,x"
-		"\tjsr Dvu2"
+		"\tjsr Dvu"
  					| %[a] | |
 lol lol dvu (IN($1) && IN($2) && $3==2) | |
 		allocate(R16)
@@ -1568,7 +1600,7 @@ lol lol dvu (IN($1) && IN($2) && $3==2) | |
 		"\tstaa <ARTH"
 		"\tldab BASE+$1+1,x"
 		"\tldaa BASE+$1+0,x"
-		"\tjsr Dvu2"
+		"\tjsr Dvu"
 					| %[a] | |
 lol loe dvu (IN($1) && $3==2) | |
 		allocate(R16)
@@ -1580,7 +1612,7 @@ lol loe dvu (IN($1) && $3==2) | |
 		"\tstaa <ARTH"
 		"\tldab $2+1"
 		"\tldaa $2"
-		"\tjsr Dvu2"
+		"\tjsr Dvu"
 					| %[a] | |
 loe lol dvu (IN($2) && $3==2) | |
 		allocate(R16)
@@ -1592,7 +1624,7 @@ loe lol dvu (IN($2) && $3==2) | |
 		"\tstaa <ARTH"
 		"\tldab $1+1"
 		"\tldaa $1"
-		"\tjsr Dvu2"
+		"\tjsr Dvu"
 					| %[a] | |
 loe loe dvu $3==2	| |
 		allocate(R16)
@@ -1603,7 +1635,7 @@ loe loe dvu $3==2	| |
 		"\tstaa <ARTH"
 		"\tldab $1+1"
 		"\tldaa $1"
-		"\tjsr Dvu2"
+		"\tjsr Dvu"
 					| %[a] | |
 loc loe dvu $3==2	| |
 		allocate(R16)
@@ -1614,7 +1646,7 @@ loc loe dvu $3==2	| |
 		"\tstaa <ARTH"
 		"\tldab #[$1].l"
 		"\tldaa #[$1].h"
-		"\tjsr Dvu2"
+		"\tjsr Dvu"
 					| %[a] | |
 loe loc dvu $3==2	| |
 		allocate(R16)
@@ -1625,7 +1657,7 @@ loe loc dvu $3==2	| |
 		"\tstaa <ARTH"
 		"\tldab $1+1"
 		"\tldaa $1"
-		"\tjsr Dvu2"
+		"\tjsr Dvu"
 					| %[a] | |
 ldl dvu IN($1) && $2==2	| |
 		allocate(R16)
@@ -1637,54 +1669,35 @@ ldl dvu IN($1) && $2==2	| |
 		"\tstaa <ARTH"
 		"\tldab BASE+$2+1,x"
 		"\tldaa BASE+$2+0,x"
-		"\tjsr Dvu2"
+		"\tjsr Dvu"
 					| %[a] | |
 lde dvu $2==2	| |
 		allocate(R16)
 		"! lde dvu $2==2"
-		"\tldab $1+1"
-		"\tldaa $1"
-		"\tstab <ARTH+1"
-		"\tstaa <ARTH"
+		"\tldx $1+1"
+		"\tstx <ARTH"
 		"\tldab $1+3"
 		"\tldaa $1+2"
-		"\tjsr Dvu2"
+		"\tjsr Dvu"
 					| %[a] | |
 loc dvu $2==2 | R16 |
-		"\tpshb"
-		"\tpsha"
-		"\tldab #[$1].l"
-		"\tldaa #[$1].h"
-		"\tstab <ARTH+1"
-		"\tstaa <ARTH"
-		"\tpula"
-		"\tpulb"
-		"\tjsr Dvu2"
+		"! loc dvu $2==2"
+		"\tldx #$1"
+		"\tstx <ARTH"
+		"\tjsr Dvu"
 					| %[1] | |
 lol dvu IN($1) && $2==2 | R16 |
 		"! lol dvu IN($1) && $2==2"
-		"\tpshb"
-		"\tpsha"
 		"\tldx <LBl"
-		"\tldab BASE+$1+1,x"
-		"\tldaa BASE+$1+0,x"
-		"\tstab <ARTH+1"
-		"\tstaa <ARTH"
-		"\tpula"
-		"\tpulb"
-		"\tjsr Dvu2"
+		"\tldx BASE+$1,x"
+		"\tstx <ARTH"
+		"\tjsr Dvu"
 					| %[1] | |
 loe dvu $2==2	| R16 |
 		"! loe dvu $2==2"
-		"\tpshb"
-		"\tpsha"
-		"\tldab $1+1"
-		"\tldaa $1"
-		"\tstab <ARTH+1"
-		"\tstaa <ARTH"
-		"\tpula"
-		"\tpulb"
-		"\tjsr Dvu2"
+		"\tldx $1"
+		"\tstx <ARTH"
+		"\tjsr Dvu"
 					| %[1] | |
 dvu $1==2	| R16 |
 		"! dvu $1==2"
@@ -1943,9 +1956,9 @@ cii 	| R16 |
 cui 	| | "! cui to cii" | | cii |
 ciu	| | "! ciu to cii" | | cii |
 cuu 	| | "! cuu to cii" | | cii |
-loc loc cui $1==$2	| | "! loc loc cui" | | |
-loc loc ciu $1==$2	| | "! loc loc ciu" | | |
-loc loc cuu $1==2 && $2==4 | | "! loc loc cuu" | | loc 0 |
+loc loc cui $1==$2	| | "! loc loc cui $1==$2" | | |
+loc loc ciu $1==$2	| | "! loc loc ciu $1==2"  | | |
+loc loc cuu $1==2 && $2==4 | | "! loc loc cuu $1==2 $2==4" | | loc 0 |
 
 
 /* GROUP 9 - LOGICAL */
@@ -2760,7 +2773,7 @@ cai	| R16 |
 					| | |
 cal	| |
 		remove(ALL)
-		"! cal"
+		"! cal $1"
 		"\tjsr $1"
 					| | |
 lfr $1==2 | |
