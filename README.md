@@ -112,6 +112,7 @@ This project generates a large number of files, which can lead to i-node exhaust
 
 To participate in development, follow these steps to test code generation. The environment assumed is Ubuntu Linux.
 
+```
 $ sudo apt install git make gcc pkg-config lua5.4 flex bison
 $ git clone https://github.com/zu2/ack-6800.git
 $ cd ack-6800
@@ -122,6 +123,7 @@ $ export PATH=/opt/pkg/ack/bin:$PATH
 $ cd examples
 $ ack  -me6800 -v -v  hilo.c
 $ emu6800 6800   e6800.img /dev/null 
+```
 
 By default, 'make' builds for all CPUs and platforms, leading to long build times. To compile only mc6800/e6800, update the Makefile as shown below.
 
