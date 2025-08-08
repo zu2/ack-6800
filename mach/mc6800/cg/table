@@ -1989,6 +1989,27 @@ ior $1==2	| R16 |
 		"\tins"
 		"\tins"
 					| %[1] | |
+ior $1==4	| |
+		allocate(R16)
+		"! ior $1"
+		"\ttsx"
+		"\tldab 7,x"
+		"\tldaa 6,x"
+		"\torab 3,x"
+		"\toraa 2,x"
+		"\tstab 7,x"
+		"\tstaa 6,x"
+		"\tldab 5,x"
+		"\tldaa 4,x"
+		"\torab 1,x"
+		"\toraa 0,x"
+		"\tstab 5,x"
+		"\tstaa 4,x"
+		"\tins"
+		"\tins"
+		"\tins"
+		"\tins"
+					| | |
 ior $1<=254	| R16 |
 		"! ior $1"
 		"\tins"
