@@ -1,5 +1,5 @@
-.define Mli2, Mlinp, Mul
-.define Mlu2, Mlinp, Mlu
+.define Mli2, Mli, Mlix
+.define Mlu2, Mlu, Mlux
 .sect .zero
 .sect .text
 .sect .rom
@@ -10,6 +10,10 @@
 ! are popped from the stack.
 ! The subroutine Mlinp expects the two integer to be in zeropage.
 ! While the subroutine Mul an unsigned multiply subroutine is.
+
+! Mli2, Mlu2:	multiply AccAB * TOS
+! Mlix, Mlux:	multiply AccAB * IX
+! Mli,  Mlu:	multiply AccAB * ARTH
 
 .sect .text
 Mli2:
@@ -23,13 +27,14 @@ Mlu2:
 	ins
 	pula
 	pulb
-	bsr Mul
-	tsx
+	bsr Mlu
 	ldx <TMP
 	jmp 0,x
-Mul:
+Mlix:
+Mlux:
+	stx <ARTH
+Mli:
 Mlu:
-Mlinp:	
 	stab <ARTH+3
 	staa <ARTH+2
 	clrb
