@@ -1113,10 +1113,8 @@ loc lol dvi (IN($2) && $3==2)	| |
 		allocate(R16)
 		"! loc lol dvi IN($2) $3"
 		"\tldx <LBl"
-		"\tldab BASE+$2+1"
-		"\tldaa BASE+$2"
-		"\tstab <ARTH+1"
-		"\tstaa <ARTH"
+		"\tldx BASE+$2"
+		"\tstx <ARTH"
 		"\tldab #[$1].l"
 		"\tldaa #[$1].h"
 		"\tjsr Dvi"
@@ -1137,10 +1135,8 @@ lol loc dvi (IN($1) && $2==2 && $3==2)	| |
 lol loc dvi (IN($1) && $3==2)	| |
 		allocate(R16)
 		"! lol loc dvi IN($1) $3"
-		"\tldab #[$2].l"
-		"\tldaa #[$2].h"
-		"\tstab <ARTH+1"
-		"\tstaa <ARTH"
+		"\tldx #[$2]"
+		"\tstx <ARTH"
 		"\tldx <LBl"
 		"\tldab BASE+$1+1,x"
 		"\tldaa BASE+$1+0,x"
@@ -1150,10 +1146,9 @@ lol lol dvi (IN($1) && IN($2) && $3==2) | |
 		allocate(R16)
 		"! lol lol dvi IN($1) IN($2) $3"
 		"\tldx <LBl"
-		"\tldab BASE+$2+1,x"
-		"\tldaa BASE+$2+0,x"
-		"\tstab <ARTH+1"
-		"\tstaa <ARTH"
+		"\tldx BASE+$2,x"
+		"\tstx <ARTH"
+		"\tldx <LBl"
 		"\tldab BASE+$1+1,x"
 		"\tldaa BASE+$1+0,x"
 		"\tjsr Dvi"
@@ -1162,10 +1157,8 @@ lol loe dvi (IN($1) && $3==2) | |
 		allocate(R16)
 		"! lol loe dvi IN($1) $3"
 		"\tldx <LBl"
-		"\tldab BASE+$1+1,x"
-		"\tldaa BASE+$1+0,x"
-		"\tstab <ARTH+1"
-		"\tstaa <ARTH"
+		"\tldx BASE+$1,x"
+		"\tstx <ARTH"
 		"\tldab $2+1"
 		"\tldaa $2"
 		"\tjsr Dvi"
@@ -1174,10 +1167,8 @@ loe lol dvi (IN($2) && $3==2) | |
 		allocate(R16)
 		"! loe lol dvi IN($2) $3"
 		"\tldx <LBl"
-		"\tldab BASE+$2+1,x"
-		"\tldaa BASE+$2+0,x"
-		"\tstab <ARTH+1"
-		"\tstaa <ARTH"
+		"\tldx BASE+$2,x"
+		"\tstx <ARTH"
 		"\tldab $1+1"
 		"\tldaa $1"
 		"\tjsr Dvi"
@@ -1185,10 +1176,8 @@ loe lol dvi (IN($2) && $3==2) | |
 loe loe dvi $3==2	| |
 		allocate(R16)
 		"! loe loe dvi $3"
-		"\tldab $2+1"
-		"\tldaa $2"
-		"\tstab <ARTH+1"
-		"\tstaa <ARTH"
+		"\tldx $2"
+		"\tstx <ARTH"
 		"\tldab $1+1"
 		"\tldaa $1"
 		"\tjsr Dvi"
@@ -1196,10 +1185,8 @@ loe loe dvi $3==2	| |
 loc loe dvi $3==2	| |
 		allocate(R16)
 		"! loc loe dvi $3"
-		"\tldab #[$1].l"
-		"\tldaa #[$1].h"
-		"\tstab <ARTH+1"
-		"\tstaa <ARTH"
+		"\tldx #[$1]"
+		"\tstx <ARTH"
 		"\tldab $2+1"
 		"\tldaa $2"
 		"\tjsr Dvi"
@@ -1207,10 +1194,8 @@ loc loe dvi $3==2	| |
 loe loc dvi $3==2	| |
 		allocate(R16)
 		"! loe loc dvi $3"
-		"\tldab #[$2].l"
-		"\tldaa #[$2].h"
-		"\tstab <ARTH+1"
-		"\tstaa <ARTH"
+		"\tldx #[$2]"
+		"\tstx <ARTH"
 		"\tldab $1+1"
 		"\tldaa $1"
 		"\tjsr Dvi"
@@ -1219,21 +1204,17 @@ ldl dvi IN($1) && $2==2	| |
 		allocate(R16)
 		"! ldl dvi IN($1) $2"
 		"\tldx <LBl"
-		"\tldab BASE+$1+1,x"
-		"\tldaa BASE+$1+0,x"
-		"\tstab <ARTH+1"
-		"\tstaa <ARTH"
 		"\tldab BASE+$1+3,x"
 		"\tldaa BASE+$1+2,x"
+		"\tldx BASE+$1,x"
+		"\tstx <ARTH"
 		"\tjsr Dvi"
 					| %[a] | |
 lde dvi $2==2	| |
 		allocate(R16)
 		"! lde dvi $2"
-		"\tldab $1+1"
-		"\tldaa $1"
-		"\tstab <ARTH+1"
-		"\tstaa <ARTH"
+		"\tldx $1"
+		"\tstx <ARTH"
 		"\tldab $1+3"
 		"\tldaa $1+2"
 		"\tjsr Dvi"
@@ -1250,14 +1231,8 @@ loc dvi $1==2 && $2==2 | R16 |
 					| %[1] | |
 loc dvi $2==2 | R16 |
 		"! loc dvi $2"
-		"\tpshb"
-		"\tpsha"
-		"\tldab #[$1].l"
-		"\tldaa #[$1].h"
-		"\tstab <ARTH+1"
-		"\tstaa <ARTH"
-		"\tpula"
-		"\tpulb"
+		"\tldx #[$1]"
+		"\tstx <ARTH"
 		"\tjsr Dvi"
 					| %[1] | |
 lol dvi IN($1) && $2==2 | R16 |
@@ -2564,6 +2539,17 @@ loc ble | R16 |
 		"\tbeq $2"
 		"1:"
 					| | |
+lol loc ble IN($1) | | | | loc $2 lol $1 bge $3 |
+lol lol ble IN($1) && IN($2) | |
+		allocate(R16)
+		"! lol lol ble IN($1) && IN($2)"
+		"\tldx <LBl"
+		"\tldab BASE+$2+1,x"
+		"\tldaa BASE+$2+0,x"
+		"\tsubb BASE+$1+1,x"
+		"\tsbca BASE+$1+0,x"
+		"\tbge $3"
+					| | |
 lol ble IN($1) | R16 |
 		"! lol ble IN($1)"
 		"\tldx <LBl"
@@ -2656,6 +2642,7 @@ bge	| R16 |
 		"\tjsr Sbi2"
 		"\tbge $1"
 					| | |
+lol loc bgt IN($1) | | | | loc $2 lol $1 blt $3 |
 loc bgt | R16 |
 		"! loc bgt"
 		"\tsubb #[$1].l"
@@ -2695,12 +2682,26 @@ zle	| R16 |
 cmi zeq $1==2 | | | | beq $2 |
 cmp zeq | | | | beq $2 |
 cms zeq $1==2 | | | | beq $2 |
+lal loi zeq IN($1) && $2==1 | |
+		allocate(R16)
+		"! lal loi zne IN($1) && $2==1"
+		"\tldx <LBl"
+		"\tldab BASE+$1,x"
+		"\tbeq $3"
+					| | |
 loi zeq $1==1 | R16 |
 		"! loi zeq $1==1"
 		"\tstab <TMP+1"
 		"\tstaa <TMP"
 		"\tldx <TMP"
 		"\ttst 0,x"
+		"\tbeq $2"
+					| | |
+lol zeq IN($1) | |
+		allocate(R16)
+		"! lol zeq IN($1)"
+		"\tldx <LBl"
+		"\tldx BASE+$1,x"
 		"\tbeq $2"
 					| | |
 zeq	| R16 |
@@ -2713,6 +2714,20 @@ zeq	| R16 |
 cmi zne $1==2 | | | | bne $2 |
 cmp zne | | | | bne $2 |
 cms zne $1==2 | | | | bne $2 |
+lal loi zne IN($1) && $2==1 | |
+		allocate(R16)
+		"! lal loi zne IN($1) && $2==1"
+		"\tldx <LBl"
+		"\tldab BASE+$1,x"
+		"\tbne $3"
+					| | |
+lol zne IN($1) | |
+		allocate(R16)
+		"! lol zne IN($1)"
+		"\tldx <LBl"
+		"\tldx BASE+$1,x"
+		"\tbne $2"
+					| | |
 zne	| R16 |
 		"! zne"
 		"\ttsta"

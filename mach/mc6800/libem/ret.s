@@ -14,10 +14,6 @@
 Ret1:
 	stab	<RETURN
 	bra	1f
-Ret2:
-	stab	<RETURN+1
-	staa	<RETURN
-	bra	1f
 Ret4:
 	stab	<RETURN+1
 	staa	<RETURN
@@ -25,6 +21,10 @@ Ret4:
 	pulb
 	stab	<RETURN+3
 	staa	<RETURN+2
+	bra	1f
+Ret2:
+	stab	<RETURN+1
+	staa	<RETURN
 1:
 Ret0:
 	ldx	<LB
