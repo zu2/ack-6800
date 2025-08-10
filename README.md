@@ -96,13 +96,13 @@ Cycle time of Mandelbrot.
 - Add essential source files under plat/e6800/
 - Avoid generating redundant ldx LB/LBl instructions.
 - Support routines need to be extended further. 
+- Other language support
 
 ## DONE
 
 - The directory was renamed from mach/6800 to mach/mc6800, though it is not clear if this is the best approach.
   - Renamed to prevent the program from treating names starting with 'em' as EM code platforms.
 - Compilation of some test program.
-- Other language support
 
 ## Note on Disk Space
 
@@ -200,4 +200,4 @@ f9dasm:  https://github.com/Arakula/f9dasm
 The following is the original README.
 
 - [zu2/ack-6800/README](https://github.com/zu2/ack-6800/blob/default/README)
-- https://github.com/davidgiven/ack/blob/default/README )
+- https://github.com/davidgiven/ack/blob/default/README
