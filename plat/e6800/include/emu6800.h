@@ -4,7 +4,7 @@
 
 #include <stdint.h>
 
-#define	emu6800_ramtop	((uint8_t *)0x7fff)
+#define	emu6800_ramtop	((uint8_t *)0xefff)
 
 /*
  * boot.s minitourine
