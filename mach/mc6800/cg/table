@@ -1974,6 +1974,26 @@ and $1==4	| |
 		"\tins"
 		"\tins"
 					| | |
+and $1>=0 && $1<=254 | |
+		allocate(R16)
+		"! and $1>=0 && $1<=254"
+		"\ttsx"
+		"\tstx <TMP"
+		"\tldab <TMP+1"
+		"\tldaa <TMP"
+		"\taddb #[$1].l"
+		"\tadca #[$1].h"
+		"\tstab <TMP+1"
+		"\tstaa <TMP"
+		"\tldx <TMP"
+		"\tldab #[$1].l"
+		"1:"
+		"\tpula"
+		"\tanda 0,x"
+		"\tinx"
+		"\tdecb"
+		"\tbne 1b"
+					| | |
 and ND	| R16 |
 		"! and ND $1"
 		"\ttsx"
@@ -2026,23 +2046,24 @@ ior $1==4	| |
 		"\tins"
 		"\tins"
 					| | |
-ior $1<=254	| R16 |
-		"! ior $1"
+ior $1>=0 && $1<=254	| |
+		allocate(R16)
+		"! ior $1>=0 && $1<=254"
 		"\ttsx"
-		"\tstx <ADDR"
-		"\taslb"
-		"\trola"
-		"\taddb <ADDR+1"
-		"\tadca <ADDR"
-		"\tstab <ADDR+3"
-		"\tstaa <ADDR+2"
-		"\tldx <ADDR+2"
+		"\tstx <TMP"
+		"\tldab <TMP+1"
+		"\tldaa <TMP"
+		"\taddb #[$1].l"
+		"\tadca #[$1].h"
+		"\tstab <TMP+1"
+		"\tstaa <TMP"
+		"\tldx <TMP"
+		"\tldab #[$1].l"
 		"1:"
-		"\tpulb"
-		"\torab 0,x"
-		"\tstab 0,x"
+		"\tpula"
+		"\toraa 0,x"
 		"\tinx"
-		"\tcpx <ADDR+2"
+		"\tdecb"
 		"\tbne 1b"
 					| | |
 ior ND	| R16 |
@@ -2097,6 +2118,26 @@ xor $1==4	| |
 		"\tins"
 		"\tins"
 					| | |
+xor $1>=0 && $1<=254	| |
+		allocate(R16)
+		"! xor $1>=0 && $1<=254"
+		"\ttsx"
+		"\tstx <TMP"
+		"\tldab <TMP+1"
+		"\tldaa <TMP"
+		"\taddb #[$1].l"
+		"\tadca #[$1].h"
+		"\tstab <TMP+1"
+		"\tstaa <TMP"
+		"\tldx <TMP"
+		"\tldab #[$1].l"
+		"1:"
+		"\tpula"
+		"\teora 0,x"
+		"\tinx"
+		"\tdecb"
+		"\tbne 1b"
+					| | |
 xor ND	| R16 |
 		"! xor ND"
 		"\ttsx"
@@ -2125,7 +2166,27 @@ com $1==2	| R16 |
 		"\tcomb"
 		"\tcoma"
 					| %[1] | |
-com ND	| R16 |
+com $1==4	| R16 |
+		"! com $1"
+		"\ttsx"
+		"\tcom 1,x"
+		"\tcom 0,x"
+		"\tcomb"
+		"\tcoma"
+					| %[1] | |
+com $1>=0 && $1<=254 | |
+		allocate(R16)
+		"! com $1<=254"
+		"\ttsx"
+		"\tldab #[$1].l"
+		"1:"
+		"\tcom 0,x"
+		"\tinx"
+		"\tdecb"
+		"\tbne 1b"
+					| | |
+com ND	| |
+		allocate(R16)
 		"! com ND"
 		"\ttsx"
 		"\tstx <ADDR"

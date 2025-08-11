@@ -50,7 +50,7 @@ Aar:
 	beq 4f
 !			! AccAB has index - lower bound
 	stx ARTH
-	jsr Mul		! AccAB = AccAB * ARTH (object size)
+	jsr Mlu2	! AccAB = AccAB * ARTH (object size)
 	bra 6f
 !
 4:	aslb		! object size == 4
