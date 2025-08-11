@@ -12,6 +12,7 @@
 ! stack:
 ! +0, +1: rerurn address
 ! +2, +3: index
+! +4, +5: base of array
 !
 ! descriptor:
 ! +0, +1  lower bound
@@ -40,7 +41,7 @@ Aar:
 	pulb
 	bgt 9f		! trap EARRAY
 !
-2:	ldx 4,x
+2:	ldx 4,x		! get object size
 	beq Trap
 	cpx #1
 	beq 6f
@@ -60,12 +61,12 @@ Aar:
 	rola
 !
 6:			! object size == 1
-	addb ADDR+1
-	adca ADDR
-	addb #6		! skip descriptor
-	adca #0
 	tsx
+	addb 5,x	! add base of array
+	adca 4,x
 	ldx 0,x
+	ins
+	ins
 	ins
 	ins
 	ins

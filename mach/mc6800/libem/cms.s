@@ -22,19 +22,21 @@
 
 
 Cms:
-	clra
 	tsx
 	ldx 0,x		! get return address
 	ins
 	ins
 	stx <TMP
 	tsx
+	tsta
+	bne Cms_N
 	cmpb #2
 	beq Cms_2	! 2byte compare
 	cmpb #4
 	beq Cms_4	! 4byte compara
 !
-	stab <ARTH+1
+Cms_N:
+	stab <ARTH+1	! size of gtoup (byte)
 	staa <ARTH
 	stx <ADDR
 	addb <ADDR+1

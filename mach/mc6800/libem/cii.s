@@ -15,6 +15,13 @@
 ! source so that sign extentension takes place if neccesairy.
 
 
+! AccAB: convert to
+! Stack:
+! +0,+1: return address
+! +2,+3: convert from
+! +4,+5: convert value low word
+! +6,+7: (high word when dword)
+
 Cii:
 	tsx
 	ldx 0,x		! get return address
@@ -37,17 +44,17 @@ Cii_4:	cmpb #4
 	bne 2f
 	pula		! a conversion 1 to 4
 	pulb
-	pshb		! save lower byte
+	pshb
 	clra		! sign extend
 	aslb
 	sbca #0
-	psha
-	tab
+	psha		! push upper byte
+	tab		! top half word is equal to sign
 	jmp 0,x
 2:	pulb		! a conversion 2 to 4
 	pshb
 	clra
-	aslb
+	rolb
 	sbca #0		! sign extend
 	tab
 	jmp 0,x
@@ -59,9 +66,9 @@ Cii_1:			! a conversion from ? to 1
 	beq 5f		! a conversion from 1 to 1 (skip)
 3:	cmpb #2
 	beq 5f 		! a conversion from 2 to 1
-4:	pula		! a conversion from 4 to 1
-	pulb
-5:	pula
+4:	ins		! a conversion from 4 to 1	
+	ins
+5:	pula	
 	pulb
 	clra
 	jmp 0,x
@@ -81,8 +88,11 @@ Cii_2:			! a conversion from ? to 2
 !
 2:	cmpb #2
 	beq 3f		! a conversion from 2 to 2 (skip)
-	ins		! strip upper word
+	ins		! a conversion from 4 to 2
 	ins
-3:	pula		! get lower word
+	pula
+	pulb
+	jmp 0,x
+3:	pula
 	pulb
 8:	jmp 0,x

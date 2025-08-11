@@ -11,19 +11,19 @@
 !    0  if S = T,
 !    1  if S > T.
 
-! AccAB: T
+! AccAB: S
 ! Stack:
 ! +0:	return address
-! +2:	S
+! +2:	T
 
 Cmi2:
 	tsx
-	subb 3,x	! T - S
+	subb 3,x	! S - T
 	sbca 2,x
-	blt 2f		! S > T
-	bgt 3f		! S < T
+	blt 3f		! S < T
+	bgt 2f		! S > T
 	tstb
-	bne 3f		! S != T  (i.e S < T)
+	bne 2f		! S != T  (i.e S > T)
 			! S == T, AccAB already zero
 1:
 	ldx 0,x

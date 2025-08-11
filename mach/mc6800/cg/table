@@ -2208,8 +2208,8 @@ rol $1==2	| R16 |
 rol $1==4	| R16 |
 		"! rol $1"
 		"\ttsx"
-		"\tasl 1,1"
-		"\trol 0,1"
+		"\tasl 1,x"
+		"\trol 0,x"
 		"\trolb"
 		"\trola"
 					| | |
@@ -2498,6 +2498,13 @@ cmu $1==4	| |
 		"! cmu $1"
 		"\tjsr Cmu4"
 					| %[a] | |
+cmu $1>0 | |
+		allocate(R16)
+		"! cmu $1"
+		"\tldab #[$1].l"
+		"\tldaa #[$1].h"
+		"\tjsr Cmu"
+					| %[a] | |
 cmu ND	| |
 		allocate(R16)
 		"! cmu ND"
@@ -2511,22 +2518,15 @@ cmu ND	| |
 					| | |
 cmp	| |
 					| | cmu 2 |
-cms $1==2	| |
+cms $1==2 || $1==4	| |
 		allocate(R16)
 		"! cms $1"
-		"\tldab #2"
-		"\tjsr Cms"
-					| %[a] | |
-cms $1==4	| |
-		allocate(R16)
-		"! cms $1"
-		"\tldab #4"
+		"\tldab #[$1].l"
+		"\tldaa #[$1].h"
 		"\tjsr Cms"
 					| %[a] | |
 cms ND	| R16 |
 		"! cms ND"
-		"\tjsr TestFFh"
-		"\tincb"
 		"\tjsr Cms"
 					| %[1] | |
 tlt	| R16 |
@@ -2708,8 +2708,8 @@ loc bgt | R16 |
 		"! loc bgt"
 		"\tsubb #[$1].l"
 		"\tsbca #[$1].h"
-		"\tbmi 1f"
-		"\tbne $2"
+		"\tblt 1f"
+		"\tbgt $2"
 		"\ttstb"
 		"\tbne $2"
 		"1:"
@@ -2717,8 +2717,8 @@ loc bgt | R16 |
 bgt	| R16 |
 		"! bgt"
 		"\tjsr Sbi2"
-		"\tbmi 1f"
-		"\tbne $1"
+		"\tblt 1f"
+		"\tbgt $1"
 		"\ttstb"
 		"\tbne $1"
 		"1:"
@@ -3094,7 +3094,8 @@ exg $1==2	| R16 |
 exg $1<=255	| |
 		allocate(R16)
 		"! exg $1"
-		"\tldx #$1"
+		"\tldab #[$1].l"
+		"\tldaa #[$1].h"
 		"\tjsr Exg"
 					| | |
 fil	| |
