@@ -96,7 +96,10 @@ Cycle time of Mandelbrot.
 - Add essential source files under plat/e6800/
 - Avoid generating redundant ldx LB/LBl instructions.
 - Support routines need to be extended further. 
-- Other language support
+- Other language support (test with hilo.\*)
+  - BASIC: PRINT works fine, but INPUT is still acting up.
+  - Pascal: Compilation succeeds, but the program crashes during initialization.
+  - Other languages: Compilation fails due to insufficient library support.
 
 ## DONE
 
