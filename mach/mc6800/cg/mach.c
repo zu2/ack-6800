@@ -18,6 +18,8 @@ con_part(int sz, word w) {
 		}
 		part_word |= w;
 	} else {
+if (sz!=2)
+  fprintf(stderr,"con_part(%d,%04x)\n",sz,w);
 		assert(sz == 2);
 		part_word = w;
 	}
@@ -62,7 +64,7 @@ void prolog(full nlocals)
 	else
 		fprintf(codefile,
 	"\tldab #[%d].l\n\tldaa #[%d].h\n\tjsr Lcs\n",
-					nlocals, nlocals);
+					-nlocals, -nlocals);
 }
 
 void mes(word type)

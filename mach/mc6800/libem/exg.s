@@ -24,31 +24,31 @@ Exg:
 	ins
 	ins
 	tsx
-	stx <ADRS
+	stx <ADDR
 !
 	stab <ARTH+1
 	staa <ARTH
-	addb <ADRS+1	! calculate second group's address
-	adca <ADRS
-	stab <ADRS+3
-	staa <ADRS+2
+	addb <ADDR+1	! calculate second group's address
+	adca <ADDR
+	stab <ADDR+3
+	staa <ADDR+2
 !
 	ldab <ARTH+1	! adjust size for loop
 	beq 1f
 	inc ARTH
 1:
-!	ldx <ADRS
+!	ldx <ADDR
 	dex
 2:
 	inx
 	ldab 0,x
-	stx <ADRS
-	ldx <ADRS+2
+	stx <ADDR
+	ldx <ADDR+2
 	ldaa 0,x
 	stab 0,x
 	inx
-	stx <ADRS+2
-	ldx <ADRS
+	stx <ADDR+2
+	ldx <ADDR
 	staa 0,x
 	dec ARTH+1
 	bne 2b

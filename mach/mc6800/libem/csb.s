@@ -11,7 +11,7 @@
 ! case descriptor, which also is the address of the default pointer.
 
 !
-! case_table: <- (AccAB)
+! case_table:	Csb:AccAB, CsbX:IX
 ! default_addr: .data2 adrs
 ! num_of_case:	.data2 num
 ! case_1:	.data2 num
@@ -20,14 +20,18 @@
 ! jump_addr:	.data2 adrs
 !
 
-! TOS: switch value
+! switch value: TOS:Csb, AccAB:CsbX
+! 
 
+CsbX:	pshb
+	psha
+	stx <ADDR
+	bra 0f
 Csb:
 	stab <ADDR+1	! address of descriptor (lowbyte)
 	staa <ADDR	! address of descriptor (highbyte)
 	ldx <ADDR
-CsbX:	stx <ADDR
-	inx
+0:	inx
 	inx
 	ldab 1,x	! number of entries (lowbyte)
 	ldaa 0,x

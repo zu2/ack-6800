@@ -1,4 +1,4 @@
-.define Pushx
+.define Pushx,TfrXD
 .sect .zero
 .sect .text
 .sect .rom
@@ -18,3 +18,8 @@ Pushx:
 	pshb
 	psha
     	jmp 0,x
+TfrXD:
+	stx <TMP
+	ldab <TMP+1
+	ldaa <TMP
+	rts

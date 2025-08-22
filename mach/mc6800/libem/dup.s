@@ -1,4 +1,4 @@
-.define Dup
+.define Dup,DupX,DupAB
 .sect .zero
 .sect .text
 .sect .rom
@@ -14,23 +14,36 @@
 ! +2..+2+n-1	copy data
 
 Dup:
-	stx	<NBYTES
 	tsx
 	ldx	0,x
-	stx	TMP
+	stx	<TMP
 	ins
 	ins
-	stx	<ADDR
+	pula
+	pulb
+	bra	0f
+DupX:
+	stx	<NBYTES
 	ldab	<NBYTES+1
 	ldaa	<NBYTES
+DupAB:
+	tsx
+	ldx	0,x
+	stx	<TMP
+	ins
+	ins
+0:
+	tsx
+	stx	<ADDR
 	addb	<ADDR+1
 	adca	<ADDR
 	stab	<ADDR+3		! copy end address+1
 	staa	<ADDR+2
 	ldx	<ADDR+2
 1:	dex
-	ldab 0,x
+	ldab	0,x
 	pshb
 	cpx	<ADDR
 	bne	1b
-	jmp 0,x
+	ldx	<TMP
+	jmp	0,x

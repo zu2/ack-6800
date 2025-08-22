@@ -28,11 +28,11 @@ Inn:
 	tsx
 	inx
 	inx
-	stx <ADRS	! save top of data address
-	addb <ADRS+1
-	adca <ADRS
-	stab <ADRS+3	! save end of data address
-	staa <ADRS+2
+	stx <ADDR	! save top of data address
+	addb <ADDR+1
+	adca <ADDR
+	stab <ADDR+3	! save end of data address
+	staa <ADDR+2
 !
 	pula		! get bit number
 	pulb
@@ -57,11 +57,11 @@ Inn:
 !
 	pula
 	pulb
-	addb <ADRS+1	! calcucalte data address
-	adca <ADRS
-	stab <ADRS+1
-	staa <ADRS
-	ldx <ADRS
+	addb <ADDR+1	! calcucalte data address
+	adca <ADDR
+	stab <ADDR+1
+	staa <ADDR
+	ldx <ADDR
 !
 	ldaa #1		! bit pos
 	ldab <ARTH+3	! get bit number
@@ -80,7 +80,7 @@ Inn:
 !
 7:	clrb
 8:	clra
-9:	ldx <ADRS+2	! adjust stack
+9:	ldx <ADDR+2	! adjust stack
 	txs
 	ldx <TMP
 	jmp 0,x

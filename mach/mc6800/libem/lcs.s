@@ -9,18 +9,17 @@
 ! This subroutine creates space for locals on procedure entry
 ! by lowering the stackpointer.
 
+! For faster execution, AccAB is passed to Lcs with inverted sign,
+!  which reduces STA usage. see mach/mc6800/cg/mach.c
+
 Lcs:
 	tsx
 	ldx 0,x
 	ins
 	ins
-	stab ARTH+1	! number of locals (lowbyte)
-	staa ARTH	! number of locals (highbyte)
 	sts TMP
-	ldab TMP+1
-	ldaa TMP
-	subb ARTH+1
-	sbca ARTH
+	addb TMP+1
+	adca TMP
 	stab TMP+1
 	staa TMP
 	lds TMP

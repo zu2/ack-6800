@@ -273,12 +273,21 @@ lae sti $2==2 | R16 |
 		"\tstab $1+1"
 		"\tstaa $1+0"
 					| | |
+lae stl IN($2) | |
+		allocate(R16)
+		"! lae stl IN($2)"
+		"\tldx #$1"
+		"\tjsr TfrXD"
+		"\tldx <LBl"
+		"\tstab BASE+$2+1,x"
+		"\tstaa BASE+$2+0,x"
+					| | |
 lae 	| |
 		allocate(R16)
-		"! lae"
+		"! lae $1"
 		"\tldx #$1"
-		"\tjsr Pushx"
-					| | |
+		"\tjsr TfrXD"
+					| %[a] | |
 
 /* lxl: load local base  n (255 => n > 0) static levels back.*/
 
@@ -330,6 +339,12 @@ loi $1==1	| R16 |
 		"\tldab 0,x"
 		"\tclra"
 					| %[1] | |
+lae loi $2==2 | |
+		allocate(R16)
+		"! lae loi $1==2"
+		"\tldab $1+1"
+		"\tldaa $1+0"
+					| %[a] | |
 loi $1==2	| R16 |
 		"! loi $1"
 		"\tstab <TMP+1"
@@ -338,6 +353,16 @@ loi $1==2	| R16 |
 		"\tldab 1,x"
 		"\tldaa 0,x"
 					| %[1] | |
+lae loi $2==4 | |
+		allocate(R16)
+		"! lae loi $1==4"
+		"\tldab $1+3"
+		"\tldaa $1+2"
+		"\tpshb"
+		"\tpsha"
+		"\tldab $1+1"
+		"\tldaa $1+0"
+					| %[a] | |
 loi $1==4	| R16 |
 		"! loi $1"
 		"\tstab <TMP+1"
@@ -3014,22 +3039,22 @@ bls $1==2	| R16 |
 bls | R16 |
 		"\tjsr Trap"
 					| | |
-lae csa | |
-		allocate(R16)
-		"! lae"
+lae csa | R16 |
+		"! lae csa"
 		"\tldx #$1"
 		"\tjmp CsaX"
 					| | |
-lae csb	| |
-		allocate(R16)
-		"! lae"
+lae csb	| R16 |
+		"! lae csb"
 		"\tldx #$1"
 		"\tjmp CsbX"
 					| | |
 csa	| R16 |
+		"! csa"
 		"\tjmp Csa"
 					| | |
 csb	| R16 |
+		"! csb"
 		"\tjmp Csb"
 					| | |
 dch	| | | | loi 2 |
@@ -3055,30 +3080,16 @@ dup $1<=256	| |
 		allocate(R16)
 		"! dup $1"
 		"\tldx #$1"
-		"\tjsr Dup"
+		"\tjsr DupX"
 					| | |
 dup 		| R16 |
 		"! dup ND"
 		"\tldx #$1"
-		"\tjsr Dup"
+		"\tjsr DupX"
 					| | |
 dus $1==2	| R16 |
 		"! dus $1"
-		"\tjsr TestFFh"
-		"\ttsx"
-		"\tldx 0,x"
-		"\tins"
-		"\tins"
-		"\tjsr Dup"
-					| | |
-dus 		| R16 |
-		"! dus $1"
-		"\tjsr TestFFh"
-		"\ttsx"
-		"\tldx 0,x"
-		"\tins"
-		"\tins"
-		"\tjsr Dup"
+		"\tjsr DupAB"
 					| | |
 exg $1==2	| R16 |
 		"! exg $1"
