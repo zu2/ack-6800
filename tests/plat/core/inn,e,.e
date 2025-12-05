@@ -10,7 +10,7 @@
     rom 0I4
     loe .1
     loc 1       /* bit number */
-    inn 4
+    inn EM_WSIZE
     zeq *1
 
     loc __LINE__

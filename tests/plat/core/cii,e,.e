@@ -49,8 +49,11 @@ monebyte
     loc 1
     loc 4
     cii
+    ldc 1
+/*
     loc 0
     loc 1
+*/
 	cmu 4
 	zeq *3
 
@@ -65,8 +68,11 @@ monebyte
     loc 1
     loc 4
     cii
+    ldc -1
+/*
     loc -1
     loc -1
+*/
 	cmu 4
 	zeq *4
 
@@ -80,8 +86,11 @@ monebyte
     loc 2
     loc 4
     cii
+    ldc 1
+/*
     loc 0
     loc 1
+*/
 	cmu 4
 	zeq *5
 
@@ -96,8 +105,11 @@ monebyte
     loc 2
     loc 4
     cii
+    ldc -1
+/*
     loc -1
     loc -1
+*/
 	cmu 4
 	zeq *6
 
