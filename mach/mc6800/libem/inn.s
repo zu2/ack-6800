@@ -9,7 +9,7 @@
 ! This subroutine checks if a certain bit is set in a set
 ! of n bytes on top of the stack.
 
-! AccAB: size of set (bytes)
+! AccAB: data size
 ! Stack:
 ! +0,+1: return address
 ! +2,+3: bit number
@@ -42,11 +42,11 @@ Inn:
 !
 	bmi 7f		! bit number < 0
 !
-	asra		! bit/8
+	lsra		! bit/8
 	rorb
-	asra
+	lsra
 	rorb
-	asra
+	lsra
 	rorb
 !
 	pshb
@@ -59,6 +59,7 @@ Inn:
 	pulb
 	addb <ADDR+1	! calcucalte data address
 	adca <ADDR
+	eorb #1		! byte swap
 	stab <ADDR+1
 	staa <ADDR
 	ldx <ADDR

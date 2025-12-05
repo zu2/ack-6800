@@ -11,6 +11,10 @@
 
 #if ACKCONF_WANT_STDIO
 
+extern	void	putstr(const char *s);
+extern	void	print(int x);
+extern	void	puthexi(int x);
+
 /* gnum() is used to get the width and precision fields of a format. */
 static const char*
 gnum(const char* f, int* ip, va_list* app)
@@ -62,6 +66,18 @@ o_print(va_list* ap, int flags, char* s, char c, int precision, int is_signed)
 	char* old_s = s;
 	int base;
 
+#if 0
+putstr("o_print:ap=");puthexi(ap);putstr("\n");
+putstr("       :flags=");puthexi(flags);putstr("\n");
+putstr("       :s=");puthexi(s);putstr("\n");
+putstr("       :c=");puthexi(c);putstr("\n");
+putstr("       :precision=");print(precision);
+putstr("       :is_signed=");print(is_signed);
+
+putstr("       :flags&FL_SHORT=");puthexi(flags&FL_SHORT);putstr("\n");
+putstr("       :flags&FL_LONG=");puthexi(flags&FL_LONG);putstr("\n");
+#endif
+
 	switch (flags & (FL_SHORT | FL_LONG))
 	{
 		case FL_SHORT:
@@ -95,6 +111,10 @@ o_print(va_list* ap, int flags, char* s, char c, int precision, int is_signed)
 			}
 			break;
 	}
+#if 0
+putstr("  signed val:");puthexl(signed_val);putstr("\n");
+putstr("unsigned val:");puthexl(unsigned_val);putstr("\n");
+#endif
 
 	if (is_signed)
 	{
@@ -123,6 +143,10 @@ o_print(va_list* ap, int flags, char* s, char c, int precision, int is_signed)
 		*s++ = (c == 'X' ? 'X' : 'x');
 	}
 
+#if 0
+	putstr("before switch\n");
+	putstr("o_print:c=");puthexi(c);putstr("\n");
+#endif
 	switch (c)
 	{
 		case 'b':
@@ -142,6 +166,13 @@ o_print(va_list* ap, int flags, char* s, char c, int precision, int is_signed)
 			base = 16;
 			break;
 	}
+#if 0
+	putstr("after switch\n");
+	putstr("o_print:base=");puthexi(base);putstr(" hex\n");
+	putstr("o_print:base=");print(base);
+	putstr("       :c=");puthexi(c);putstr("\n");
+	base = 10;
+#endif
 
 	s = _i_compute(unsigned_val, base, s, precision);
 
@@ -252,6 +283,9 @@ int _vfprintf(const char* fmt, va_list ap)
 				break;
 		}
 
+#if 0
+putstr("_vfprintf:c=");puthexi(*fmt);putstr("\n");
+#endif
 		switch (c = *fmt++)
 		{
 			default:
@@ -307,6 +341,16 @@ int _vfprintf(const char* fmt, va_list ap)
 					precision = 1;
 				else
 					flags &= ~FL_ZEROFILL;
+
+#if 0
+putstr("_vfprintf:c='d'\n");
+putstr(" call o_print\n");
+putstr("         :ap=");puthexi(&ap);putstr("\n");
+putstr("         :flags=");puthexi(flags);putstr("\n");
+putstr("         :s=");puthexi(s);putstr("\n");
+putstr("         :c=");puthexi(c);putstr("\n");
+putstr("         :precision=");puthexi(precision);putstr("\n");
+#endif
 				s = o_print(&ap, flags, s, c, precision, 1);
 				break;
 			case 'c':

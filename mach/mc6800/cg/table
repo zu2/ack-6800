@@ -2309,6 +2309,11 @@ loc inn	$2==2 && $1>0 && $1<16	| R16 |
 		"\tandb #1"
 		"\tclra"
 					| %[1] | |
+loc inn zeq $1==0 && $2==2	| R16 |
+		"! loc inn zeq $1 $2 $3"
+		"\tandb #1"
+		"\tbeq $3 ! ???"
+					| | |
 loc inn zeq $1>0 && $1<16 && $2==2	| R16 |
 		"\tldx #$1"
 		"1:"
@@ -2318,6 +2323,11 @@ loc inn zeq $1>0 && $1<16 && $2==2	| R16 |
 		"\tbne 1b"
 		"\tandb #1"
 		"\tbeq $3 ! ???"
+					| | |
+loc inn zne $1==0 && $2==2	| R16 |
+		"! loc inn zne $1 $2 $3"
+		"\tandb #1"
+		"\tbne $3 ! ???"
 					| | |
 loc inn zne $1>0 && $1<16 && $2==2	| R16 |
 		"! loc inn zne $1 $2"
@@ -2330,19 +2340,25 @@ loc inn zne $1>0 && $1<16 && $2==2	| R16 |
 		"\tandb #1"
 		"\tbne $3 ! ???"
 					| | |
+/*
 inn $1==2	| R16 |
 		"! inn $1"
 		"\tstab <ARTH+1"
 		"\tstaa <ARTH"
 		"\tldx <ARTH"
+		"\tbne 1f"
+		"\tclrb"
+		"\tbra 3f"
+		"1:"
 		"\tpula"
 		"\tpulb"
-		"1:"
+		"2:"
 		"\tlsra"
 		"\trorb"
 		"\tdex"
-		"\tbne 1b"
+		"\tbne 2b"
 		"\tandb #1"
+		"3:"
 		"\tclra"
 				| %[1] | |
 inn zeq $1==2	| R16 |
@@ -2375,11 +2391,14 @@ inn zne $1==2	| R16 |
 		"\tandb #1"
 		"\tbne $2"
 				| %[1] | |
-inn $1<=256	| R16 |
+*/
+inn $1<=256	| |
+		allocate(R16)
 		"! inn $1"
-		"\tldx #$1-1"
+		"\tldab #[$1].l"
+		"\tldaa #[$1].h"
 		"\tjsr Inn"
-					| %[1] | |
+					| %[a] | |
 inn ND	| R16 |
 		"! inn ND"
 		"\tjsr TestFFh"

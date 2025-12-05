@@ -10,8 +10,9 @@ DEFAULT_PLATFORM ?= pc86
 # Which architectures should get built?
 
 $(if $(PLATS), $(error Don't set PLATS on the command line, because reasons. Edit the Makefile instead.))
-PLATS = all
+#PLATS = all
 # PLATS = linux386 linuxppc linuxmips
+PLATS = e6800
 
 # Where should the ACK put its temporary files?
 
